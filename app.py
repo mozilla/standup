@@ -16,7 +16,7 @@ class User(db.Model):
     name = db.Column(db.String(100))
     email = db.Column(db.String(100))
     irc_handle = db.Column(db.String(100))
-    github_hanlde = db.Column(db.String(100))
+    github_handle = db.Column(db.String(100))
 
 
 class Project(db.Model):
