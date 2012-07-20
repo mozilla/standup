@@ -1,7 +1,8 @@
 from datetime import datetime
 import os
 
-from flask import Flask, render_template, request, redirect, url_for
+from flask import (Flask, render_template, request, redirect, url_for,
+                   jsonify, make_response)
 from flask.ext.sqlalchemy import SQLAlchemy
 
 
@@ -11,20 +12,22 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
 db = SQLAlchemy(app)
 
 
+# Models:
+
 class User(db.Model):
     """A standup participant."""
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
-    email = db.Column(db.String(100))
-    irc_handle = db.Column(db.String(100))
-    github_handle = db.Column(db.String(100))
+    email = db.Column(db.String(100), unique=True)
+    irc_handle = db.Column(db.String(100), unique=True)
+    github_handle = db.Column(db.String(100), unique=True)
 
 
 class Project(db.Model):
     """A project that does standups."""
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
-    irc_channel = db.Column(db.String(100))
+    irc_channel = db.Column(db.String(100), unique=True)
 
 
 class Status(db.Model):
@@ -45,6 +48,7 @@ class Status(db.Model):
 # TODO: M2M Users <-> Projects
 
 
+# Views:
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -54,10 +58,54 @@ def index():
 def create_status():
     """Post a new status.
 
-    The status should be posted as json using
-    'application/json' as the content type.
+    The status should be posted as json using 'application/json' as the
+    content type. The posted JSON needs to have 3 required fields:
+        * irc_handle
+        * irc_channel
+        * content
+
+    An example of the JSON::
+
+        {
+            "irc_handle": "r1cky",
+            "irc_channel": "sumodev",
+            "content": "working on bug 123456"
+        }
     """
-    return request.json['content']
+    # TODO: Some sort of authentication
+
+    # The data we need
+    irc_handle = request.json.get('irc_handle')
+    irc_channel = request.json.get('irc_channel')
+    content = request.json.get('content')
+
+    # Validate we have the required fields.
+    if not (irc_handle and irc_channel and content):
+        return make_response(
+            jsonify(dict(error='Missing required fields.')), 400)
+
+    # Get or create the user
+    # TODO: People change their nicks sometimes, figure out what to do.
+    user = User.query.filter_by(irc_handle=irc_handle).first()
+    if not user:
+        user = User(irc_handle=irc_handle)
+        db.session.add(user)
+        db.session.commit()
+
+    # Get or create the project
+    project = Project.query.filter_by(irc_channel=irc_channel).first()
+    if not project:
+        project = Project(irc_channel=irc_channel, name=irc_channel)
+        db.session.add(project)
+        db.session.commit()
+
+    # Create the status
+    status = Status(irc_handle=irc_handle, project_id=project.id,
+                    user_id=user.id, content=content, content_html=content)
+    db.session.add(status)
+    db.session.commit()
+
+    return jsonify(dict(id=status.id, content=content))
 
 
 if __name__ == '__main__':
