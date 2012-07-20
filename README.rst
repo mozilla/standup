@@ -6,7 +6,16 @@ standup is an app to log daily status updates.
 It is currently in super early active development, check back later.
 
 We developed it with the following priorities:
-1. 
+
+1. Let's the team, stake holders and everyone else see status for team
+   members across projects.
+
+2. Let's us do that asynchronously. Conference calls were getting
+   difficult to schedule because of the range of timezones we're in.
+
+3. Let's us see who's blocked on what---then scrummasters can go
+   through and work to unblock people.
+
 
 Hacking
 =======
