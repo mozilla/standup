@@ -6,7 +6,8 @@ from flask.ext.sqlalchemy import SQLAlchemy
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///flask_app.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
+    'DATABASE_URL', 'sqlite:///standup_app.db')
 db = SQLAlchemy(app)
 
 
@@ -49,13 +50,14 @@ def index():
     return render_template('index.html')
 
 
-# @app.route('/user', methods=['POST'])
-# def user():
-#     if request.method == 'POST':
-#         u = User(request.form['name'], request.form['email'])
-#         db.session.add(u)
-#         db.session.commit()
-#     return redirect(url_for('index'))
+@app.route('/status', methods=['POST'])
+def create_status():
+    """Post a new status.
+
+    The status should be posted as json using
+    'application/json' as the content type.
+    """
+    return request.json['content']
 
 
 if __name__ == '__main__':
