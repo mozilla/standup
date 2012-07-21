@@ -23,6 +23,7 @@ class User(db.Model):
     email = db.Column(db.String(100), unique=True)
     irc_handle = db.Column(db.String(100), unique=True)
     github_handle = db.Column(db.String(100), unique=True)
+    is_admin = db.Column(db.Boolean, default=False)
 
 
 class Project(db.Model):
