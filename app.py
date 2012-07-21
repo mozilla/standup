@@ -5,6 +5,8 @@ from flask import (Flask, render_template, request, redirect, url_for,
                    jsonify, make_response)
 from flask.ext.sqlalchemy import SQLAlchemy
 
+import settings
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
@@ -59,20 +61,25 @@ def create_status():
     """Post a new status.
 
     The status should be posted as json using 'application/json' as the
-    content type. The posted JSON needs to have 3 required fields:
+    content type. The posted JSON needs to have 4 required fields:
         * irc_handle
         * irc_channel
         * content
+        * api_key
 
     An example of the JSON::
 
         {
             "irc_handle": "r1cky",
             "irc_channel": "sumodev",
-            "content": "working on bug 123456"
+            "content": "working on bug 123456",
+            "api_key": "qwertyuiopasdfghjklzxcvbnm1234567890"
         }
     """
-    # TODO: Some sort of authentication
+    # Check that api_key is valid.
+    api_key = request.json.get('api_key')
+    if api_key != settings.API_KEY:
+        return make_response(jsonify(dict(error='Invalid API key.')), 403)
 
     # The data we need
     irc_handle = request.json.get('irc_handle')
@@ -109,7 +116,6 @@ def create_status():
 
 
 if __name__ == '__main__':
-    print app.config['SQLALCHEMY_DATABASE_URI']
     db.create_all()
     # Bind to PORT if defined, otherwise default to 5000.
     port = int(os.environ.get('PORT', 5000))

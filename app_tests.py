@@ -5,6 +5,7 @@ import unittest
 
 import app
 from app import User, Project, Status
+import settings
 
 
 class AppTestCase(unittest.TestCase):
@@ -24,6 +25,7 @@ class AppTestCase(unittest.TestCase):
     def test_create_first_status(self):
         """Test creating the very first status for a project and user."""
         data = json.dumps({
+            'api_key': settings.API_KEY,
             'irc_handle': 'r1cky',
             'irc_channel': 'sumodev',
             'content': 'bug 123456'})
@@ -43,6 +45,7 @@ class AppTestCase(unittest.TestCase):
         """Verify validation of required fields."""
         # Missing irc nick
         data = json.dumps({
+            'api_key': settings.API_KEY,
             'irc_channel': 'sumodev',
             'content': 'bug 123456'})
         response = self.app.post(
@@ -51,6 +54,7 @@ class AppTestCase(unittest.TestCase):
 
         # Missing irc channel
         data = json.dumps({
+            'api_key': settings.API_KEY,
             'irc_handle': 'r1cky',
             'content': 'bug 123456'})
         response = self.app.post(
@@ -59,11 +63,34 @@ class AppTestCase(unittest.TestCase):
 
         # Missing content
         data = json.dumps({
+            'api_key': settings.API_KEY,
             'irc_handle': 'r1cky',
             'irc_channel': 'sumodev'})
         response = self.app.post(
             '/status', data=data, content_type='application/json')
         self.assertEqual(response.status_code, 400)
+
+    def test_create_status_invalid_api_key(self):
+        """Request with invalid API key should return 403."""
+        data = json.dumps({
+            'api_key': 'abc123',
+            'irc_handle': 'r1cky',
+            'irc_channel': 'sumodev',
+            'content': 'bug 123456'})
+        response = self.app.post(
+            '/status', data=data, content_type='application/json')
+        self.assertEqual(response.status_code, 403)
+
+    def test_create_status_missing_api_key(self):
+        """Request without an API key should return 403."""
+        data = json.dumps({
+            'irc_handle': 'r1cky',
+            'irc_channel': 'sumodev',
+            'content': 'bug 123456'})
+        response = self.app.post(
+            '/status', data=data, content_type='application/json')
+        self.assertEqual(response.status_code, 403)
+
 
 if __name__ == '__main__':
     unittest.main()
