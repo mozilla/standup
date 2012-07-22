@@ -54,7 +54,11 @@ class Status(db.Model):
 # Views:
 @app.route('/')
 def index():
-    return render_template('index.html')
+    """The home page."""
+    return render_template(
+        'index.html',
+        statuses=Status.query.all(),
+        projects=Project.query.all())
 
 
 @app.route('/status', methods=['POST'])
