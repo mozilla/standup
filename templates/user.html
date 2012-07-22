@@ -18,7 +18,7 @@
       <tr>
         <td>{{ status.created }}</td>
         <td>
-          <a href="{{ url_for('project', slug=status.project.irc_channel) }}">
+          <a href="{{ url_for('project', slug=status.project.slug) }}">
             {{ status.project.name }}
           </a>
         </td>

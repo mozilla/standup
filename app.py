@@ -20,6 +20,7 @@ class User(db.Model):
     """A standup participant."""
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
+    slug = db.Column(db.String(100), unique=True)
     email = db.Column(db.String(100), unique=True)
     irc_handle = db.Column(db.String(100), unique=True)
     github_handle = db.Column(db.String(100), unique=True)
@@ -30,6 +31,7 @@ class Project(db.Model):
     """A project that does standups."""
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
+    slug = db.Column(db.String(100), unique=True)
     irc_channel = db.Column(db.String(100), unique=True)
 
 
@@ -64,7 +66,7 @@ def index():
 @app.route('/user/<slug>', methods=['GET'])
 def user(slug):
     """The user page. Shows a user's statuses."""
-    user = User.query.filter_by(irc_handle=slug).first()
+    user = User.query.filter_by(slug=slug).first()
     if not user:
         return '404'  # TODO: raise a proper 404
 
@@ -80,7 +82,7 @@ def user(slug):
 @app.route('/project/<slug>', methods=['GET'])
 def project(slug):
     """The project page. Shows a project's statuses."""
-    project = Project.query.filter_by(irc_channel=slug).first()
+    project = Project.query.filter_by(slug=slug).first()
     if not project:
         return '404'  # TODO: raise a proper 404
 
@@ -133,14 +135,15 @@ def create_status():
     user = User.query.filter_by(irc_handle=irc_handle).first()
     if not user:
         user = User(irc_handle=irc_handle, name=irc_handle,
-                    github_handle=irc_handle)
+                    slug=irc_handle, github_handle=irc_handle)
         db.session.add(user)
         db.session.commit()
 
     # Get or create the project
     project = Project.query.filter_by(irc_channel=irc_channel).first()
     if not project:
-        project = Project(irc_channel=irc_channel, name=irc_channel)
+        project = Project(irc_channel=irc_channel, name=irc_channel,
+                          slug=irc_channel)
         db.session.add(project)
         db.session.commit()
 
