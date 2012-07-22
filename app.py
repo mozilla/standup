@@ -61,6 +61,38 @@ def index():
         projects=Project.query.all())
 
 
+@app.route('/user/<slug>', methods=['GET'])
+def user(slug):
+    """The user page. Shows a user's statuses."""
+    user = User.query.filter_by(irc_handle=slug).first()
+    if not user:
+        return '404'  # TODO: raise a proper 404
+
+    statuses = Status.query.filter_by(
+        user=user).order_by(db.desc(Status.created))
+
+    return render_template(
+        'user.html',
+        user=user,
+        statuses=statuses)
+
+
+@app.route('/project/<slug>', methods=['GET'])
+def project(slug):
+    """The project page. Shows a project's statuses."""
+    project = Project.query.filter_by(irc_channel=slug).first()
+    if not project:
+        return '404'  # TODO: raise a proper 404
+
+    statuses = Status.query.filter_by(
+        project=project).order_by(db.desc(Status.created))
+
+    return render_template(
+        'project.html',
+        project=project,
+        statuses=statuses)
+
+
 @app.route('/status', methods=['POST'])
 def create_status():
     """Post a new status.
@@ -100,7 +132,8 @@ def create_status():
     # TODO: People change their nicks sometimes, figure out what to do.
     user = User.query.filter_by(irc_handle=irc_handle).first()
     if not user:
-        user = User(irc_handle=irc_handle)
+        user = User(irc_handle=irc_handle, name=irc_handle,
+                    github_handle=irc_handle)
         db.session.add(user)
         db.session.commit()
 
@@ -118,6 +151,16 @@ def create_status():
     db.session.commit()
 
     return jsonify(dict(id=status.id, content=content))
+
+
+@app.errorhandler(404)
+def page_not_found(error):
+    return render_template('404.html')
+
+
+@app.errorhandler(500)
+def something_broke(error):
+    return render_template('500.html')
 
 
 if __name__ == '__main__':

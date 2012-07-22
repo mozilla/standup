@@ -1,35 +1,22 @@
 {% extends "base.html" %}
 
 {% block title %}
-  Standups
+  {{ project.name }} standups
 {% endblock %}
 
 {% block content %}
-  <h1>Standups</h1>
-
-  <h2>Projects</h2>
-  <ul>
-    {% for project in projects %}
-      <li>{{ project.name }}</li>
-    {% endfor %}
-  </ul>
+  <h1>{{ project.name }} Standups</h1>
 
   <h2>Statuses</h2>
   <table cellpadding="3">
     <tr>
       <th>Created</th>
-      <th>Project</th>
       <th>User</th>
       <th>Status</th>
     </tr>
     {% for status in statuses %}
       <tr>
         <td>{{ status.created }}</td>
-        <td>
-          <a href="{{ url_for('project', slug=status.project.irc_channel) }}">
-            {{ status.project.name }}
-          </a>
-        </td>
         <td>
           <a href="{{ url_for('user', slug=status.user.irc_handle) }}">
             {{ status.irc_handle }}
