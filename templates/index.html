@@ -10,7 +10,11 @@
   <h2>Projects</h2>
   <ul>
     {% for project in projects %}
-      <li>{{ project.name }}</li>
+      <li>
+        <a href="{{ url_for('project', slug=project.slug) }}">
+          {{ project.name }}
+        </a>
+      </li>
     {% endfor %}
   </ul>
 
