@@ -57,7 +57,7 @@ def index():
     """The home page."""
     return render_template(
         'index.html',
-        statuses=Status.query.all(),
+        statuses=Status.query.order_by(db.desc(Status.created)),
         projects=Project.query.all())
 
 
