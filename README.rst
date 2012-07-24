@@ -34,4 +34,4 @@ To setup a local dev environment for hacking::
 
 4. Run the app::
 
-    $ python app.py
+    $ python standup/app.py
