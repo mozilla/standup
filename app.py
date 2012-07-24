@@ -68,7 +68,7 @@ def user(slug):
     """The user page. Shows a user's statuses."""
     user = User.query.filter_by(slug=slug).first()
     if not user:
-        return '404'  # TODO: raise a proper 404
+        return page_not_found('User not found.')
 
     statuses = Status.query.filter_by(
         user=user).order_by(db.desc(Status.created))
@@ -84,7 +84,7 @@ def project(slug):
     """The project page. Shows a project's statuses."""
     project = Project.query.filter_by(slug=slug).first()
     if not project:
-        return '404'  # TODO: raise a proper 404
+        return page_not_found('Project not found.')
 
     statuses = Status.query.filter_by(
         project=project).order_by(db.desc(Status.created))
@@ -158,12 +158,12 @@ def create_status():
 
 @app.errorhandler(404)
 def page_not_found(error):
-    return render_template('404.html')
+    return render_template('404.html'), 404
 
 
 @app.errorhandler(500)
 def something_broke(error):
-    return render_template('500.html')
+    return render_template('500.html'), 500
 
 
 if __name__ == '__main__':
