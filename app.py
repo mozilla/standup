@@ -95,7 +95,7 @@ def project(slug):
         statuses=statuses)
 
 
-@app.route('/status', methods=['POST'])
+@app.route('/api/v1/status/', methods=['POST'])
 def create_status():
     """Post a new status.
 
