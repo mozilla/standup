@@ -3,9 +3,9 @@ import os
 import tempfile
 import unittest
 
-import app
-from app import User, Project, Status
-import settings
+from standup import app
+from standup.app import User, Project, Status
+from standup import settings
 
 
 class AppTestCase(unittest.TestCase):
@@ -30,7 +30,7 @@ class AppTestCase(unittest.TestCase):
             'irc_channel': 'sumodev',
             'content': 'bug 123456'})
         response = self.app.post(
-            '/status', data=data, content_type='application/json')
+            '/api/v1/status/', data=data, content_type='application/json')
         self.assertEqual(response.status_code, 200)
         assert 'bug 123456' in response.data
 
@@ -49,7 +49,7 @@ class AppTestCase(unittest.TestCase):
             'irc_channel': 'sumodev',
             'content': 'bug 123456'})
         response = self.app.post(
-            '/status', data=data, content_type='application/json')
+            '/api/v1/status/', data=data, content_type='application/json')
         self.assertEqual(response.status_code, 400)
 
         # Missing irc channel
@@ -58,7 +58,7 @@ class AppTestCase(unittest.TestCase):
             'irc_handle': 'r1cky',
             'content': 'bug 123456'})
         response = self.app.post(
-            '/status', data=data, content_type='application/json')
+            '/api/v1/status/', data=data, content_type='application/json')
         self.assertEqual(response.status_code, 400)
 
         # Missing content
@@ -67,7 +67,7 @@ class AppTestCase(unittest.TestCase):
             'irc_handle': 'r1cky',
             'irc_channel': 'sumodev'})
         response = self.app.post(
-            '/status', data=data, content_type='application/json')
+            '/api/v1/status/', data=data, content_type='application/json')
         self.assertEqual(response.status_code, 400)
 
     def test_create_status_invalid_api_key(self):
@@ -78,7 +78,7 @@ class AppTestCase(unittest.TestCase):
             'irc_channel': 'sumodev',
             'content': 'bug 123456'})
         response = self.app.post(
-            '/status', data=data, content_type='application/json')
+            '/api/v1/status/', data=data, content_type='application/json')
         self.assertEqual(response.status_code, 403)
 
     def test_create_status_missing_api_key(self):
@@ -88,9 +88,5 @@ class AppTestCase(unittest.TestCase):
             'irc_channel': 'sumodev',
             'content': 'bug 123456'})
         response = self.app.post(
-            '/status', data=data, content_type='application/json')
+            '/api/v1/status/', data=data, content_type='application/json')
         self.assertEqual(response.status_code, 403)
-
-
-if __name__ == '__main__':
-    unittest.main()

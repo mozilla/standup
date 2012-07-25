@@ -35,3 +35,11 @@ To setup a local dev environment for hacking::
 4. Run the app::
 
     $ python standup/app.py
+
+
+Testing
+=======
+
+We use nose for testing. To run the tests, do::
+
+    $ nosetests

@@ -8,3 +8,4 @@ ipython==0.13
 wsgiref==0.1.2
 
 psycopg2
+nose
