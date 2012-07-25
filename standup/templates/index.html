@@ -7,23 +7,12 @@
 {% block content %}
   <h1>Standups</h1>
 
-  <h2>Projects</h2>
-  <ul>
-    {% for project in projects %}
-      <li>
-        <a href="{{ url_for('project', slug=project.slug) }}">
-          {{ project.name }}
-        </a>
-      </li>
-    {% endfor %}
-  </ul>
-
   <h2>Statuses</h2>
   {% for status in statuses %}
     {% if status.created.date() != last_created %}
       {% if last_created %}</ul>{% endif %}
       {% set last_created = status.created.date() %}
-      {{ last_created }}
+      <h3>{{ last_created }}</h3>
       <ul>
     {% endif %}
     <li>
@@ -35,5 +24,27 @@
       <em>{{ status.created }}</em>
     </li>
   {% endfor %}
-  {% if last_created %}</ul>{% endif %}
+  {% if statuses %}</ul>{% endif %}
+
+  <h2>Projects</h2>
+  <ul>
+    {% for project in projects %}
+      <li>
+        <a href="{{ url_for('project', slug=project.slug) }}">
+          {{ project.name }}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+
+  <h2>Teams</h2>
+  <ul>
+    {% for team in teams %}
+      <li>
+        <a href="{{ url_for('team', slug=team.slug) }}">
+          {{ team.name }}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
 {% endblock %}

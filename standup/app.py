@@ -16,6 +16,21 @@ db = SQLAlchemy(app)
 
 # Models:
 
+class Team(db.Model):
+    """A team of users in the organization."""
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100))
+    slug = db.Column(db.String(100), unique=True)
+
+    def __repr__(self):
+        return '<Team: %s>' % self.name
+
+    def recent_statuses(self, daterange='all'):
+        """Return the statuses for the team."""
+        # TODO: filter on dates
+        return self.statuses
+
+
 class User(db.Model):
     """A standup participant."""
     id = db.Column(db.Integer, primary_key=True)
@@ -25,6 +40,17 @@ class User(db.Model):
     irc_handle = db.Column(db.String(100), unique=True)
     github_handle = db.Column(db.String(100), unique=True)
     is_admin = db.Column(db.Boolean, default=False)
+    team_id = db.Column(db.Integer, db.ForeignKey('team.id'))
+    team = db.relationship(
+        'Team', backref=db.backref('users', lazy='dynamic'))
+
+    def __repr__(self):
+        return '<User: %s>' % self.name
+
+    def recent_statuses(self, daterange='all'):
+        """Return the statuses for the user."""
+        # TODO: filter on dates
+        return self.statuses
 
 
 class Project(db.Model):
@@ -33,6 +59,14 @@ class Project(db.Model):
     name = db.Column(db.String(100))
     slug = db.Column(db.String(100), unique=True)
     irc_channel = db.Column(db.String(100), unique=True)
+
+    def __repr__(self):
+        return '<Project: %s>' % self.name
+
+    def recent_statuses(self, daterange='all'):
+        """Return the statuses for the project."""
+        # TODO: filter on dates
+        return self.statuses
 
 
 class Status(db.Model):
@@ -50,8 +84,10 @@ class Status(db.Model):
     content = db.Column(db.Text)
     content_html = db.Column(db.Text)
 
-# TODO: M2M Users <-> Projects
+    def __repr__(self):
+        return '<Status: [%s] %s>' % (self.irc_handle, self.content)
 
+# TODO: M2M Users <-> Projects
 
 # Views:
 @app.route('/')
@@ -60,7 +96,8 @@ def index():
     return render_template(
         'index.html',
         statuses=Status.query.order_by(db.desc(Status.created)),
-        projects=Project.query.all())
+        projects=Project.query.all(),
+        teams=Team.query.all())
 
 
 @app.route('/user/<slug>', methods=['GET'])
@@ -73,10 +110,7 @@ def user(slug):
     statuses = Status.query.filter_by(
         user=user).order_by(db.desc(Status.created))
 
-    return render_template(
-        'user.html',
-        user=user,
-        statuses=statuses)
+    return render_template('user.html', user=user, statuses=statuses)
 
 
 @app.route('/project/<slug>', methods=['GET'])
@@ -89,10 +123,17 @@ def project(slug):
     statuses = Status.query.filter_by(
         project=project).order_by(db.desc(Status.created))
 
-    return render_template(
-        'project.html',
-        project=project,
-        statuses=statuses)
+    return render_template('project.html', project=project, statuses=statuses)
+
+
+@app.route('/team/<slug>', methods=['GET'])
+def team(slug):
+    """The team page. Shows a statuses for all users in the team."""
+    team = Team.query.filter_by(slug=slug).first()
+    if not team:
+        return page_not_found('Team not found.')
+
+    return render_template('team.html', team=team, users=team.users)
 
 
 @app.route('/api/v1/status/', methods=['POST'])
