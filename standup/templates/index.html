@@ -19,28 +19,21 @@
   </ul>
 
   <h2>Statuses</h2>
-  <table cellpadding="3">
-    <tr>
-      <th>Created</th>
-      <th>Project</th>
-      <th>User</th>
-      <th>Status</th>
-    </tr>
-    {% for status in statuses %}
-      <tr>
-        <td>{{ status.created }}</td>
-        <td>
-          <a href="{{ url_for('project', slug=status.project.slug) }}">
-            {{ status.project.name }}
-          </a>
-        </td>
-        <td>
-          <a href="{{ url_for('user', slug=status.user.slug) }}">
-            {{ status.irc_handle }}
-          </a>
-        </td>
-        <td>{{ status.content_html }}</td>
-      </tr>
-    {% endfor %}
-  </table>
+  {% for status in statuses %}
+    {% if status.created.date() != last_created %}
+      {% if last_created %}</ul>{% endif %}
+      {% set last_created = status.created.date() %}
+      {{ last_created }}
+      <ul>
+    {% endif %}
+    <li>
+      [<a href="{{ url_for('project', slug=status.project.slug) }}">{{ status.project.name }}</a>]
+      <a href="{{ url_for('user', slug=status.user.slug) }}">
+        {{ status.irc_handle }}
+      </a>:
+      {{ status.content_html }}
+      <em>{{ status.created }}</em>
+    </li>
+  {% endfor %}
+  {% if last_created %}</ul>{% endif %}
 {% endblock %}
