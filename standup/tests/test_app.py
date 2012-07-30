@@ -26,8 +26,8 @@ class AppTestCase(unittest.TestCase):
         """Test creating the very first status for a project and user."""
         data = json.dumps({
             'api_key': settings.API_KEY,
-            'irc_handle': 'r1cky',
-            'irc_channel': 'sumodev',
+            'user': 'r1cky',
+            'project': 'sumodev',
             'content': 'bug 123456'})
         response = self.app.post(
             '/api/v1/status/', data=data, content_type='application/json')
@@ -35,27 +35,27 @@ class AppTestCase(unittest.TestCase):
         assert 'bug 123456' in response.data
 
         # Verify the user was created.
-        self.assertEqual(User.query.first().irc_handle, 'r1cky')
+        self.assertEqual(User.query.first().username, 'r1cky')
         # Verify the project was created.
-        self.assertEqual(Project.query.first().irc_channel, 'sumodev')
+        self.assertEqual(Project.query.first().slug, 'sumodev')
         # Verify the status was created.
         self.assertEqual(Status.query.first().content, 'bug 123456')
 
     def test_create_status_validation(self):
         """Verify validation of required fields."""
-        # Missing irc nick
+        # Missing user
         data = json.dumps({
             'api_key': settings.API_KEY,
-            'irc_channel': 'sumodev',
+            'project': 'sumodev',
             'content': 'bug 123456'})
         response = self.app.post(
             '/api/v1/status/', data=data, content_type='application/json')
         self.assertEqual(response.status_code, 400)
 
-        # Missing irc channel
+        # Missing project
         data = json.dumps({
             'api_key': settings.API_KEY,
-            'irc_handle': 'r1cky',
+            'user': 'r1cky',
             'content': 'bug 123456'})
         response = self.app.post(
             '/api/v1/status/', data=data, content_type='application/json')
@@ -64,8 +64,8 @@ class AppTestCase(unittest.TestCase):
         # Missing content
         data = json.dumps({
             'api_key': settings.API_KEY,
-            'irc_handle': 'r1cky',
-            'irc_channel': 'sumodev'})
+            'user': 'r1cky',
+            'project': 'sumodev'})
         response = self.app.post(
             '/api/v1/status/', data=data, content_type='application/json')
         self.assertEqual(response.status_code, 400)
@@ -74,8 +74,8 @@ class AppTestCase(unittest.TestCase):
         """Request with invalid API key should return 403."""
         data = json.dumps({
             'api_key': 'abc123',
-            'irc_handle': 'r1cky',
-            'irc_channel': 'sumodev',
+            'user': 'r1cky',
+            'project': 'sumodev',
             'content': 'bug 123456'})
         response = self.app.post(
             '/api/v1/status/', data=data, content_type='application/json')
@@ -84,8 +84,8 @@ class AppTestCase(unittest.TestCase):
     def test_create_status_missing_api_key(self):
         """Request without an API key should return 403."""
         data = json.dumps({
-            'irc_handle': 'r1cky',
-            'irc_channel': 'sumodev',
+            'user': 'r1cky',
+            'project': 'sumodev',
             'content': 'bug 123456'})
         response = self.app.post(
             '/api/v1/status/', data=data, content_type='application/json')

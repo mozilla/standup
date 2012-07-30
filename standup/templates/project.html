@@ -17,7 +17,7 @@
     {% endif %}
     <li>
       <a href="{{ url_for('user', slug=status.user.slug) }}">
-        {{ status.irc_handle }}
+        {{ status.user.username }}
       </a>:
       {{ status.content_html }}
       <em>{{ status.created }}</em>

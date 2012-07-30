@@ -34,10 +34,10 @@ class Team(db.Model):
 class User(db.Model):
     """A standup participant."""
     id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(100), unique=True)
     name = db.Column(db.String(100))
     slug = db.Column(db.String(100), unique=True)
     email = db.Column(db.String(100), unique=True)
-    irc_handle = db.Column(db.String(100), unique=True)
     github_handle = db.Column(db.String(100), unique=True)
     is_admin = db.Column(db.Boolean, default=False)
     team_id = db.Column(db.Integer, db.ForeignKey('team.id'))
@@ -45,7 +45,7 @@ class User(db.Model):
         'Team', backref=db.backref('users', lazy='dynamic'))
 
     def __repr__(self):
-        return '<User: %s>' % self.name
+        return '<User: [%s] %s>' % (self.username, self.name)
 
     def recent_statuses(self, daterange='all'):
         """Return the statuses for the user."""
@@ -58,10 +58,9 @@ class Project(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
     slug = db.Column(db.String(100), unique=True)
-    irc_channel = db.Column(db.String(100), unique=True)
 
     def __repr__(self):
-        return '<Project: %s>' % self.name
+        return '<Project: [%s] %s>' % (self.slug, self.name)
 
     def recent_statuses(self, daterange='all'):
         """Return the statuses for the project."""
@@ -73,7 +72,6 @@ class Status(db.Model):
     """A standup update for a user on a given project."""
     id = db.Column(db.Integer, primary_key=True)
     created = db.Column(db.DateTime, default=datetime.now)
-    irc_handle = db.Column(db.String(100))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     user = db.relationship(
         'User', backref=db.backref('statuses', lazy='dynamic'))
@@ -85,7 +83,7 @@ class Status(db.Model):
     content_html = db.Column(db.Text)
 
     def __repr__(self):
-        return '<Status: [%s] %s>' % (self.irc_handle, self.content)
+        return '<Status: %s: %s>' % (self.user.username, self.content)
 
 # TODO: M2M Users <-> Projects
 
@@ -142,16 +140,16 @@ def create_status():
 
     The status should be posted as json using 'application/json' as the
     content type. The posted JSON needs to have 4 required fields:
-        * irc_handle
-        * irc_channel
+        * user (the username)
+        * project (the slug)
         * content
         * api_key
 
     An example of the JSON::
 
         {
-            "irc_handle": "r1cky",
-            "irc_channel": "sumodev",
+            "user": "r1cky",
+            "project": "sumodev",
             "content": "working on bug 123456",
             "api_key": "qwertyuiopasdfghjklzxcvbnm1234567890"
         }
@@ -162,35 +160,34 @@ def create_status():
         return make_response(jsonify(dict(error='Invalid API key.')), 403)
 
     # The data we need
-    irc_handle = request.json.get('irc_handle')
-    irc_channel = request.json.get('irc_channel')
+    username = request.json.get('user')
+    project_slug = request.json.get('project')
     content = request.json.get('content')
 
     # Validate we have the required fields.
-    if not (irc_handle and irc_channel and content):
+    if not (username and project_slug and content):
         return make_response(
             jsonify(dict(error='Missing required fields.')), 400)
 
     # Get or create the user
     # TODO: People change their nicks sometimes, figure out what to do.
-    user = User.query.filter_by(irc_handle=irc_handle).first()
+    user = User.query.filter_by(username=username).first()
     if not user:
-        user = User(irc_handle=irc_handle, name=irc_handle,
-                    slug=irc_handle, github_handle=irc_handle)
+        user = User(username=username, name=username,
+                    slug=username, github_handle=username)
         db.session.add(user)
         db.session.commit()
 
     # Get or create the project
-    project = Project.query.filter_by(irc_channel=irc_channel).first()
+    project = Project.query.filter_by(slug=project_slug).first()
     if not project:
-        project = Project(irc_channel=irc_channel, name=irc_channel,
-                          slug=irc_channel)
+        project = Project(slug=project_slug, name=project_slug)
         db.session.add(project)
         db.session.commit()
 
     # Create the status
-    status = Status(irc_handle=irc_handle, project_id=project.id,
-                    user_id=user.id, content=content, content_html=content)
+    status = Status(project_id=project.id, user_id=user.id, content=content,
+                    content_html=content)
     db.session.add(status)
     db.session.commit()
 
