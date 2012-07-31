@@ -28,7 +28,7 @@ class Team(db.Model):
     def recent_statuses(self, daterange='all'):
         """Return the statuses for the team."""
         # TODO: filter on dates
-        return self.statuses
+        return self.statuses.order_by(db.desc(Status.created))
 
 
 class User(db.Model):
@@ -50,7 +50,7 @@ class User(db.Model):
     def recent_statuses(self, daterange='all'):
         """Return the statuses for the user."""
         # TODO: filter on dates
-        return self.statuses
+        return self.statuses.order_by(db.desc(Status.created))
 
 
 class Project(db.Model):
@@ -65,7 +65,7 @@ class Project(db.Model):
     def recent_statuses(self, daterange='all'):
         """Return the statuses for the project."""
         # TODO: filter on dates
-        return self.statuses
+        return self.statuses.order_by(db.desc(Status.created))
 
 
 class Status(db.Model):
@@ -105,10 +105,7 @@ def user(slug):
     if not user:
         return page_not_found('User not found.')
 
-    statuses = Status.query.filter_by(
-        user=user).order_by(db.desc(Status.created))
-
-    return render_template('user.html', user=user, statuses=statuses)
+    return render_template('user.html', user=user)
 
 
 @app.route('/project/<slug>', methods=['GET'])
@@ -118,10 +115,7 @@ def project(slug):
     if not project:
         return page_not_found('Project not found.')
 
-    statuses = Status.query.filter_by(
-        project=project).order_by(db.desc(Status.created))
-
-    return render_template('project.html', project=project, statuses=statuses)
+    return render_template('project.html', project=project)
 
 
 @app.route('/team/<slug>', methods=['GET'])

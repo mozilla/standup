@@ -8,6 +8,7 @@
   <h1>{{ user.name }}'s Standups</h1>
 
   <h2>Statuses</h2>
+  {% set statuses = user.recent_statuses() %}
   {% for status in statuses %}
     {% if status.created.date() != last_created %}
       {% if last_created %}</ul>{% endif %}
