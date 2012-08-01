@@ -1,0 +1,228 @@
+@import 'vendor.less';
+@import 'grid.less';
+@import 'colors.less';
+@import 'mixins.less';
+
+@font-face {
+  font-family: 'OpenSans';
+  src: url('../fonts/OpenSans-Regular-webfont.eot'); /* IE9 Compat Modes */
+  src: url('../fonts/OpenSans-Regular-webfont.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+  url('../fonts/OpenSans-Regular-webfont.woff') format('woff'), /* Modern Browsers */
+  url('../fonts/OpenSans-Regular-webfont.ttf')  format('truetype'), /* Safari, Android, iOS */
+  url('../fonts/OpenSans-Regular-webfont.svg#svgFontName') format('svg'); /* Legacy iOS */
+}
+
+@font-face {
+  font-family: 'OpenSansLight';
+  src: url('../fonts/OpenSans-Light-webfont.eot'); /* IE9 Compat Modes */
+  src: url('../fonts/OpenSans-Light-webfont.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+  url('../fonts/OpenSans-Light-webfont.woff') format('woff'), /* Modern Browsers */
+  url('../fonts/OpenSans-Light-webfont.ttf')  format('truetype'), /* Safari, Android, iOS */
+  url('../fonts/OpenSans-Light-webfont.svg#svgFontName') format('svg'); /* Legacy iOS */
+}
+
+::selection {
+  .selection();
+}
+
+::-moz-selection {
+  .selection();
+}
+
+body,
+html {
+  background: #f5f5f5 url('../img/grain.png') 0 0 repeat;
+  color: #333;
+  font-family: 'OpenSans', Helvetica, Arial, sans-serif;
+  font-size: 14px;
+}
+
+a,
+a:visited {
+  color: #3399ff;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+footer {
+  color: #999;
+  border-top: 1px solid #e2e2e2;
+  font-size: 13px;
+  line-height: 180%;
+  padding: 20px 0 40px 0;
+  text-shadow: 0 1px 0 #fff;
+}
+
+h3 {
+  border-bottom: 1px solid #fff;
+  border-top: 1px solid #ccc;
+  color: #999;
+  font-size: 14px;
+  font-weight: normal;
+  margin: 10px 0 40px 0;
+  position: relative;
+  text-shadow: 0 1px 0 #fff;
+
+  span {
+    background: #f5f5f5 url('../img/grain.png') 0 0 repeat;
+    left: 60px;
+    padding: 0 10px;
+    position: absolute;
+    top: -10px;
+  }
+}
+
+header {
+  background: @purple url('../img/grain.png') 0 0 repeat;
+  height: 50px;
+  margin-bottom: 40px;
+
+  nav {
+    ul {
+      float: right;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+
+      li {
+        color: #fff;
+        float: left;
+        height: 50px;
+        line-height: 44px;
+
+        a,
+        a:visited {
+          color: #fff;
+        }
+      }
+    }
+  }
+
+  .logo,
+  .logo:visited,
+  .logo:hover {
+    background: url('../img/icons-sprite.png') -50px -37px no-repeat;
+    color: #fff;
+    display: block;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 24px;
+    font-weight: normal;
+    height: 50px;
+    line-height: 44px;
+    margin: 0;
+    padding: 0 0 0 34px;
+    text-decoration: none;
+  }
+}
+
+.box {
+  background: #fff;
+  .shadowed();
+  margin-bottom: 40px;
+  padding: 16px 0;
+
+  h2 {
+    border-bottom: 1px solid #ccc;
+    color: #333;
+    font-size: 18px;
+    font-weight: normal;
+    margin: 0 20px 16px 20px;
+    padding: 0 0 16px 0;
+  }
+
+  .menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    li {
+      a,
+      a:visited {
+        color: #666;
+        display: block;
+        margin-bottom: 1px;
+        padding: 3px 20px;
+        text-decoration: none;
+      }
+
+      a:hover,
+      a.selected {
+        background: @green;
+        color: #fff;
+        text-decoration: none;
+      }
+    }
+  }
+}
+
+.status-updates {
+  color: #666;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li {
+    background: #fff;
+    border-top: 4px solid #ccc;
+    .shadowed();
+    margin: 0 0 30px 0;
+    padding: 26px 20px 20px 20px;
+    position: relative;
+
+    .gravatar {
+      float: left;
+      margin: 0 10px 0 0;
+      width: 24px;
+    }
+
+    .post-meta {
+      position: absolute;
+      right: 20px;
+      top: -15px;
+
+      .post-time,
+      .project-name,
+      .project-name:visited {
+
+        border: 2px solid #fff;
+        .border-radius(2px);
+        .shadowed-tight();
+        color: #fff;
+        float: right;
+        height: 24px;
+        line-height: 22px;
+        margin: 0 0 0 6px;
+        padding: 0 6px;
+      }
+
+      .post-time {
+        .gradient(#333, #555, #333);
+      }
+
+      .project-name {
+        .gradient(#36c, #47f, #36c);
+      }
+    }
+
+    .user-meta,
+    .user-meta:visited {
+      .gradient(#fff, #fff, #eee);
+      border: 2px solid #fff;
+      .border-radius(2px);
+      .shadowed-tight();
+      color: #666;
+      position: absolute;
+      font-size: 15px;
+      font-weight: bold;
+      height: 24px;
+      left: 20px;
+      line-height: 24px;
+      padding: 0 6px 0 0;
+      text-shadow: 0 1px 0 #fff;
+      top: -15px;
+    }
+  }
+}

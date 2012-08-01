@@ -1,3 +1,5 @@
+{% from 'includes/macros.html' import teams_menu, users_menu, show_statuses %}
+
 {% extends "base.html" %}
 
 {% block title %}
@@ -5,29 +7,15 @@
 {% endblock %}
 
 {% block content %}
-  <h1>{{ team.name }} statuses</h1>
-
-  <h2>Users</h2>
-  <ul>
+  <div class="grid_3">
+    {{ users_menu(users) }}
+    {{ teams_menu(teams, team) }}
+  </div>
+  <div class="grid_5">
     {% for user in users %}
-      <li>
-        <h2>{{ user.name }}</h2>
-        {% set statuses = user.recent_statuses() %}
-        {% for status in statuses %}
-          {% if status.created.date() != last_created %}
-            {% if last_created %}</ul>{% endif %}
-            {% set last_created = status.created.date() %}
-            {{ last_created }}
-            <ul>
-          {% endif %}
-          <li>
-            [<a href="{{ url_for('project', slug=status.project.slug) }}">{{ status.project.name }}</a>]
-            {{ status.content_html }}
-            <em>{{ status.created }}</em>
-          </li>
-        {% endfor %}
-        {% if statuses %}</ul>{% endif %}
-      </li>
+      <h2>{{ user.name }} ({{ user.username }})</h2>
+      {% set statuses = user.recent_statuses() %}
+      {{ show_statuses(statuses) }}
     {% endfor %}
-  </ul>
+  </div>
 {% endblock %}

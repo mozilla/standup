@@ -1,5 +1,7 @@
 from datetime import datetime
-import os
+from tring import lowercase
+import md5, os
+
 
 from flask import (Flask, render_template, request, redirect, url_for,
                    jsonify, make_response)
@@ -94,8 +96,8 @@ def index():
     return render_template(
         'index.html',
         statuses=Status.query.order_by(db.desc(Status.created)),
-        projects=Project.query.all(),
-        teams=Team.query.all())
+        projects=Project.query.order_by(Project.name),
+        teams=Team.query.order_by(Team.name).all())
 
 
 @app.route('/user/<slug>', methods=['GET'])
@@ -115,7 +117,8 @@ def project(slug):
     if not project:
         return page_not_found('Project not found.')
 
-    return render_template('project.html', project=project)
+    return render_template('project.html', project=project,
+                           projects=Project.query.order_by(Project.name).all())
 
 
 @app.route('/team/<slug>', methods=['GET'])
@@ -125,7 +128,8 @@ def team(slug):
     if not team:
         return page_not_found('Team not found.')
 
-    return render_template('team.html', team=team, users=team.users)
+    return render_template('team.html', team=team, users=team.users,
+                           teams=Team.query.order_by(Team.name).all())
 
 
 @app.route('/api/v1/status/', methods=['POST'])
@@ -197,9 +201,21 @@ def page_not_found(error):
 def something_broke(error):
     return render_template('500.html'), 500
 
+@app.template_filter('dateformat')
+def dateformat(date, format='%Y-%m-%d'):
+    def suffix(d):
+        return 'th' if 11<=d<=13 else {1:'st',2:'nd',3:'rd'}.get(d%10, 'th')
+
+    return date.strftime(format).replace('{S}', str(date.day) + suffix(date.day))
+
+@app.template_filter('gravatar_url')
+def gravatar_url(email):
+    m = md5.new(lowercase(email))
+    hash = m.hexdigest()
+    return 'http://www.gravatar.com/avatar/' + hash
 
 if __name__ == '__main__':
     db.create_all()
     # Bind to PORT if defined, otherwise default to 5000.
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=port, debug=settings.DEBUG)

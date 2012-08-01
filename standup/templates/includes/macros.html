@@ -1,0 +1,69 @@
+{% macro projects_menu(projects, selected=None) %}
+  <div class="box">
+    <h2>Projects:</h2>
+    <ul class="menu">
+      {% for project in projects %}
+      <li>
+        <a {% if project == selected %}class="selected"{% endif %} href="{{ url_for('project', slug=project.slug) }}">
+          {{ project.name }}
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endmacro %}
+
+{% macro teams_menu(teams, selected=None) %}
+  <div class="box">
+    <h2>Teams:</h2>
+    <ul class="menu">
+      {% for team in teams %}
+      <li>
+        <a {% if team == selected %}class="selected"{% endif %} href="{{ url_for('team', slug=team.slug) }}">
+        {{ team.name }}
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endmacro %}
+
+{% macro users_menu(users, selected=None) %}
+  <div class="box">
+    <h2>People:</h2>
+    <ul class="menu">
+      {% for user in users %}
+      <li>
+        <a {% if user == selected %}class="selected"{% endif %} href="{{ url_for('user', slug=user.slug) }}">
+        {{ user.name }}
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endmacro %}
+
+{% macro show_statuses(statuses) %}
+  {% for status in statuses %}
+    {% if status.created.date() != last_created %}
+      {% if last_created %}</ul>{% endif %}
+      {% set last_created = status.created.date() %}
+      <h3><span>{{ last_created|dateformat('%A, {S} %B %Y') }}</span></h3>
+      <ul class="status-updates">
+    {% endif %}
+    <li>
+      <a class="user-meta" href="{{ url_for('user', slug=status.user.slug) }}">
+        <img class="gravatar" src="{% if status.user.email %}{{ status.user.email|gravatar_url }}{% else %}{{ 'None'|gravatar_url }}{% endif %}" alt="">
+        {{ status.user.username }}
+      </a>
+      <div class="post-meta">
+        <div class="post-time">{{ status.created|dateformat('%-I:%M %p')|lower }}</div>
+        <a class="project-name" href="{{ url_for('project', slug=status.project.slug) }}">
+          {{ status.project.name }}
+        </a>
+      </div>
+      {{ status.content_html }}
+    </li>
+  {% endfor %}
+  {% if statuses %}</ul>{% endif %}
+{% endmacro %}

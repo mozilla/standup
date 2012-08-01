@@ -1,50 +1,21 @@
+{% from 'includes/macros.html' import projects_menu, teams_menu, show_statuses %}
+
 {% extends "base.html" %}
 
 {% block title %}
-  Standups
+  Standup
+{% endblock %}
+
+{% block sidebar %}
+
 {% endblock %}
 
 {% block content %}
-  <h1>Standups</h1>
-
-  <h2>Statuses</h2>
-  {% for status in statuses %}
-    {% if status.created.date() != last_created %}
-      {% if last_created %}</ul>{% endif %}
-      {% set last_created = status.created.date() %}
-      <h3>{{ last_created }}</h3>
-      <ul>
-    {% endif %}
-    <li>
-      [<a href="{{ url_for('project', slug=status.project.slug) }}">{{ status.project.name }}</a>]
-      <a href="{{ url_for('user', slug=status.user.slug) }}">
-        {{ status.user.username }}
-      </a>:
-      {{ status.content_html }}
-      <em>{{ status.created }}</em>
-    </li>
-  {% endfor %}
-  {% if statuses %}</ul>{% endif %}
-
-  <h2>Projects</h2>
-  <ul>
-    {% for project in projects %}
-      <li>
-        <a href="{{ url_for('project', slug=project.slug) }}">
-          {{ project.name }}
-        </a>
-      </li>
-    {% endfor %}
-  </ul>
-
-  <h2>Teams</h2>
-  <ul>
-    {% for team in teams %}
-      <li>
-        <a href="{{ url_for('team', slug=team.slug) }}">
-          {{ team.name }}
-        </a>
-      </li>
-    {% endfor %}
-  </ul>
+  <div class="grid_3">
+    {{ projects_menu(projects) }}
+    {{ teams_menu(teams) }}
+  </div>
+  <div class="grid_5">
+    {{ show_statuses(statuses) }}
+  </div>
 {% endblock %}

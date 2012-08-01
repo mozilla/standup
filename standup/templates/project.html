@@ -1,3 +1,5 @@
+{% from 'includes/macros.html' import projects_menu, show_statuses %}
+
 {% extends "base.html" %}
 
 {% block title %}
@@ -5,24 +7,11 @@
 {% endblock %}
 
 {% block content %}
-  <h1>{{ project.name }} Standups</h1>
-
-  <h2>Statuses</h2>
-  {% set statuses = project.recent_statuses() %}
-  {% for status in statuses %}
-    {% if status.created.date() != last_created %}
-      {% if last_created %}</ul>{% endif %}
-      {% set last_created = status.created.date() %}
-      {{ last_created }}
-      <ul>
-    {% endif %}
-    <li>
-      <a href="{{ url_for('user', slug=status.user.slug) }}">
-        {{ status.user.username }}
-      </a>:
-      {{ status.content_html }}
-      <em>{{ status.created }}</em>
-    </li>
-  {% endfor %}
-  {% if statuses %}</ul>{% endif %}
+  <div class="grid_3">
+    {{ projects_menu(projects, project) }}
+  </div>
+  <div class="grid_5">
+    {% set statuses = project.recent_statuses() %}
+    {{ show_statuses(statuses) }}
+  </div>
 {% endblock %}

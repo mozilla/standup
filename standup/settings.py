@@ -4,7 +4,7 @@
 
 # The key used to authenticate API calls.
 API_KEY = 'qwertyuiopasdfghjklzxcvbnm1234567890'
-
+DEBUG = False
 
 try:
     from local_settings import *
