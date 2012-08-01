@@ -1,7 +1,6 @@
 from datetime import datetime
-from tring import lowercase
-import md5, os
 
+import md5, os
 
 from flask import (Flask, render_template, request, redirect, url_for,
                    jsonify, make_response)
@@ -210,7 +209,7 @@ def dateformat(date, format='%Y-%m-%d'):
 
 @app.template_filter('gravatar_url')
 def gravatar_url(email):
-    m = md5.new(lowercase(email))
+    m = md5.new(email.lower())
     hash = m.hexdigest()
     return 'http://www.gravatar.com/avatar/' + hash
 
