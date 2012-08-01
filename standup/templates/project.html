@@ -12,6 +12,6 @@
   </div>
   <div class="grid_5">
     {% set statuses = project.recent_statuses() %}
-    {{ show_statuses(statuses) }}
+    {{ show_statuses(statuses, show_project=False) }}
   </div>
 {% endblock %}

@@ -9,6 +9,6 @@
 {% block content %}
   <div class="grid_8">
     {% set statuses = user.recent_statuses() %}
-    {{ show_statuses(statuses) }}
+    {{ show_statuses(statuses, show_user=False) }}
   </div>
 {% endblock %}

@@ -43,24 +43,39 @@
   </div>
 {% endmacro %}
 
-{% macro show_statuses(statuses) %}
+{% macro show_statuses(statuses, show_project=True, show_user=True) %}
   {% for status in statuses %}
     {% if status.created.date() != last_created %}
       {% if last_created %}</ul>{% endif %}
+      {% set last_project = None %}
+      {% set last_user = None %}
       {% set last_created = status.created.date() %}
       <h3><span>{{ last_created|dateformat('%A, {S} %B %Y') }}</span></h3>
       <ul class="status-updates">
     {% endif %}
-    <li>
-      <a class="user-meta" href="{{ url_for('user', slug=status.user.slug) }}">
-        <img class="gravatar" src="{% if status.user.email %}{{ status.user.email|gravatar_url }}{% else %}{{ 'None'|gravatar_url }}{% endif %}" alt="">
-        {{ status.user.username }}
-      </a>
+    {% if status.user.username != last_user %}
+      {% set last_project = None %}
+      {% set last_user = status.user.username %}
+      <li>
+        {% if show_user %}
+          <a class="user-meta" href="{{ url_for('user', slug=status.user.slug) }}">
+            <img class="gravatar" src="{% if status.user.email %}{{ status.user.email|gravatar_url }}{% else %}{{ 'None'|gravatar_url }}{% endif %}" alt="">
+            {{ last_user }}
+          </a>
+        {% endif %}
+    {% else %}
+      <li class="squashed">
+    {% endif %}
       <div class="post-meta">
         <div class="post-time">{{ status.created|dateformat('%-I:%M %p')|lower }}</div>
-        <a class="project-name" href="{{ url_for('project', slug=status.project.slug) }}">
-          {{ status.project.name }}
-        </a>
+        {% if status.project.name != last_project %}
+          {% set last_project = status.project.name %}
+          {% if show_project %}
+            <a class="project-name" href="{{ url_for('project', slug=status.project.slug) }}">
+              {{ status.project.name }}
+            </a>
+          {% endif %}
+        {% endif %}
       </div>
       {{ status.content_html }}
     </li>

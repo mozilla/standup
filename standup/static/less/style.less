@@ -172,6 +172,11 @@ header {
     padding: 26px 20px 20px 20px;
     position: relative;
 
+    &.squashed {
+      border-top: 1px solid #ddd;
+      margin-top: -30px;
+    }
+
     .gravatar {
       float: left;
       margin: 0 10px 0 0;
@@ -186,12 +191,12 @@ header {
       .post-time,
       .project-name,
       .project-name:visited {
-
         border: 2px solid #fff;
         .border-radius(2px);
         .shadowed-tight();
         color: #fff;
         float: right;
+        font-size: 12px;
         height: 24px;
         line-height: 22px;
         margin: 0 0 0 6px;
@@ -200,10 +205,11 @@ header {
 
       .post-time {
         .gradient(#333, #555, #333);
+        color: #ccc;
       }
 
       .project-name {
-        .gradient(#36c, #47f, #36c);
+        .linear-gradient-top(#36c, rgba(255, 255, 255, 0.3), 0%, rgba(255, 255, 255, 0), 80%);
       }
     }
 
