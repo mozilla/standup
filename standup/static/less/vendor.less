@@ -194,8 +194,11 @@
 
 
 /* Gradients */
-.gradient(@default: #F5F5F5, @start: #EEE, @stop: #FFF) {
+.gradient(@default,@start,@stop) {
   .linear-gradient-top(@default,@start,0%,@stop,100%);
+}
+.gradient(@default,@start,@stop,@extra) {
+  .linear-gradient-top(@default,@start,0%,@stop,100%,@extra);
 }
 .linear-gradient-top(@default,@color1,@stop1,@color2,@stop2) {
   background-color: @default;

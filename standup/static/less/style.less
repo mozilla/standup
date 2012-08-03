@@ -165,6 +165,8 @@ header {
   text-align: right;
 
   ul {
+    border: 1px solid #ccc;
+    .border-radius(3px);
     float: right;
     list-style: none;
     margin: 0;
@@ -175,22 +177,41 @@ header {
 
       a,
       a:visited {
-        background: rgba(51, 51, 51, 0.1);
-        .border-radius(12px);
+        .gradient(#ddd, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0));
+        border-left: 1px solid #fff;
+        border-right: 1px solid #ccc;
         color: #333;
         display: block;
         font-weight: normal;
         height: 24px;
         line-height: 22px;
-        margin: -2px 0 0 5px;
         padding: 0 12px;
+        text-decoration: none;
+        text-shadow: 0 1px 0 #fff;
+      }
+
+      a:hover {
+        background-color: #ccc;
         text-decoration: none;
       }
 
-      a:hover,
       a.selected {
-        background: #333;
+        .gradient(#666, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.2), url('../img/grain.png'));
+        border: 0;
         color: #fff;
+        text-shadow: none;
+      }
+
+      &:first-of-type {
+        a {
+          .border-radius(2px 0 0 2px);
+        }
+      }
+
+      &:last-of-type {
+        a {
+          .border-radius(0 2px 2px 0);
+        }
       }
     }
   }
