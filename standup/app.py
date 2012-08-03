@@ -30,7 +30,8 @@ class Team(db.Model):
         """Return the statuses for the team."""
         # TODO: filter on dates
         user_ids = [u.id for u in self.users]
-        return Status.query.filter(Status.user_id.in_(user_ids))
+        return Status.query.filter(
+            Status.user_id.in_(user_ids)).order_by(db.desc(Status.created))
 
 
 class User(db.Model):
