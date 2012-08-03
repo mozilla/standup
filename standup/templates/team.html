@@ -1,4 +1,4 @@
-{% from 'includes/macros.html' import teams_menu, users_menu, show_statuses %}
+{% from 'includes/macros.html' import teams_menu, users_menu, show_statuses, user_banner %}
 
 {% extends "base.html" %}
 
@@ -13,7 +13,7 @@
   </div>
   <div class="grid_5">
     {% for user in users %}
-      <h2>{{ user.name }} ({{ user.username }})</h2>
+      {{ user_banner(user) }}
       {% set statuses = user.recent_statuses() %}
       {{ show_statuses(statuses, show_user=False) }}
     {% endfor %}

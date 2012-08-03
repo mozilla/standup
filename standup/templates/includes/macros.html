@@ -82,3 +82,10 @@
   {% endfor %}
   {% if statuses %}</ul>{% endif %}
 {% endmacro %}
+
+{% macro user_banner(user) %}
+  <a class="user-banner" href="{{ url_for('user', slug=user.slug) }}">
+    <img class="gravatar" src="{% if user.email %}{{ user.email|gravatar_url }}{% else %}{{ 'None'|gravatar_url }}{% endif %}" alt="">
+    {{ user.username }}
+  </a>
+{% endmacro %}
