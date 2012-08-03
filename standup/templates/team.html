@@ -12,10 +12,6 @@
     {{ teams_menu(teams, team) }}
   </div>
   <div class="grid_5">
-    {% for user in users %}
-      {{ user_banner(user) }}
-      {% set statuses = user.recent_statuses() %}
-      {{ show_statuses(statuses, show_user=False) }}
-    {% endfor %}
+    {{ show_statuses(team.recent_statuses()) }}
   </div>
 {% endblock %}

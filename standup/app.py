@@ -29,7 +29,8 @@ class Team(db.Model):
     def recent_statuses(self, daterange='all'):
         """Return the statuses for the team."""
         # TODO: filter on dates
-        return self.statuses.order_by(db.desc(Status.created))
+        user_ids = [u.id for u in self.users]
+        return Status.query.filter(Status.user_id.in_(user_ids))
 
 
 class User(db.Model):
