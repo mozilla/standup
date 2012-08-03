@@ -89,3 +89,9 @@
     {{ user.username }}
   </a>
 {% endmacro %}
+
+{% macro date_range(url) %}
+  <a href="{{ url }}">Today</a>
+  <a href="{{ url }}?dates=7d">Last 7 days</a>
+  <a href="{{ url }}?dates=all">All</a>
+{% endmacro %}

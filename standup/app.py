@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date, timedelta
 
 import md5, os
 
@@ -26,12 +26,13 @@ class Team(db.Model):
     def __repr__(self):
         return '<Team: %s>' % self.name
 
-    def recent_statuses(self, daterange='all'):
+    def recent_statuses(self, startdate=None, enddate=None):
         """Return the statuses for the team."""
-        # TODO: filter on dates
         user_ids = [u.id for u in self.users]
-        return Status.query.filter(
+        statuses = Status.query.filter(
             Status.user_id.in_(user_ids)).order_by(db.desc(Status.created))
+        return _apply_date_range(statuses, startdate, enddate)
+            
 
 
 class User(db.Model):
@@ -50,10 +51,10 @@ class User(db.Model):
     def __repr__(self):
         return '<User: [%s] %s>' % (self.username, self.name)
 
-    def recent_statuses(self, daterange='all'):
+    def recent_statuses(self, startdate=None, enddate=None):
         """Return the statuses for the user."""
-        # TODO: filter on dates
-        return self.statuses.order_by(db.desc(Status.created))
+        statuses = self.statuses.order_by(db.desc(Status.created))
+        return _apply_date_range(statuses, startdate, enddate)
 
 
 class Project(db.Model):
@@ -65,10 +66,10 @@ class Project(db.Model):
     def __repr__(self):
         return '<Project: [%s] %s>' % (self.slug, self.name)
 
-    def recent_statuses(self, daterange='all'):
+    def recent_statuses(self, startdate=None, enddate=None):
         """Return the statuses for the project."""
-        # TODO: filter on dates
-        return self.statuses.order_by(db.desc(Status.created))
+        statuses = self.statuses.order_by(db.desc(Status.created))
+        return _apply_date_range(statuses, startdate, enddate)
 
 
 class Status(db.Model):
@@ -96,7 +97,10 @@ def index():
     """The home page."""
     return render_template(
         'index.html',
-        statuses=Status.query.order_by(db.desc(Status.created)),
+        statuses=_apply_date_range(
+            Status.query.order_by(db.desc(Status.created)),
+            _startdate(request),
+            _enddate(request)),
         projects=Project.query.order_by(Project.name),
         teams=Team.query.order_by(Team.name).all())
 
@@ -107,8 +111,11 @@ def user(slug):
     user = User.query.filter_by(slug=slug).first()
     if not user:
         return page_not_found('User not found.')
-
-    return render_template('user.html', user=user)
+    return render_template(
+        'user.html',
+        user=user,
+        statuses=user.recent_statuses(
+            _startdate(request), _enddate(request)))
 
 
 @app.route('/project/<slug>', methods=['GET'])
@@ -118,8 +125,12 @@ def project(slug):
     if not project:
         return page_not_found('Project not found.')
 
-    return render_template('project.html', project=project,
-                           projects=Project.query.order_by(Project.name).all())
+    return render_template(
+        'project.html',
+        project=project,
+        projects=Project.query.order_by(Project.name).all(),
+        statuses=project.recent_statuses(
+            _startdate(request), _enddate(request)))
 
 
 @app.route('/team/<slug>', methods=['GET'])
@@ -129,8 +140,13 @@ def team(slug):
     if not team:
         return page_not_found('Team not found.')
 
-    return render_template('team.html', team=team, users=team.users,
-                           teams=Team.query.order_by(Team.name).all())
+    return render_template(
+        'team.html',
+        team=team,
+        users=team.users,
+        teams=Team.query.order_by(Team.name).all(),
+        statuses=team.recent_statuses(
+            _startdate(request), _enddate(request)))
 
 
 @app.route('/api/v1/status/', methods=['POST'])
@@ -202,6 +218,7 @@ def page_not_found(error):
 def something_broke(error):
     return render_template('500.html'), 500
 
+
 @app.template_filter('dateformat')
 def dateformat(date, format='%Y-%m-%d'):
     def suffix(d):
@@ -209,11 +226,34 @@ def dateformat(date, format='%Y-%m-%d'):
 
     return date.strftime(format).replace('{S}', str(date.day) + suffix(date.day))
 
+
 @app.template_filter('gravatar_url')
 def gravatar_url(email):
     m = md5.new(email.lower())
     hash = m.hexdigest()
     return 'http://www.gravatar.com/avatar/' + hash
+
+
+def _apply_date_range(statuses, startdate=None, enddate=None):
+    if startdate:
+        statuses = statuses.filter(Status.created >= startdate)
+    if enddate:
+        statuses = statuses.filter(Status.created <= enddate)
+    return statuses
+
+
+def _startdate(request):
+    dates = request.args.get('dates')
+    if dates == '7d':
+        return date.today() - timedelta(days=7)
+    elif not dates:
+        return date.today()
+    return None
+
+
+def _enddate(request):
+    return None
+
 
 if __name__ == '__main__':
     db.create_all()

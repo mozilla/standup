@@ -1,4 +1,4 @@
-{% from 'includes/macros.html' import teams_menu, users_menu, show_statuses, user_banner %}
+{% from 'includes/macros.html' import teams_menu, users_menu, show_statuses, user_banner, date_range %}
 
 {% extends "base.html" %}
 
@@ -12,6 +12,7 @@
     {{ teams_menu(teams, team) }}
   </div>
   <div class="grid_5">
-    {{ show_statuses(team.recent_statuses()) }}
+    {{ date_range(url_for('team', slug=team.slug)) }}
+    {{ show_statuses(statuses }}
   </div>
 {% endblock %}
