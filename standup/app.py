@@ -170,7 +170,7 @@ def status(id):
 def create_status():
     """Post a new status.
 
-    The status should be posted as json using 'application/json' as the
+    The status should be posted as JSON using 'application/json' as the
     content type. The posted JSON needs to have 4 required fields:
         * user (the username)
         * project (the slug)
@@ -225,6 +225,50 @@ def create_status():
 
     return jsonify(dict(id=status.id, content=content))
 
+@app.route('/api/v1/status/', methods=['DELETE'])
+def delete_status():
+    """Delete an existing status
+
+    The status to be deleted should be posted as JSON using 'application/json as
+    the content type. The posted JSON need to have 3 required fields:
+        * id
+        * username
+        * api_key
+
+    An example of the JSON:
+
+        {
+            "id": 1,
+            "user": "r1cky"
+            "api_key": "qwertyuiopasdfghjklzxcvbnm1234567890"
+        }
+    """
+    # Check that api_key is valid.
+    api_key = request.json.get('api_key')
+    if api_key != settings.API_KEY:
+        return make_response(jsonify(dict(error='Invalid API key.')), 403)
+
+    # The data we need
+    id = request.json.get('id')
+    user = request.json.get('user')
+
+    if not (id and user):
+        return make_response(
+            jsonify(dict(error='Missing required fields.')), 400)
+
+    status = Status.query.filter(Status.id==id)
+
+    if not status.count():
+        return make_response(jsonify(dict(error='Status does not exist.')), 400)
+
+    if not status[0].user.username == user:
+        return make_response(
+            jsonify(dict(error='You cannot delete this status.')), 403)
+
+    status.delete()
+    db.session.commit()
+
+    return make_response(jsonify(dict(id=id)))
 
 @app.errorhandler(404)
 def page_not_found(error):
