@@ -102,7 +102,8 @@ def index():
             _startdate(request),
             _enddate(request)),
         projects=Project.query.order_by(Project.name),
-        teams=Team.query.order_by(Team.name).all())
+        teams=Team.query.order_by(Team.name).all(),
+        dates=request.args.get('dates'))
 
 
 @app.route('/user/<slug>', methods=['GET'])
@@ -115,7 +116,8 @@ def user(slug):
         'user.html',
         user=user,
         statuses=user.recent_statuses(
-            _startdate(request), _enddate(request)))
+            _startdate(request), _enddate(request)),
+        dates=request.args.get('dates'))
 
 
 @app.route('/project/<slug>', methods=['GET'])
@@ -130,7 +132,8 @@ def project(slug):
         project=project,
         projects=Project.query.order_by(Project.name).all(),
         statuses=project.recent_statuses(
-            _startdate(request), _enddate(request)))
+            _startdate(request), _enddate(request)),
+        dates=request.args.get('dates'))
 
 
 @app.route('/team/<slug>', methods=['GET'])
@@ -146,7 +149,8 @@ def team(slug):
         users=team.users,
         teams=Team.query.order_by(Team.name).all(),
         statuses=team.recent_statuses(
-            _startdate(request), _enddate(request)))
+            _startdate(request), _enddate(request)),
+        dates=request.args.get('dates'))
 
 
 @app.route('/api/v1/status/', methods=['POST'])

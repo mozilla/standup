@@ -16,7 +16,7 @@
     {{ teams_menu(teams) }}
   </div>
   <div class="grid_5">
-    {{ date_range(url_for('index')) }}
+    {{ date_range(url_for('index'), dates=dates) }}
     {{ show_statuses(statuses) }}
   </div>
 {% endblock %}

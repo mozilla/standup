@@ -11,7 +11,7 @@
     {{ projects_menu(projects, project) }}
   </div>
   <div class="grid_5">
-    {{ date_range(url_for('project', slug=project.slug)) }}
+    {{ date_range(url_for('project', slug=project.slug), dates=dates) }}
     {{ show_statuses(statuses, show_project=False) }}
   </div>
 {% endblock %}

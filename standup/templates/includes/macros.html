@@ -90,8 +90,13 @@
   </a>
 {% endmacro %}
 
-{% macro date_range(url) %}
-  <a href="{{ url }}">Today</a>
-  <a href="{{ url }}?dates=7d">Last 7 days</a>
-  <a href="{{ url }}?dates=all">All</a>
+{% macro date_range(url, dates=None) %}
+  <div class="date-filter cf">
+    Show by date:
+    <ul>
+      <li><a class="{% if dates == 'all' %}selected{% endif %}" href="{{ url }}?dates=all">All</a></li>
+      <li><a class="{% if dates == '7d' %}selected{% endif %}" href="{{ url }}?dates=7d">Last 7 days</a></li>
+      <li><a  class="{% if not dates %}selected{% endif %}" href="{{ url }}">Today</a></li>
+    </ul>
+  </div>
 {% endmacro %}

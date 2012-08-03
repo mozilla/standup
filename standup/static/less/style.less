@@ -158,6 +158,44 @@ header {
   }
 }
 
+.date-filter {
+  font-weight: bold;
+  margin: 0 0 20px 0;
+  padding: 2px 0 0 0;
+  text-align: right;
+
+  ul {
+    float: right;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    li {
+      float: left;
+
+      a,
+      a:visited {
+        background: rgba(51, 51, 51, 0.1);
+        .border-radius(12px);
+        color: #333;
+        display: block;
+        font-weight: normal;
+        height: 24px;
+        line-height: 22px;
+        margin: -2px 0 0 5px;
+        padding: 0 12px;
+        text-decoration: none;
+      }
+
+      a:hover,
+      a.selected {
+        background: #333;
+        color: #fff;
+      }
+    }
+  }
+}
+
 .status-updates {
   color: #666;
   list-style: none;
