@@ -1,0 +1,10 @@
+{% from 'includes/macros.html' import show_status, user_banner %}
+
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="grid_8">
+    {{ user_banner(user) }}
+    {{ show_status(status, show_user=False) }}
+  </div>
+{% endblock %}

@@ -83,6 +83,28 @@
   {% if statuses %}</ul>{% endif %}
 {% endmacro %}
 
+{% macro show_status(status, show_project=True, show_user=True) %}
+  <ul class="status-updates">
+    <li>
+      {% if show_user %}
+        <a class="user-meta" href="{{ url_for('user', slug=status.user.slug) }}">
+          <img class="gravatar" src="{% if status.user.email %}{{ status.user.email|gravatar_url }}{% else %}{{ 'None'|gravatar_url }}{% endif %}" alt="">
+          {{ last_user }}
+        </a>
+      {% endif %}
+      <div class="post-meta">
+        <div class="post-time">{{ status.created|dateformat('{S} %B %Y') }} at {{ status.created|dateformat('%-I:%M %p')|lower }}</div>
+        {% if show_project %}
+          <a class="project-name" href="{{ url_for('project', slug=status.project.slug) }}">
+            {{ status.project.name }}
+          </a>
+        {% endif %}
+      </div>
+      {{ status.content_html }}
+    </li>
+  </ul>
+{% endmacro %}
+
 {% macro user_banner(user) %}
   <a class="user-banner" href="{{ url_for('user', slug=user.slug) }}">
     <img class="gravatar" src="{% if user.email %}{{ user.email|gravatar_url }}{% else %}{{ 'None'|gravatar_url }}{% endif %}" alt="">

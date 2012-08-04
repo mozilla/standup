@@ -152,6 +152,19 @@ def team(slug):
             _startdate(request), _enddate(request)),
         dates=request.args.get('dates'))
 
+@app.route('/status/<id>', methods=['GET'])
+def status(id):
+    """The status page. Shows a single status."""
+    status = Status.query.filter_by(id=id).first()
+    if not status:
+        return page_not_found('Status not found.')
+
+    return render_template(
+        'status.html',
+        user=status.user,
+        status=status
+    )
+
 
 @app.route('/api/v1/status/', methods=['POST'])
 def create_status():
