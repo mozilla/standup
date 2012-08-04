@@ -67,7 +67,9 @@
       <li class="squashed">
     {% endif %}
       <div class="post-meta">
-        <div class="post-time">{{ status.created|dateformat('%-I:%M %p')|lower }}</div>
+        <a href="{{ url_for('status', id=status.id) }}" class="post-time">
+          {{ status.created|dateformat('%-I:%M %p')|lower }}
+        </a>
         {% if status.project.name != last_project %}
           {% set last_project = status.project.name %}
           {% if show_project %}
@@ -115,7 +117,7 @@
 {% macro date_range(url, dates=None) %}
   <div class="date-filter cf">
     <ul>
-      <li><a  class="{% if not dates %}selected{% endif %}" href="{{ url }}">Today</a></li>
+      <li><a class="{% if not dates %}selected{% endif %}" href="{{ url }}">Today</a></li>
       <li><a class="{% if dates == '7d' %}selected{% endif %}" href="{{ url }}?dates=7d">Last 7 days</a></li>
       <li><a class="{% if dates == 'all' %}selected{% endif %}" href="{{ url }}?dates=all">All</a></li>
     </ul>
