@@ -82,6 +82,9 @@
       {{ status.content_html }}
     </li>
   {% endfor %}
+  {% if statuses.count() == 0 %}
+    <div class="notice">No status updates available.</div>
+  {% endif %}
   {% if statuses %}</ul>{% endif %}
 {% endmacro %}
 
