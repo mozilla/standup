@@ -245,7 +245,7 @@ header {
     .shadowed();
     line-height: 160%;
     margin: 0 0 30px 0;
-    padding: 26px 20px 20px 20px;
+    padding: 26px 100px 20px 20px;
     position: relative;
 
     &.squashed {
@@ -264,7 +264,6 @@ header {
       right: 20px;
       top: -15px;
 
-      .post-time,
       .project-name,
       .project-name:visited {
         border: 2px solid #fff;
@@ -279,14 +278,22 @@ header {
         padding: 0 6px;
       }
 
-      .post-time {
-        .gradient(#333, #555, #333);
-        color: #ccc;
-      }
-
       .project-name {
         .linear-gradient-top(#36c, rgba(255, 255, 255, 0.3), 0%, rgba(255, 255, 255, 0), 80%);
       }
+    }
+
+    .post-time,
+    .post-time:visited {
+      color: #ccc;
+      display: block;
+      position: absolute;
+      right: 20px;
+      text-decoration: none;
+    }
+
+    .post-time:hover {
+      text-decoration: underline;
     }
 
     .user-meta,

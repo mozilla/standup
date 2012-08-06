@@ -67,9 +67,6 @@
       <li class="squashed">
     {% endif %}
       <div class="post-meta">
-        <a href="{{ url_for('status', id=status.id) }}" class="post-time">
-          {{ status.created|dateformat('%-I:%M %p')|lower }}
-        </a>
         {% if status.project.name != last_project %}
           {% set last_project = status.project.name %}
           {% if show_project %}
@@ -79,6 +76,9 @@
           {% endif %}
         {% endif %}
       </div>
+      <a href="{{ url_for('status', id=status.id) }}" class="post-time">
+        {{ status.created|dateformat('%-I:%M %p')|lower }}
+      </a>
       {{ status.content_html }}
     </li>
   {% endfor %}
@@ -98,13 +98,13 @@
         </a>
       {% endif %}
       <div class="post-meta">
-        <div class="post-time">{{ status.created|dateformat('{S} %B %Y') }} at {{ status.created|dateformat('%-I:%M %p')|lower }}</div>
         {% if show_project %}
           <a class="project-name" href="{{ url_for('project', slug=status.project.slug) }}">
             {{ status.project.name }}
           </a>
         {% endif %}
       </div>
+      <span class="post-time">{{ status.created|dateformat('{S} %B %Y') }} at {{ status.created|dateformat('%-I:%M %p')|lower }}</span>
       {{ status.content_html }}
     </li>
   </ul>
