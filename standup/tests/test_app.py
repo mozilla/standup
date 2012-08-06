@@ -97,33 +97,25 @@ class AppTestCase(unittest.TestCase):
         s = status(save=True)
         data = json.dumps({
             'api_key': settings.API_KEY,
-            'user': s.user.username,
-            'id': s.id})
+            'user': s.user.username})
         response = self.app.delete(
-            '/api/v1/status/', data=data, content_type='application/json')
+            '/api/v1/status/%s/' % s.id, data=data,
+            content_type='application/json')
         self.assertEqual(response.status_code, 200)
 
         # Verify the status was deleted
-        self.assertEqual(Status.query.filter(Status.id==s.id).count(), 0)
+        self.assertEqual(Status.query.count(), 0)
 
     def test_delete_status_validation(self):
         """Verify validation of required fields"""
         s = status(save=True)
 
-        # Missing id
-        data = json.dumps({
-            'api_key': settings.API_KEY,
-            'user': s.user.username})
-        response = self.app.delete(
-            '/api/v1/status/', data=data, content_type='application/json')
-        self.assertEqual(response.status_code, 400)
-
         # Missing user
         data = json.dumps({
-            'api_key': settings.API_KEY,
-            'id': s.id})
+            'api_key': settings.API_KEY})
         response = self.app.delete(
-            '/api/v1/status/', data=data, content_type='application/json')
+            '/api/v1/status/%s/' % s.id, data=data,
+            content_type='application/json')
         self.assertEqual(response.status_code, 400)
 
     def test_delete_status_unauthorized(self):
@@ -131,10 +123,10 @@ class AppTestCase(unittest.TestCase):
         s = status(save=True)
         data = json.dumps({
             'api_key': settings.API_KEY,
-            'user': s.user.username + '123',
-            'id': s.id})
+            'user': s.user.username + '123'})
         response = self.app.delete(
-            '/api/v1/status/', data=data, content_type='application/json')
+            '/api/v1/status/%s/' % s.id, data=data,
+            content_type='application/json')
         self.assertEqual(response.status_code, 403)
 
     def test_delete_status_invalid_api_key(self):
@@ -142,18 +134,18 @@ class AppTestCase(unittest.TestCase):
         s = status(save=True)
         data = json.dumps({
             'api_key': settings.API_KEY + '123',
-            'user': s.user.username,
-            'id': s.id})
+            'user': s.user.username})
         response = self.app.delete(
-            '/api/v1/status/', data=data, content_type='application/json')
+            '/api/v1/status/%s/' % s.id, data=data,
+            content_type='application/json')
         self.assertEqual(response.status_code, 403)
 
     def test_delete_status_missing_api_key(self):
         """Request with missing API key should return 403"""
         s = status(save=True)
         data = json.dumps({
-            'user': s.user.username,
-            'id': s.id})
+            'user': s.user.username})
         response = self.app.delete(
-            '/api/v1/status/', data=data, content_type='application/json')
+            '/api/v1/status/%s/' % s.id, data=data,
+            content_type='application/json')
         self.assertEqual(response.status_code, 403)
