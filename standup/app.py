@@ -62,6 +62,8 @@ class Project(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
     slug = db.Column(db.String(100), unique=True)
+    color = db.Column('color', db.String(6))
+    repo_url = db.Column('repo_url', db.String(100))
 
     def __repr__(self):
         return '<Project: [%s] %s>' % (self.slug, self.name)

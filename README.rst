@@ -37,6 +37,18 @@ To setup a local dev environment for hacking::
     $ python standup/app.py
 
 
+Migrations
+==========
+
+To enable versioning on the DB use::
+
+  $ ./standup/migrations.py version_control
+
+To run migrations use::
+
+  $ ./standup/migrations.py upgrade
+
+
 Testing
 =======
 

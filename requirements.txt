@@ -7,6 +7,7 @@ Werkzeug==0.8.3
 gunicorn==0.14.5
 ipython==0.13
 wsgiref==0.1.2
+sqlalchemy-migrate==0.7.2
 
 psycopg2
 nose
