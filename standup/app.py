@@ -1,6 +1,7 @@
+import hashlib
+import os
 from datetime import datetime, date, timedelta
-
-import hashlib, os
+from functools import wraps
 
 from flask import (Flask, render_template, request, redirect, url_for,
                    jsonify, make_response)
@@ -32,7 +33,6 @@ class Team(db.Model):
         statuses = Status.query.filter(
             Status.user_id.in_(user_ids)).order_by(db.desc(Status.created))
         return _apply_date_range(statuses, startdate, enddate)
-            
 
 
 class User(db.Model):
@@ -92,6 +92,17 @@ class Status(db.Model):
 # TODO: M2M Users <-> Projects
 
 # Views:
+def api_key_required(view):
+    @wraps(view)
+    def wrapper(*args, **kwargs):
+        api_key = request.json.get('api_key', '')
+        if api_key != settings.API_KEY:
+            return make_response(jsonify({'error': 'Invalid API key.'}), 403)
+        return view(*args, **kwargs)
+
+    return wrapper
+
+
 @app.route('/')
 def index():
     """The home page."""
@@ -154,6 +165,7 @@ def team(slug):
             _startdate(request), _enddate(request)),
         dates=request.args.get('dates'))
 
+
 @app.route('/status/<id>', methods=['GET'])
 def status(id):
     """The status page. Shows a single status."""
@@ -169,6 +181,7 @@ def status(id):
 
 
 @app.route('/api/v1/status/', methods=['POST'])
+@api_key_required
 def create_status():
     """Post a new status.
 
@@ -188,11 +201,6 @@ def create_status():
             "api_key": "qwertyuiopasdfghjklzxcvbnm1234567890"
         }
     """
-    # Check that api_key is valid.
-    api_key = request.json.get('api_key')
-    if api_key != settings.API_KEY:
-        return make_response(jsonify(dict(error='Invalid API key.')), 403)
-
     # The data we need
     username = request.json.get('user')
     project_slug = request.json.get('project')
@@ -227,7 +235,9 @@ def create_status():
 
     return jsonify(dict(id=status.id, content=content))
 
+
 @app.route('/api/v1/status/<id>/', methods=['DELETE'])
+@api_key_required
 def delete_status(id):
     """Delete an existing status
 
@@ -244,11 +254,6 @@ def delete_status(id):
             "api_key": "qwertyuiopasdfghjklzxcvbnm1234567890"
         }
     """
-    # Check that api_key is valid.
-    api_key = request.json.get('api_key')
-    if api_key != settings.API_KEY:
-        return make_response(jsonify(dict(error='Invalid API key.')), 403)
-
     # The data we need
     user = request.json.get('user')
 
@@ -269,6 +274,7 @@ def delete_status(id):
     db.session.commit()
 
     return make_response(jsonify(dict(id=id)))
+
 
 @app.errorhandler(404)
 def page_not_found(error):
