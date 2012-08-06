@@ -77,7 +77,7 @@ class Project(db.Model):
 class Status(db.Model):
     """A standup update for a user on a given project."""
     id = db.Column(db.Integer, primary_key=True)
-    created = db.Column(db.DateTime, default=datetime.now)
+    created = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     user = db.relationship(
         'User', backref=db.backref('statuses', lazy='dynamic'))
