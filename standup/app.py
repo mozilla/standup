@@ -101,7 +101,8 @@ def index():
             Status.query.order_by(db.desc(Status.created)),
             _startdate(request),
             _enddate(request)),
-        projects=Project.query.order_by(Project.name),
+        projects=Project.query.order_by(Project.name).filter(
+            Project.statuses.any()),
         teams=Team.query.order_by(Team.name).all(),
         dates=request.args.get('dates'))
 
@@ -130,7 +131,8 @@ def project(slug):
     return render_template(
         'project.html',
         project=project,
-        projects=Project.query.order_by(Project.name).all(),
+        projects=Project.query.order_by(Project.name).filter(
+            Project.statuses.any()),
         statuses=project.recent_statuses(
             _startdate(request), _enddate(request)),
         dates=request.args.get('dates'))
