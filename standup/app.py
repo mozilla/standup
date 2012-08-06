@@ -225,7 +225,7 @@ def create_status():
 
     return jsonify(dict(id=status.id, content=content))
 
-@app.route('/api/v1/status/<id>', methods=['DELETE'])
+@app.route('/api/v1/status/<id>/', methods=['DELETE'])
 def delete_status(id):
     """Delete an existing status
 
