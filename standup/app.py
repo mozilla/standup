@@ -225,8 +225,8 @@ def create_status():
 
     return jsonify(dict(id=status.id, content=content))
 
-@app.route('/api/v1/status/', methods=['DELETE'])
-def delete_status():
+@app.route('/api/v1/status/<id>', methods=['DELETE'])
+def delete_status(id):
     """Delete an existing status
 
     The status to be deleted should be posted as JSON using 'application/json as
@@ -238,8 +238,7 @@ def delete_status():
     An example of the JSON:
 
         {
-            "id": 1,
-            "user": "r1cky"
+            "user": "r1cky",
             "api_key": "qwertyuiopasdfghjklzxcvbnm1234567890"
         }
     """
@@ -249,7 +248,6 @@ def delete_status():
         return make_response(jsonify(dict(error='Invalid API key.')), 403)
 
     # The data we need
-    id = request.json.get('id')
     user = request.json.get('user')
 
     if not (id and user):
