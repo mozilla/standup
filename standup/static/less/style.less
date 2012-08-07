@@ -253,21 +253,15 @@ header {
       margin-top: -30px;
     }
 
-    .gravatar {
-      float: left;
-      margin: 0 10px 0 0;
-      width: 24px;
-    }
-
     .post-meta {
       position: absolute;
       right: 20px;
-      top: -15px;
+      top: -13px;
 
       .project-name,
       .project-name:visited {
-        border: 2px solid #fff;
-        .border-radius(2px);
+        .linear-gradient-top(#36c, rgba(255, 255, 255, 0.3), 0%, rgba(255, 255, 255, 0), 80%);
+        .border-radius(4px);
         .shadowed-tight();
         color: #fff;
         float: right;
@@ -275,11 +269,7 @@ header {
         height: 24px;
         line-height: 22px;
         margin: 0 0 0 6px;
-        padding: 0 6px;
-      }
-
-      .project-name {
-        .linear-gradient-top(#36c, rgba(255, 255, 255, 0.3), 0%, rgba(255, 255, 255, 0), 80%);
+        padding: 0 8px;
       }
     }
 
@@ -298,9 +288,8 @@ header {
 
     .user-meta,
     .user-meta:visited {
-      .gradient(#fff, #fff, #eee);
-      border: 2px solid #fff;
-      .border-radius(2px);
+      .gradient(#bbb, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0));
+      .border-radius(4px);
       .shadowed-tight();
       color: #666;
       position: absolute;
@@ -309,9 +298,23 @@ header {
       height: 24px;
       left: 20px;
       line-height: 24px;
-      padding: 0 6px 0 0;
+      padding: 0 8px 0 52px;
+      text-decoration: none;
       text-shadow: 0 1px 0 #fff;
-      top: -15px;
+      top: -13px;
+
+      .gravatar {
+        border: 2px solid #fff;
+        .shadowed-tight();
+        left: 8px;
+        position: absolute;
+        top: -6px;
+        width: 32px;
+      }
+    }
+
+    .user-meta:hover {
+      text-decoration: none;
     }
   }
 }
