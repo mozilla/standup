@@ -18,6 +18,9 @@ function fixTimezones() {
             hours -= 12;
             ampm = 'pm';
         }
+        if (minutes < 10) { // single digit
+            minutes = '0' + minutes;
+        }
         $t.text(hours + ':' + minutes + ' ' + ampm);
     });
 }
