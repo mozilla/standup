@@ -43,8 +43,8 @@
   </div>
 {% endmacro %}
 
-{% macro show_statuses(statuses, show_project=True, show_user=True) %}
-  {% for status in statuses %}
+{% macro show_statuses(statuses, page, show_project=True, show_user=True, url='/') %}
+  {% for status in statuses.items %}
     {% if status.created.date() != last_created %}
       {% if last_created %}</ul>{% endif %}
       {% set last_project = None %}
@@ -86,10 +86,19 @@
       {{ status.content_html }}
     </li>
   {% endfor %}
-  {% if statuses.count() == 0 %}
+  {% if statuses.items %}
+    </ul>
+  {% else %}
     <div class="notice">No status updates available.</div>
   {% endif %}
-  {% if statuses %}</ul>{% endif %}
+  <div class="pagination">
+    {% if statuses.has_prev %}
+      <a class="prev" href="{{ url }}?page={{ page - 1 }}">Newer</a>
+    {% endif %}
+    {% if statuses.has_next %}
+      <a class="next" href="{{ url }}?page={{ page + 1 }}">Older</a>
+    {% endif %}
+  </div>
 {% endmacro %}
 
 {% macro show_status(status, show_project=True, show_user=True) %}
@@ -121,14 +130,4 @@
     <img class="gravatar" src="{% if user.email %}{{ user.email|gravatar_url }}{% else %}{{ 'None'|gravatar_url }}{% endif %}" alt="">
     {{ user.username }}
   </a>
-{% endmacro %}
-
-{% macro date_range(url, dates=None) %}
-  <div class="date-filter cf">
-    <ul>
-      <li><a class="{% if not dates %}selected{% endif %}" href="{{ url }}">Today</a></li>
-      <li><a class="{% if dates == '7d' %}selected{% endif %}" href="{{ url }}?dates=7d">Last 7 days</a></li>
-      <li><a class="{% if dates == 'all' %}selected{% endif %}" href="{{ url }}?dates=all">All</a></li>
-    </ul>
-  </div>
 {% endmacro %}

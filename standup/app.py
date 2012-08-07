@@ -27,12 +27,12 @@ class Team(db.Model):
     def __repr__(self):
         return '<Team: %s>' % self.name
 
-    def recent_statuses(self, startdate=None, enddate=None):
+    def recent_statuses(self, page=1, startdate=None, enddate=None):
         """Return the statuses for the team."""
         user_ids = [u.id for u in self.users]
         statuses = Status.query.filter(
             Status.user_id.in_(user_ids)).order_by(db.desc(Status.created))
-        return _apply_date_range(statuses, startdate, enddate)
+        return _paginate(statuses, page, startdate, enddate)
 
 
 class User(db.Model):
@@ -51,10 +51,10 @@ class User(db.Model):
     def __repr__(self):
         return '<User: [%s] %s>' % (self.username, self.name)
 
-    def recent_statuses(self, startdate=None, enddate=None):
+    def recent_statuses(self, page=1, startdate=None, enddate=None):
         """Return the statuses for the user."""
         statuses = self.statuses.order_by(db.desc(Status.created))
-        return _apply_date_range(statuses, startdate, enddate)
+        return _paginate(statuses, page, startdate, enddate)
 
 
 class Project(db.Model):
@@ -68,10 +68,10 @@ class Project(db.Model):
     def __repr__(self):
         return '<Project: [%s] %s>' % (self.slug, self.name)
 
-    def recent_statuses(self, startdate=None, enddate=None):
+    def recent_statuses(self, page=1, startdate=None, enddate=None):
         """Return the statuses for the project."""
         statuses = self.statuses.order_by(db.desc(Status.created))
-        return _apply_date_range(statuses, startdate, enddate)
+        return _paginate(statuses, page, startdate, enddate)
 
 
 class Status(db.Model):
@@ -110,14 +110,14 @@ def index():
     """The home page."""
     return render_template(
         'index.html',
-        statuses=_apply_date_range(
+        statuses=_paginate(
             Status.query.order_by(db.desc(Status.created)),
+            request.args.get('page', 1),
             _startdate(request),
             _enddate(request)),
         projects=Project.query.order_by(Project.name).filter(
             Project.statuses.any()),
-        teams=Team.query.order_by(Team.name).all(),
-        dates=request.args.get('dates'))
+        teams=Team.query.order_by(Team.name).all())
 
 
 @app.route('/user/<slug>', methods=['GET'])
@@ -130,8 +130,9 @@ def user(slug):
         'user.html',
         user=user,
         statuses=user.recent_statuses(
-            _startdate(request), _enddate(request)),
-        dates=request.args.get('dates'))
+            request.args.get('page', 1),
+            _startdate(request),
+            _enddate(request)))
 
 
 @app.route('/project/<slug>', methods=['GET'])
@@ -147,8 +148,9 @@ def project(slug):
         projects=Project.query.order_by(Project.name).filter(
             Project.statuses.any()),
         statuses=project.recent_statuses(
-            _startdate(request), _enddate(request)),
-        dates=request.args.get('dates'))
+            request.args.get('page', 1),
+            _startdate(request),
+            _enddate(request)))
 
 
 @app.route('/team/<slug>', methods=['GET'])
@@ -164,8 +166,9 @@ def team(slug):
         users=team.users,
         teams=Team.query.order_by(Team.name).all(),
         statuses=team.recent_statuses(
-            _startdate(request), _enddate(request)),
-        dates=request.args.get('dates'))
+            request.args.get('page', 1),
+            _startdate(request),
+            _enddate(request)))
 
 
 @app.route('/status/<id>', methods=['GET'])
@@ -303,19 +306,24 @@ def gravatar_url(email):
     return 'http://www.gravatar.com/avatar/' + hash
 
 
-def _apply_date_range(statuses, startdate=None, enddate=None):
+@app.context_processor
+def inject_page():
+    return dict(page=int(request.args.get('page', 1)))
+
+
+def _paginate(statuses, page=1, startdate=None, enddate=None):
     if startdate:
         statuses = statuses.filter(Status.created >= startdate)
     if enddate:
         statuses = statuses.filter(Status.created <= enddate)
-    return statuses
+    return statuses.paginate(int(page))
 
 
 def _startdate(request):
     dates = request.args.get('dates')
     if dates == '7d':
         return date.today() - timedelta(days=7)
-    elif not dates:
+    elif dates == 'today':
         return date.today()
     return None
 

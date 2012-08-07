@@ -9,7 +9,6 @@
 {% block content %}
   <div class="grid_8">
     {{ user_banner(user) }}
-    {{ date_range(url_for('user', slug=user.username), dates=dates) }}
-    {{ show_statuses(statuses, show_user=False) }}
+    {{ show_statuses(statuses, page, show_user=False, url=url_for('user', slug=user.username)) }}
   </div>
 {% endblock %}
