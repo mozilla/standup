@@ -32,17 +32,18 @@ To setup a local dev environment for hacking::
 
     $ pip install -r requirements.txt
 
-4. Run the app::
+4. Enable and run migrations::
+
+    $ ./standup/migrations.py version_control
+    $ ./standup/migrations.py upgrade
+
+5. Run the app::
 
     $ python standup/app.py
 
 
 Migrations
 ==========
-
-To enable versioning on the DB use::
-
-  $ ./standup/migrations.py version_control
 
 To run migrations use::
 
