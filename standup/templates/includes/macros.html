@@ -91,12 +91,12 @@
   {% else %}
     <div class="notice">No status updates available.</div>
   {% endif %}
-  <div class="pagination">
+  <div class="pagination cf">
     {% if statuses.has_prev %}
-      <a class="prev" href="{{ url }}?page={{ page - 1 }}">Newer</a>
+      <a class="prev" href="{{ url }}?page={{ page - 1 }}">Newer &rarr;</a>
     {% endif %}
     {% if statuses.has_next %}
-      <a class="next" href="{{ url }}?page={{ page + 1 }}">Older</a>
+      <a class="next" href="{{ url }}?page={{ page + 1 }}">&larr; Older</a>
     {% endif %}
   </div>
 {% endmacro %}
