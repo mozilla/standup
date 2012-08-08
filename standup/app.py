@@ -1,14 +1,14 @@
 import hashlib
-import os
+import os, re
 from datetime import datetime, date, timedelta
 from functools import wraps
+from bleach import clean, linkify
 
 from flask import (Flask, render_template, request, redirect, url_for,
                    jsonify, make_response)
 from flask.ext.sqlalchemy import SQLAlchemy
 
 import settings
-
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
@@ -304,6 +304,20 @@ def gravatar_url(email):
     m = hashlib.md5(email.lower())
     hash = m.hexdigest()
     return 'http://www.gravatar.com/avatar/' + hash
+
+
+@app.template_filter('format_update')
+def format_update(update):
+    def set_target(attrs, new=False):
+        attrs['target'] = '_blank'
+        return attrs
+
+    update = clean(update)
+    update = re.sub(r'(bug #?(\d+))',
+        r'<a href="http://bugzilla.mozilla.org/show_bug.cgi?id=\2">\1</a>',
+        update, flags=re.I)
+    update = linkify(update, target='_blank')
+    return update
 
 
 @app.context_processor
