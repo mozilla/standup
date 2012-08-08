@@ -83,7 +83,7 @@
           {{ status.created|dateformat('%-I:%M %p') }}
         </time>
       </a>
-      {{ status.content_html|format_update|safe }}
+      {{ status.content_html|format_update(status.project)|safe }}
     </li>
   {% endfor %}
   {% if statuses.items %}
@@ -120,7 +120,7 @@
         {% endif %}
       </div>
       <span class="post-time">{{ status.created|dateformat('{S} %B %Y') }} at {{ status.created|dateformat('%-I:%M %p')|lower }}</span>
-      {{ status.content_html|format_update|safe }}
+      {{ status.content_html|format_update(status.project)|safe }}
     </li>
   </ul>
 {% endmacro %}

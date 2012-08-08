@@ -307,7 +307,7 @@ def gravatar_url(email):
 
 
 @app.template_filter('format_update')
-def format_update(update):
+def format_update(update, project=None):
     def set_target(attrs, new=False):
         attrs['target'] = '_blank'
         return attrs
@@ -316,6 +316,10 @@ def format_update(update):
     update = re.sub(r'(bug #?(\d+))',
         r'<a href="http://bugzilla.mozilla.org/show_bug.cgi?id=\2">\1</a>',
         update, flags=re.I)
+    if project and project.repo_url:
+        update = re.sub(r'(pull #?(\d+))',
+            r'<a href="%s/pulls/\2">\1</a>' % project.repo_url, update,
+            flags=re.I)
     update = linkify(update, target='_blank')
     return update
 
