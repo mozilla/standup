@@ -318,7 +318,7 @@ def format_update(update, project=None):
         update, flags=re.I)
     if project and project.repo_url:
         update = re.sub(r'(pull #?(\d+))',
-            r'<a href="%s/pulls/\2">\1</a>' % project.repo_url, update,
+            r'<a href="%s/pull/\2">\1</a>' % project.repo_url, update,
             flags=re.I)
     update = linkify(update, target='_blank')
     return update
