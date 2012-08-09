@@ -239,6 +239,27 @@ header {
       text-decoration: underline;
     }
 
+    .tag {
+      background-color: #999;
+      border-color: #999;
+      border-style: solid;
+      border-width: 2px 0;
+      color: #fff;
+      font-size: 11px;
+      margin: 0 2px 0 0;
+      padding: 0 6px;
+      text-transform: lowercase;
+
+      &:last-of-type {
+        margin-right: 4px;
+      }
+
+      &.tag-blocked {
+        background-color: #c00;
+        border-color: #c00;
+      }
+    }
+
     .user-meta,
     .user-meta:visited {
       .gradient(#bbb, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0));
