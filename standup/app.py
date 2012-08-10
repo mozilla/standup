@@ -247,9 +247,8 @@ def delete_status(id):
     """Delete an existing status
 
     The status to be deleted should be posted as JSON using 'application/json as
-    the content type. The posted JSON need to have 3 required fields:
-        * id
-        * username
+    the content type. The posted JSON needs to have 2 required fields:
+        * user (the username)
         * api_key
 
     An example of the JSON:
@@ -276,6 +275,69 @@ def delete_status(id):
             jsonify(dict(error='You cannot delete this status.')), 403)
 
     status.delete()
+    db.session.commit()
+
+    return make_response(jsonify(dict(id=id)))
+
+
+@app.route('/api/v1/user/<id>/', methods=['POST'])
+@api_key_required
+def update_user(username):
+    """Update settings for an existing user.
+
+    The settings to be deleted should be posted as JSON using 'application/json
+    as the content type. The posted JSON needs to have 2 required fields:
+        * user (the username of the IRC user)
+        * api_key
+
+    You may optionally supply the following settings to overwrite their values:
+        * name
+        * email
+        * github_handle
+
+    An example of the JSON:
+
+        {
+            "user": "r1cky",
+            "email": "ricky@email.com"
+            "api_key": "qwertyuiopasdfghjklzxcvbnm1234567890"
+        }
+    """
+
+    # The data we need
+    authorname = request.json.get('user')
+
+    if not username:
+        return make_response(
+            jsonify(dict(error='Missing required fields')), 400)
+
+    author = User.query.filter(User.username==authorname)[0]
+
+    user = User.query.filter(User.username==username)
+
+    if not user.count():
+        return make_response(jsonify(dict(error='User does not exist.')), 400)
+    else:
+        user = user[0]
+
+    if author.username != user.username and author.is_admin == False:
+        return make_response(
+            jsonify(dict(error='You cannot modify this user.')), 403)
+
+    # Optional data
+    name = request.json.get('name')
+    email = request.json.get('email')
+    github_handle = request.json.get('github_handle')
+
+    if name:
+        user.name = name
+
+    if email:
+        user.email = email
+
+    if github_handle:
+        user.github_handle = github_handle
+
     db.session.commit()
 
     return make_response(jsonify(dict(id=id)))

@@ -6,7 +6,7 @@ import unittest
 from standup import app
 from standup.app import User, Project, Status
 from standup import settings
-from standup.tests import status
+from standup.tests import status, user
 
 class AppTestCase(unittest.TestCase):
 
@@ -95,6 +95,8 @@ class AppTestCase(unittest.TestCase):
     def test_delete_status(self):
         """Test deletion of a status"""
         s = status(save=True)
+        id = s.id
+
         data = json.dumps({
             'api_key': settings.API_KEY,
             'user': s.user.username})
@@ -104,15 +106,14 @@ class AppTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
         # Verify the status was deleted
-        self.assertEqual(Status.query.count(), 0)
+        self.assertEqual(Status.query.get(id), None)
 
     def test_delete_status_validation(self):
         """Verify validation of required fields"""
         s = status(save=True)
 
         # Missing user
-        data = json.dumps({
-            'api_key': settings.API_KEY})
+        data = json.dumps({'api_key': settings.API_KEY})
         response = self.app.delete(
             '/api/v1/status/%s/' % s.id, data=data,
             content_type='application/json')
@@ -143,9 +144,100 @@ class AppTestCase(unittest.TestCase):
     def test_delete_status_missing_api_key(self):
         """Request with missing API key should return 403"""
         s = status(save=True)
-        data = json.dumps({
-            'user': s.user.username})
+        data = json.dumps({'user': s.user.username})
         response = self.app.delete(
             '/api/v1/status/%s/' % s.id, data=data,
+            content_type='application/json')
+        self.assertEqual(response.status_code, 403)
+
+    def test_update_user(self):
+        """Test that a user can update their own settings"""
+        u = user(save=True)
+        id = u.id
+
+        data = json.dumps({
+            'api_key': settings.API_KEY,
+            'user': u.username,
+            'email': 'test@test.com',
+            'github_handle': 'test',
+            'name': 'Test'})
+        response = self.app.post(
+            '/api/v1/user/%s/' % u.id, data=data,
+            content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+
+        u = User.query.get(id)
+
+        self.assertEqual(u.email, 'test@test.com')
+        self.assertEqual(u.github_handle, 'test')
+        self.assertEqual(u.name, 'Test')
+
+    def test_update_user_by_admins(self):
+        """Test that an admin can update another users settings and non-admins
+        cannot update other users settings
+        """
+        u = user(save=True)
+        a = user(username='admin', slug='admin', email='admin@mail.com',
+                 is_admin=True, save=True)
+
+        uid = u.id
+        aid = a.id
+        username = u.username
+
+        data = json.dumps({
+            'api_key': settings.API_KEY,
+            'user': a.username,
+            'email': 'test@test.com',
+            'github_handle': 'test',
+            'name': 'Test'})
+        response = self.app.post(
+            '/api/v1/user/%s/' % uid, data=data,
+            content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+
+        u = User.query.get(uid)
+
+        self.assertEqual(u.email, 'test@test.com')
+        self.assertEqual(u.github_handle, 'test')
+        self.assertEqual(u.name, 'Test')
+
+        data = json.dumps({
+            'api_key': settings.API_KEY,
+            'user': username,
+            'email': 'test@test.com'})
+        response = self.app.post(
+            '/api/v1/user/%s/' % aid, data=data,
+            content_type='application/json')
+        self.assertEqual(response.status_code, 403)
+
+    def test_update_user_validation(self):
+        """Verify validation of required fields"""
+        u = user(save=True)
+
+        # Missing user
+        data = json.dumps({'api_key': settings.API_KEY})
+        response = self.app.post(
+            '/api/v1/user/%s/' % u.id, data=data,
+            content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+
+    def test_update_user_invalid_api_key(self):
+        """Request with invalid API key should return 403"""
+        u = user(save=True)
+        data = json.dumps({
+            'api_key': settings.API_KEY + '123',
+            'user': u.username})
+        response = self.app.post(
+            '/api/v1/user/%s/' % u.id, data=data,
+            content_type='application/json')
+        self.assertEqual(response.status_code, 403)
+
+
+    def test_udate_user_invalid_api_key(self):
+        """Request with invalid API key should return 403"""
+        u = user(save=True)
+        data = json.dumps({'user': u.username})
+        response = self.app.post(
+            '/api/v1/user/%s/' % u.id, data=data,
             content_type='application/json')
         self.assertEqual(response.status_code, 403)
