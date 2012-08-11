@@ -2,6 +2,7 @@
 @import 'grid.less';
 @import 'colors.less';
 @import 'mixins.less';
+@import 'magic.less';
 
 @font-face {
   font-family: 'OpenSans';
@@ -257,6 +258,10 @@ header {
       &.tag-blocked {
         background-color: #c00;
         border-color: #c00;
+      }
+
+      &.tag-mfbt {
+        .animation(rainbow 5s infinite)
       }
     }
 
