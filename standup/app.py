@@ -280,7 +280,7 @@ def delete_status(id):
     return make_response(jsonify(dict(id=id)))
 
 
-@app.route('/api/v1/user/<id>/', methods=['POST'])
+@app.route('/api/v1/user/<username>/', methods=['POST'])
 @api_key_required
 def update_user(username):
     """Update settings for an existing user.
@@ -340,7 +340,7 @@ def update_user(username):
 
     db.session.commit()
 
-    return make_response(jsonify(dict(id=id)))
+    return make_response(jsonify(dict(id=user.id)))
 
 
 @app.errorhandler(404)
