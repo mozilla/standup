@@ -374,26 +374,28 @@ def format_update(update, project=None):
         attrs['target'] = '_blank'
         return attrs
 
-    update = clean(update)
-    update = re.sub(r'(bug) #?(\d+)',
+    formatted = clean(update)
+    formatted = re.sub(r'(bug) #?(\d+)',
         r'<a href="http://bugzilla.mozilla.org/show_bug.cgi?id=\2">\1 \2</a>',
-        update, flags=re.I)
+        formatted, flags=re.I)
 
     if project and project.repo_url:
-        update = re.sub(r'(pull) #?(\d+)',
-            r'<a href="%s/pull/\2">\1 \2</a>' % project.repo_url, update,
+        formatted = re.sub(r'(pull) #?(\d+)',
+            r'<a href="%s/pull/\2">\1 \2</a>' % project.repo_url, formatted,
             flags=re.I)
 
-    tags = re.findall(r'(?:^|[^\w\\/])#([a-zA-Z0-9_-]+)(?:\b|$)', update)
+    formatted = linkify(formatted, target='_blank')
+
+    # Search for tags on the original, unformatted string.
+    tags = re.findall(r'(?:^|[^\w\\/])#([a-zA-Z0-9_\.-]+)(?:\b|$)', update)
     if tags:
         tags_html = ''
         for tag in tags:
             tags_html = '{0} <span class="tag tag-{1}">{1}</span>'.format(
                 tags_html, tag)
-        update = '%s %s' % (tags_html, update)
+        formatted = '%s %s' % (tags_html, formatted)
 
-    update = linkify(update, target='_blank')
-    return update
+    return formatted
 
 
 @app.context_processor
