@@ -120,6 +120,12 @@ def index():
         teams=Team.query.order_by(Team.name).all())
 
 
+@app.route('/help')
+def help():
+    """The help page."""
+    return render_template('help.html')
+
+
 @app.route('/user/<slug>', methods=['GET'])
 def user(slug):
     """The user page. Shows a user's statuses."""
@@ -374,11 +380,15 @@ def format_update(update, project=None):
         attrs['target'] = '_blank'
         return attrs
 
+    # Remove icky stuff.
     formatted = clean(update)
+
+    # Linkify "bug #n" and "bug n" text.
     formatted = re.sub(r'(bug) #?(\d+)',
         r'<a href="http://bugzilla.mozilla.org/show_bug.cgi?id=\2">\1 \2</a>',
         formatted, flags=re.I)
 
+    # Linkify "pull #n" and "pull n" text.
     if project and project.repo_url:
         formatted = re.sub(r'(pull) #?(\d+)',
             r'<a href="%s/pull/\2">\1 \2</a>' % project.repo_url, formatted,
