@@ -32,14 +32,29 @@ To setup a local dev environment for hacking::
 
     $ pip install -r requirements.txt
 
-4. Enable and run migrations::
+4. Configure::
+
+    $ vim ./standup/local_settings.py
+
+5. Enable and run migrations::
 
     $ ./standup/migrations.py version_control
     $ ./standup/migrations.py upgrade
 
-5. Run the app::
+6. Run the app::
 
     $ python standup/app.py
+
+
+Oh, but wait--what can you do with it? Well, for testing purposes, you
+can use the included ``scripts/standup-cmd`` which is a command-line
+tool you can use to create statuses.
+
+Example::
+
+    $ ./scripts/standup-cmd localhost:5000 ou812 willkg sumo "hi!"
+
+(Assumes your api_key is set to ou812.)
 
 
 Migrations
@@ -48,6 +63,32 @@ Migrations
 To run migrations use::
 
   $ ./standup/migrations.py upgrade
+
+
+Configuration
+=============
+
+These are things you can set in ``standup/local_settings.py``:
+
+    API_KEY
+        The key used for using the API. You use this for the standup-irc
+        bot as well as the standup-cli.
+
+        Defaults to something ridiculous.
+
+    DEBUG
+        Either ``True`` or ``False``. Determines whether it prints lots of
+        stuff to the console and whether errors get a debugging-friendly
+        error page.
+
+        Defaults to ``False``.
+
+These are things you can set in the environment when you launch standup:
+
+    DATABASE_URL
+        The uri to use for the database.
+
+        Defaults to ``sqlite:///standup_app.db``.
 
 
 Testing
