@@ -312,7 +312,7 @@ def update_user(username):
     email = request.json.get('email')
     github_handle = request.json.get('github_handle')
 
-    if not username and (name or email or github_handle):
+    if not (username and authorname and (name or email or github_handle)):
         return make_response(
             jsonify(dict(error='Missing required fields')), 400)
 
