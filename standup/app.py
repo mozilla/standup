@@ -321,7 +321,7 @@ def update_user(username):
     user = User.query.filter(User.username==username)
 
     if not user.count():
-        return make_response(jsonify(dict(error='User does not exist.')), 400)
+        user = User(username=username, slug=username)
     else:
         user = user[0]
 
