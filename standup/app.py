@@ -307,7 +307,12 @@ def update_user(username):
     # The data we need
     authorname = request.json.get('user')
 
-    if not username:
+    # Optional data
+    name = request.json.get('name')
+    email = request.json.get('email')
+    github_handle = request.json.get('github_handle')
+
+    if not username and (name or email or github_handle):
         return make_response(
             jsonify(dict(error='Missing required fields')), 400)
 
@@ -323,11 +328,6 @@ def update_user(username):
     if author.username != user.username and author.is_admin == False:
         return make_response(
             jsonify(dict(error='You cannot modify this user.')), 403)
-
-    # Optional data
-    name = request.json.get('name')
-    email = request.json.get('email')
-    github_handle = request.json.get('github_handle')
 
     if name:
         user.name = name
