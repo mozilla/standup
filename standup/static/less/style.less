@@ -48,6 +48,21 @@ a:hover {
   text-decoration: underline;
 }
 
+dl {
+  dd {
+    margin: 0 0 16px 0;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  dt {
+    font-weight: bold;
+    margin-bottom: 2px;
+  }
+}
+
 footer {
   color: #999;
   border-top: 1px solid #e2e2e2;
@@ -93,6 +108,7 @@ header {
         float: left;
         height: 50px;
         line-height: 44px;
+        margin-left: 24px;
 
         a,
         a:visited {
@@ -124,6 +140,16 @@ header {
   .shadowed();
   margin-bottom: 40px;
   padding: 16px 0;
+
+  &.content-box {
+    padding-left: 20px;
+    padding-right: 20px;
+
+    h2 {
+      margin-left: 0;
+      margin-right: 0;
+    }
+  }
 
   h2 {
     border-bottom: 1px solid #ccc;
