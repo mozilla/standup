@@ -390,14 +390,14 @@ def format_update(update, project=None):
 
     # Linkify "pull #n" and "pull n" text.
     if project and project.repo_url:
-        formatted = re.sub(r'(pull) #?(\d+)',
+        formatted = re.sub(r'(pull|pr) #?(\d+)',
             r'<a href="%s/pull/\2">\1 \2</a>' % project.repo_url, formatted,
             flags=re.I)
 
     formatted = linkify(formatted, target='_blank')
 
     # Search for tags on the original, unformatted string.
-    tags = re.findall(r'(?:^|[^\w\\/])#([a-zA-Z0-9_\.-]+)(?:\b|$)', update)
+    tags = re.findall(r'(?:^|[^\w\\/])#([a-zA-Z_\.-]+)(?:\b|$)', update)
     if tags:
         tags_html = ''
         for tag in tags:

@@ -3,8 +3,10 @@ import os
 import tempfile
 import unittest
 
+from nose.tools import ok_, eq_
+
 from standup import app
-from standup.app import User, Project, Status
+from standup.app import User, Project, Status, format_update
 from standup import settings
 from standup.tests import status, user
 
@@ -41,6 +43,19 @@ class AppTestCase(unittest.TestCase):
         self.assertEqual(Project.query.first().slug, 'sumodev')
         # Verify the status was created.
         self.assertEqual(Status.query.first().content, 'bug 123456')
+
+    def test_format_update(self):
+        p = Project(name='mdndev', slug='mdndev',
+                    repo_url='https://github.com/mozilla/kuma')
+        app.db.session.add(p)
+        app.db.session.commit()
+        content = "#merge pull #1 and pR 2 to fix bug #3 and BUg 4"
+        formatted_update = format_update(content, project=p)
+        ok_('tag-merge' in formatted_update)
+        ok_('pull/1' in formatted_update)
+        ok_('pull/2' in formatted_update)
+        ok_('show_bug.cgi?id=3' in formatted_update)
+        ok_('show_bug.cgi?id=4' in formatted_update)
 
     def test_create_status_validation(self):
         """Verify validation of required fields."""
