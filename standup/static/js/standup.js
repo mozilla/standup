@@ -1,5 +1,45 @@
 $(function() {
     fixTimezones();
+
+    /* Authenticatication for Persona */
+    $('#login').click(function(ev) {
+        ev.preventDefault();
+        navigator.id.request();
+    });
+
+    $('#logout').click(function(ev) {
+        ev.preventDefault();
+        navigator.id.logout();
+    });
+
+    navigator.id.watch({
+        loggedInEmail: currentUser,
+        onlogin: function(assertion) {
+            $.ajax({
+                type: 'POST',
+                url: '/authenticate',
+                data: { assertion: assertion },
+                success: function(res, status, xhr) {
+                    window.location.reload();
+                },
+                error: function(res, status, xhr) {
+                    alert('login failure ' + res);
+                }
+            });
+        },
+        onlogout: function() {
+            $.ajax({
+                type: 'POST',
+                url: '/logout',
+                success: function(res, status, xhr) {
+                    window.location.reload();
+                },
+                error: function(res, status, xhr) {
+                    console.log('logout failure ' + res);
+                }
+            });
+        }
+    });
 });
 
 /* Find all datetime objects and modify them to match the user's current

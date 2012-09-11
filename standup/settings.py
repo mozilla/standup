@@ -1,5 +1,5 @@
 # Application settings.
-# To override the values, create a local_settings.py and enter the 
+# To override the values, create a local_settings.py and enter the
 # new values there.
 
 # The key used to authenticate API calls.

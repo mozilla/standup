@@ -1,3 +1,4 @@
+import browserid
 import hashlib
 import os, re
 from datetime import datetime, date, timedelta
@@ -5,7 +6,7 @@ from functools import wraps
 from bleach import clean, linkify
 
 from flask import (Flask, render_template, request, redirect, url_for,
-                   jsonify, make_response)
+                   jsonify, make_response, session)
 from flask.ext.sqlalchemy import SQLAlchemy
 
 import settings
@@ -13,6 +14,7 @@ import settings
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
     'DATABASE_URL', 'sqlite:///standup_app.db')
+app.secret_key = settings.SESSION_SECRET
 db = SQLAlchemy(app)
 
 
@@ -103,6 +105,26 @@ def api_key_required(view):
         return view(*args, **kwargs)
 
     return wrapper
+
+
+@app.route('/authenticate', methods=['POST'])
+def authenticate():
+    """Authenticate user with Persona."""
+    data = browserid.verify(request.form['assertion'],
+                            settings.SITE_URL)
+    session['email'] = data['email']
+    response = jsonify({'message':'login successful'})
+    response.status_code = 200
+    return response
+
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    """Log user out of app."""
+    session.pop('email', None)
+    response = jsonify({'message':'logout successful'})
+    response.status_code = 200
+    return response
 
 
 @app.route('/')

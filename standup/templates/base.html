@@ -6,6 +6,13 @@
   <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}" />
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/normalize.css') }}">
   <link rel="stylesheet/less" type="text/css" href="{{ url_for('static', filename='less/style.less') }}">
+  <script src="https://login.persona.org/include.js"></script>
+  <script type="text/javascript">
+      var currentUser = null;
+      {% if session['email'] %}
+        currentUser = '{{ session['email'] }}';
+      {% endif %}
+  </script>
   <script src="{{ url_for('static', filename='js/less.js') }}"></script>
   <script src="{{ url_for('static', filename='js/jquery-1.7.2.min.js') }}"></script>
   <script src="{{ url_for('static', filename='js/standup.js') }}"></script>
@@ -21,6 +28,13 @@
           <ul>
             <li><a href="#">Admin</a></li>
             <li><a href="{{ url_for('help') }}">Help</a></li>
+            <li>
+              {% if not session['email'] %}
+                <a href="#" id="login">Sign in with Persona</a>
+              {% else %}
+                <a href="#" id="logout">Logout</a>
+              {% endif %}
+            </li>
           </ul>
         </nav>
       </div>
