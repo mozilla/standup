@@ -50,7 +50,7 @@
       {% set last_project = None %}
       {% set last_user = None %}
       {% set last_created = status.created.date() %}
-      <h3><span>{{ last_created|dateformat('%A, {S} %B %Y') }}</span></h3>
+      <h3><a href="?day={{ last_created|dateformat('%Y-%m-%d') }}">{{ last_created|dateformat('%A, {S} %B %Y') }}</a></h3>
       <ul class="status-updates">
     {% endif %}
     {% if status.user.username != last_user %}

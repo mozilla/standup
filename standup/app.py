@@ -449,15 +449,29 @@ def _paginate(statuses, page=1, startdate=None, enddate=None):
 
 def _startdate(request):
     dates = request.args.get('dates')
+    day = request.args.get('day')
     if dates == '7d':
         return date.today() - timedelta(days=7)
     elif dates == 'today':
         return date.today()
+    elif _isday(day):
+        return _day(day)
     return None
 
 
 def _enddate(request):
+    day = request.args.get('day')
+    if _isday(day):
+        return _day(day) + timedelta(days=1)
     return None
+
+
+def _isday(day):
+    return day and re.match('^\d{4}-\d{2}-\d{2}$', day)
+
+
+def _day(day):
+    return datetime.strptime(day, '%Y-%m-%d')
 
 
 if __name__ == '__main__':
