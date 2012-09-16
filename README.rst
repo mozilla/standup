@@ -34,6 +34,7 @@ To setup a local dev environment for hacking::
 
 4. Configure::
 
+    $ cp ./standup/local_settings.py-dist ./standup/local_settings.py
     $ vim ./standup/local_settings.py
 
 5. Enable and run migrations::
@@ -68,7 +69,29 @@ To run migrations use::
 Configuration
 =============
 
+There's a ``standup/local_settings.py-dist`` template which you can copy
+to ``standup/local_settings.py`` to start you off.
+
 These are things you can set in ``standup/local_settings.py``:
+
+    SITE_URL
+        The url for your site.
+
+        For example, if you're running on your local machine, it would be::
+
+            SITE_URL = 'http://localhost:5000'
+
+        No default. You must set this.
+
+    SESSION_SECRET
+        Secret string used for creating session variables. This can be
+        any string.
+
+        For example::
+
+            SESSION_SECRET = '1234'
+
+        No default. You must set this.
 
     API_KEY
         The key used for using the API. You use this for the standup-irc
