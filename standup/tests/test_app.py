@@ -6,7 +6,7 @@ import unittest
 from nose.tools import ok_, eq_
 
 from standup import app
-from standup.app import User, Project, Status, format_update
+from standup.app import User, Project, Status, format_update, TAG_TMPL
 from standup import settings
 from standup.tests import status, user
 
@@ -256,3 +256,15 @@ class AppTestCase(unittest.TestCase):
             '/api/v1/user/%s/' % u.id, data=data,
             content_type='application/json')
         self.assertEqual(response.status_code, 403)
+
+
+class FormatUpdateTest(unittest.TestCase):
+    def test_tags(self):
+        # Test valid tags.
+        for tag in ('#t', '#tag', '#TAG', '#tag123'):
+            expected = '%s %s' % (TAG_TMPL.format('', tag[1:]), tag)
+            eq_(format_update(tag), expected)
+
+        # Test invalid tags.
+        for tag in ('#1', '#.abc', '#?abc'):
+            eq_(format_update(tag), tag)
