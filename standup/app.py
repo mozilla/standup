@@ -396,6 +396,9 @@ def gravatar_url(email):
     return 'http://www.gravatar.com/avatar/' + hash
 
 
+TAG_TMPL = '{0} <span class="tag tag-{1}">{1}</span>'
+
+
 @app.template_filter('format_update')
 def format_update(update, project=None):
     def set_target(attrs, new=False):
@@ -418,13 +421,14 @@ def format_update(update, project=None):
 
     formatted = linkify(formatted, target='_blank')
 
-    # Search for tags on the original, unformatted string.
-    tags = re.findall(r'(?:^|[^\w\\/])#([a-zA-Z_\.-]+)(?:\b|$)', update)
+    # Search for tags on the original, unformatted string. A tag must start
+    # with a letter.
+    tags = re.findall(r'(?:^|[^\w\\/])#([a-zA-Z][a-zA-Z0-9_\.-]*)(?:\b|$)',
+                      update)
     if tags:
         tags_html = ''
         for tag in tags:
-            tags_html = '{0} <span class="tag tag-{1}">{1}</span>'.format(
-                tags_html, tag)
+            tags_html = TAG_TMPL.format(tags_html, tag)
         formatted = '%s %s' % (tags_html, formatted)
 
     return formatted
