@@ -69,7 +69,7 @@
       <div class="post-meta">
         {% if status.project.name != last_project %}
           {% set last_project = status.project.name %}
-          {% if show_project %}
+          {% if status.project and show_project %}
             <a class="project-name"
                style="{% if status.project.color %}background-color: #{{ status.project.color }};{% endif %}"
                href="{{ url_for('project', slug=status.project.slug) }}">

@@ -83,8 +83,7 @@ class Status(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     user = db.relationship(
         'User', backref=db.backref('statuses', lazy='dynamic'))
-    project_id = db.Column(
-        db.Integer, db.ForeignKey('project.id'), nullable=False)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
     project = db.relationship(
         'Project', backref=db.backref('statuses', lazy='dynamic'))
     content = db.Column(db.Text)
@@ -219,9 +218,8 @@ def create_status():
     """Post a new status.
 
     The status should be posted as JSON using 'application/json' as the
-    content type. The posted JSON needs to have 4 required fields:
+    content type. The posted JSON needs to have 3 required fields:
         * user (the username)
-        * project (the slug)
         * content
         * api_key
 
@@ -240,7 +238,7 @@ def create_status():
     content = request.json.get('content')
 
     # Validate we have the required fields.
-    if not (username and project_slug and content):
+    if not (username and content):
         return make_response(
             jsonify(dict(error='Missing required fields.')), 400)
 
@@ -254,15 +252,17 @@ def create_status():
         db.session.commit()
 
     # Get or create the project
-    project = Project.query.filter_by(slug=project_slug).first()
-    if not project:
-        project = Project(slug=project_slug, name=project_slug)
-        db.session.add(project)
-        db.session.commit()
+    if project_slug:
+        project = Project.query.filter_by(slug=project_slug).first()
+        if not project:
+            project = Project(slug=project_slug, name=project_slug)
+            db.session.add(project)
+            db.session.commit()
 
     # Create the status
-    status = Status(project_id=project.id, user_id=user.id, content=content,
-                    content_html=content)
+    status = Status(user_id=user.id, content=content, content_html=content)
+    if project_slug and project:
+        status.project_id = project.id
     db.session.add(status)
     db.session.commit()
 
@@ -353,7 +353,7 @@ def update_user(username):
     else:
         user = user[0]
 
-    if author.username != user.username and author.is_admin == False:
+    if author.username != user.username and not author.is_admin:
         return make_response(
             jsonify(dict(error='You cannot modify this user.')), 403)
 

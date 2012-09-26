@@ -68,15 +68,6 @@ class AppTestCase(unittest.TestCase):
             '/api/v1/status/', data=data, content_type='application/json')
         self.assertEqual(response.status_code, 400)
 
-        # Missing project
-        data = json.dumps({
-            'api_key': settings.API_KEY,
-            'user': 'r1cky',
-            'content': 'bug 123456'})
-        response = self.app.post(
-            '/api/v1/status/', data=data, content_type='application/json')
-        self.assertEqual(response.status_code, 400)
-
         # Missing content
         data = json.dumps({
             'api_key': settings.API_KEY,
@@ -106,6 +97,19 @@ class AppTestCase(unittest.TestCase):
         response = self.app.post(
             '/api/v1/status/', data=data, content_type='application/json')
         self.assertEqual(response.status_code, 403)
+
+    def test_create_status_no_project(self):
+        """Statuses can be created without a project"""
+        data = json.dumps({
+            'api_key': settings.API_KEY,
+            'user': 'r1cky',
+            'content': 'test update'})
+        response = self.app.post(
+            '/api/v1/status/', data=data, content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+
+        # Verify the status was created
+        self.assertEqual(Status.query.first().content, 'test update')
 
     def test_delete_status(self):
         """Test deletion of a status"""
@@ -177,7 +181,7 @@ class AppTestCase(unittest.TestCase):
             'github_handle': 'test',
             'name': 'Test'})
         response = self.app.post(
-            '/api/v1/user/%s/' % u.id, data=data,
+            '/api/v1/user/%s/' % u.username, data=data,
             content_type='application/json')
         self.assertEqual(response.status_code, 200)
 
@@ -206,7 +210,7 @@ class AppTestCase(unittest.TestCase):
             'github_handle': 'test',
             'name': 'Test'})
         response = self.app.post(
-            '/api/v1/user/%s/' % uid, data=data,
+            '/api/v1/user/%s/' % username, data=data,
             content_type='application/json')
         self.assertEqual(response.status_code, 200)
 
