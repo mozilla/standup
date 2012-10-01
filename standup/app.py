@@ -1,13 +1,13 @@
 import browserid
 import hashlib
 import os, re
-from datetime import datetime, date, timedelta
-from functools import wraps
 from bleach import clean, linkify
-
+from datetime import datetime, date, timedelta
 from flask import (Flask, render_template, request, redirect, url_for,
                    jsonify, make_response, session)
 from flask.ext.sqlalchemy import SQLAlchemy
+from functools import wraps
+from urllib import urlencode
 
 import settings
 
@@ -393,13 +393,17 @@ def gravatar_url(email, size=None):
     hash = m.hexdigest()
     url = 'http://www.gravatar.com/avatar/' + hash
 
+    qs = {}
+
     if settings.DEBUG:
-        url += '?d=mm'
+        qs['d'] = 'mm'
     else:
-        url += '?d=%s%s' % settings.SITE_URL, url_for('static', filename='img/default-avatar.png')
+        qs['d'] = settings.SITE_URL + url_for('static', filename='img/default-avatar.png')
 
     if size:
-        url += '&s=%s' % size
+        qs['s'] = size
+
+    url += '?' + urlencode(qs)
     return url
 
 
@@ -413,7 +417,7 @@ def format_update(update, project=None):
         return attrs
 
     # Remove icky stuff.
-    formatted = clean(update)
+    formatted = clean(update, tags=[])
 
     # Linkify "bug #n" and "bug n" text.
     formatted = re.sub(r'(bug) #?(\d+)',
