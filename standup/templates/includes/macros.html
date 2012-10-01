@@ -1,133 +1,79 @@
-{% macro projects_menu(projects, selected=None) %}
-  <div class="box">
-    <h2>Projects:</h2>
-    <ul class="menu">
-      {% for project in projects %}
-      <li>
-        <a {% if project == selected %}class="selected"{% endif %} href="{{ url_for('project', slug=project.slug) }}">
-          {{ project.name }}
-        </a>
-      </li>
-      {% endfor %}
-    </ul>
-  </div>
-{% endmacro %}
-
-{% macro teams_menu(teams, selected=None) %}
-  <div class="box">
-    <h2>Teams:</h2>
-    <ul class="menu">
-      {% for team in teams %}
-      <li>
-        <a {% if team == selected %}class="selected"{% endif %} href="{{ url_for('team', slug=team.slug) }}">
-        {{ team.name }}
-        </a>
-      </li>
-      {% endfor %}
-    </ul>
-  </div>
-{% endmacro %}
-
-{% macro users_menu(users, selected=None) %}
-  <div class="box">
-    <h2>People:</h2>
-    <ul class="menu">
-      {% for user in users %}
-      <li>
-        <a {% if user == selected %}class="selected"{% endif %} href="{{ url_for('user', slug=user.slug) }}">
-        {{ user.name }}
-        </a>
-      </li>
-      {% endfor %}
-    </ul>
-  </div>
-{% endmacro %}
-
-{% macro show_statuses(statuses, page, show_project=True, show_user=True, url='/') %}
+{% macro status_updates(statuses, page, url='/') %}
   {% for status in statuses.items %}
-    {% if status.created.date() != last_created %}
-      {% if last_created %}</ul>{% endif %}
-      {% set last_project = None %}
-      {% set last_user = None %}
-      {% set last_created = status.created.date() %}
-      <h3><a href="?day={{ last_created|dateformat('%Y-%m-%d') }}">{{ last_created|dateformat('%A, {S} %B %Y') }}</a></h3>
-      <ul class="status-updates">
-    {% endif %}
-    {% if status.user.username != last_user %}
-      {% set last_project = None %}
-      {% set last_user = status.user.username %}
-      <li>
-        {% if show_user %}
-          <a class="user-meta" href="{{ url_for('user', slug=status.user.slug) }}">
-            <img class="gravatar" src="{% if status.user.email %}{{ status.user.email|gravatar_url }}{% else %}{{ 'None'|gravatar_url }}{% endif %}" alt="">
-            {{ last_user }}
-          </a>
-        {% endif %}
-    {% else %}
-      <li class="squashed">
-    {% endif %}
-      <div class="post-meta">
-        {% if status.project.name != last_project %}
-          {% set last_project = status.project.name %}
-          {% if status.project and show_project %}
-            <a class="project-name"
-               style="{% if status.project.color %}background-color: #{{ status.project.color }};{% endif %}"
-               href="{{ url_for('project', slug=status.project.slug) }}">
-              {{ status.project.name }}
-            </a>
-          {% endif %}
-        {% endif %}
+    {% if (status.user.username != last_user or last_date != status.created.date()) and not loop.first %}
+          </ul>
+        </div>
       </div>
-      <a href="{{ url_for('status', id=status.id) }}" class="post-time">
-        <time datetime="{{ status.created|dateformat('%Y-%m-%dT%H:%M:%SZ') }}">
-          {{ status.created|dateformat('%-I:%M %p') }}
-        </time>
-      </a>
-      {{ status.content_html|format_update(status.project)|safe }}
-    </li>
+    {% endif %}
+
+    {% if last_date != status.created.date() %}
+      {% set last_date = status.created.date() %}
+      {% set last_user = None %}
+      <div class="grid_8 alpha omega prefix_4">
+        <h3>
+          <a href="?day={{ status.created.date()|dateformat('%Y-%m-%d') }}">
+            {% if status.created.date() == today%}
+              Today
+            {% elif status.created.date() == yesterday %}
+              Yesterday
+            {% else %}
+              {{ status.created.date()|dateformat('%A, {S} %B %Y') }}
+            {% endif %}
+          </a>
+        </h3>
+      </div>
+    {% endif %}
+
+    {% if status.user.username != last_user %}
+      {% set last_user = status.user.username %}
+      <div class="status-block cf">
+        <div class="user-meta grid_3 alpha">
+          <h4><a href="{{ url_for('user', slug=status.user.slug) }}">{{ status.user.name }}</a></h4>
+          <a href="{{ url_for('user', slug=status.user.slug) }}">@{{ status.user.username }}</a>
+        </div>
+        <div class="grid_1">
+          <a href="{{ url_for('user', slug=status.user.slug) }}">
+            <img class="gravatar" src="{% if status.user.email %}{{ status.user.email|gravatar_url(size=60) }}{% else %}{{ 'None'|gravatar_url(size=60) }}{% endif %}">
+          </a>
+        </div>
+        <div class="grid_8 omega">
+          <ul class="bubble">
+    {% endif %}
+            <li class="cf">
+              <div class="update-meta">
+                <a class="post-time" href="{{ url_for('status', id=status.id) }}">
+                  <time datetime="{{ status.created|dateformat('%Y-%m-%dT%H:%M:%SZ') }}">
+                    {{ status.created|dateformat('%-I:%M %p') }}
+                  </time>
+                </a>
+
+                {% if status.project %}
+                  <a class="project-name"
+                     style="{% if status.project.color %}background-color: #{{ status.project.color }}; color: #{{ status.project.color }};{% endif %}"
+                     href="{{ url_for('project', slug=status.project.slug) }}">
+                    {{ status.project.name }}
+                  </a>
+                {% endif %}
+              </div>
+              <div class="update">{{ status.content_html|format_update(status.project)|safe }}</div>
+            </li>
+    {% if loop.last %}
+          </ul>
+        </div>
+      </div>
+    {% endif %}
   {% endfor %}
-  {% if statuses.items %}
-    </ul>
-  {% else %}
+  {% if not statuses.items %}
     <div class="notice">No status updates available.</div>
   {% endif %}
-  <div class="pagination cf">
-    {% if statuses.has_prev %}
-      <a class="prev" href="{{ url }}?page={{ page - 1 }}">Newer &rarr;</a>
-    {% endif %}
-    {% if statuses.has_next %}
-      <a class="next" href="{{ url }}?page={{ page + 1 }}">&larr; Older</a>
-    {% endif %}
-  </div>
-{% endmacro %}
-
-{% macro show_status(status, show_project=True, show_user=True) %}
-  <ul class="status-updates">
-    <li>
-      {% if show_user %}
-        <a class="user-meta" href="{{ url_for('user', slug=status.user.slug) }}">
-          <img class="gravatar" src="{% if status.user.email %}{{ status.user.email|gravatar_url }}{% else %}{{ 'None'|gravatar_url }}{% endif %}" alt="">
-          {{ last_user }}
-        </a>
+  {% if statuses.has_prev or statuses.has_next %}
+    <div class="grid_8 prefix_4 pagination cf">
+      {% if statuses.has_prev %}
+        <a class="btn prev" href="{{ url }}?page={{ page - 1 }}">Newer &raquo;</a>
       {% endif %}
-      <div class="post-meta">
-        {% if show_project %}
-          <a class="project-name"
-             style="{% if status.project.color %}background-color: #{{ status.project.color }};{% endif %}"
-             href="{{ url_for('project', slug=status.project.slug) }}">
-            {{ status.project.name }}
-          </a>
-        {% endif %}
-      </div>
-      <span class="post-time">{{ status.created|dateformat('{S} %B %Y') }} at {{ status.created|dateformat('%-I:%M %p')|lower }}</span>
-      {{ status.content_html|format_update(status.project)|safe }}
-    </li>
-  </ul>
-{% endmacro %}
-
-{% macro user_banner(user) %}
-  <a class="user-banner" href="{{ url_for('user', slug=user.slug) }}">
-    <img class="gravatar" src="{% if user.email %}{{ user.email|gravatar_url }}{% else %}{{ 'None'|gravatar_url }}{% endif %}" alt="">
-    {{ user.username }}
-  </a>
+      {% if statuses.has_next %}
+        <a class="btn next" href="{{ url }}?page={{ page + 1 }}">&laquo; Older</a>
+      {% endif %}
+    </div>
+  {% endif %}
 {% endmacro %}

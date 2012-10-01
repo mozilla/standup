@@ -266,7 +266,7 @@ class FormatUpdateTest(unittest.TestCase):
     def test_tags(self):
         # Test valid tags.
         for tag in ('#t', '#tag', '#TAG', '#tag123'):
-            expected = '%s %s' % (TAG_TMPL.format('', tag[1:]), tag)
+            expected = '%s <div class="tags">%s</div>' % (tag, TAG_TMPL.format('', tag[1:]),)
             eq_(format_update(tag), expected)
 
         # Test invalid tags.

@@ -1,14 +1,13 @@
-{% from 'includes/macros.html' import show_statuses, user_banner, date_range %}
+{% from 'includes/macros.html' import status_updates %}
 
 {% extends "base.html" %}
 
 {% block title %}
-  {{ user.name }}'s standups
+  @{{ user.username }} | Standup
 {% endblock %}
 
 {% block content %}
-  <div class="grid_8">
-    {{ user_banner(user) }}
-    {{ show_statuses(statuses, page, show_user=False, url=url_for('user', slug=user.username)) }}
+  <div class="grid_12">
+    {{ status_updates(statuses, page, url=url_for('user', slug=user.username)) }}
   </div>
 {% endblock %}

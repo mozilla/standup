@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html class="no-js">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
   <title>{% block title %}{% endblock %}</title>
@@ -13,42 +13,88 @@
         currentUser = '{{ session['email'] }}';
       {% endif %}
   </script>
+  <script src="{{ url_for('static', filename='js/modernizr-2.6.1.js') }}"></script>
   <script src="{{ url_for('static', filename='js/less.js') }}"></script>
   <script src="{{ url_for('static', filename='js/jquery-1.7.2.min.js') }}"></script>
   <script src="{{ url_for('static', filename='js/standup.js') }}"></script>
 </head>
 <body>
+  <div class="page">
   <header>
-    <div class="container_8">
+    <div class="container_12">
       <div class="grid_2">
         <a class="logo" href="{{ url_for('index') }}">standup</a>
       </div>
-      <div class="grid_6">
+      <div class="grid_10">
         <nav>
           <ul>
-            <li><a href="#">Admin</a></li>
-            <li><a href="{{ url_for('help') }}">Help</a></li>
+            {% if teams %}
+              <li>
+                <a href="#">Teams</a>
+                <ul>
+                  {% for team in teams %}
+                  <li>
+                    <a {% if team == selected %}class="selected"{% endif %} href="{{ url_for('team', slug=team.slug) }}">
+                    {{ team.name }}
+                    </a>
+                  </li>
+                  {% endfor %}
+                </ul>
+              </li>
+            {% endif %}
             <li>
-              {% if not session['email'] %}
-                <a href="#" id="login">Sign in with Persona</a>
-              {% else %}
-                <a href="#" id="logout">Logout</a>
-              {% endif %}
-            </li>
-          </ul>
-        </nav>
+              <a href="#">Projects</a>
+              <ul>
+                {% for project in projects %}
+                <li>
+                    <a {% if project == selected %}class="selected"{% endif %} href="{{ url_for('project', slug=project.slug) }}">
+                    {{ project.name }}
+                    </a>
+                  </li>
+                  {% endfor %}
+                </ul>
+              </li>
+              <li>
+                {% if not session['email'] %}
+                  <a href="#" id="login">Sign in with Persona</a>
+                {% else %}
+                  <a href="#" id="user-menu"><img src="{{ session['email']|gravatar_url(size=22) }}" alt="{{ current_user.username }}"></a>
+                  <ul>
+                    <li><a href="#" id="logout">Sign out</a></li>
+                  </ul>
+                {% endif %}
+              </li>
+            </ul>
+          </nav>
+        </div>
       </div>
-    </div>
-  </header>
+    </header>
 
-  <div class="container_8 cf">
-    {% block content %}{% endblock %}
-    <div class="grid_8">
-      <footer>
-        <a href="https://github.com/rlr/standup">Contribute to this site.</a>
-        <br>Found a bug? <a href="https://github.com/rlr/standup/issues">File an issue!</a>
-      </footer>
+    <div id="main-content" class="container_12 cf">
+      {% block content %}{% endblock %}
     </div>
+
+    <footer>
+      <div class="container_12 cf">
+        <div class="grid_1">
+          <img src="{{ url_for('static', filename='img/logo-grey.png') }}" alt="">
+        </div>
+        <div class="grid_5">
+          Standup is a neat little app that helps to organize and publish
+          asynchronous status updates.
+        </div>
+        <div class="grid_6">
+          <nav>
+            <ul>
+              <li><a href="{{ url_for('help') }}">Help &amp; FAQ</a></li>
+              <li><a href="https://github.com/rlr/standup/issues">Report a bug</a></li>
+              <li><a href="https://github.com/rlr/standup">Contribute</a></li>
+
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </footer>
   </div>
 </body>
 </html>

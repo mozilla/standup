@@ -6,9 +6,9 @@
 */
 
 // Modify these values to alter the grid
-@gridColumnWidth: 80px;
-@gridGutterWidth: 40px;
-@gridColumns: 8;
+@gridColumnWidth: 60px;
+@gridGutterWidth: 20px;
+@gridColumns: 12;
 
 /*
   Forces backgrounds to span full width,
@@ -30,6 +30,7 @@ body {
   position: relative;
   margin-left: @gridGutterWidth / 2;
   margin-right: @gridGutterWidth / 2;
+  min-height: 1px;
 }
 
 [class*="push_"], [class*="pull_"] {

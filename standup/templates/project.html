@@ -1,16 +1,13 @@
-{% from 'includes/macros.html' import projects_menu, show_statuses, date_range %}
+{% from 'includes/macros.html' import status_updates %}
 
 {% extends "base.html" %}
 
 {% block title %}
-  {{ project.name }} standups
+  Project: {{ project.name }} | Standup
 {% endblock %}
 
 {% block content %}
-  <div class="grid_3">
-    {{ projects_menu(projects, project) }}
-  </div>
-  <div class="grid_5">
-    {{ show_statuses(statuses, page, show_project=False, url=url_for('project', slug=project.slug)) }}
+  <div class="grid_12">
+    {{ status_updates(statuses, page, url=url_for('project', slug=project.slug)) }}
   </div>
 {% endblock %}

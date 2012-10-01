@@ -135,10 +135,7 @@ def index():
             Status.query.order_by(db.desc(Status.created)),
             request.args.get('page', 1),
             _startdate(request),
-            _enddate(request)),
-        projects=Project.query.order_by(Project.name).filter(
-            Project.statuses.any()),
-        teams=Team.query.order_by(Team.name).all())
+            _enddate(request)),)
 
 
 @app.route('/help')
@@ -201,14 +198,15 @@ def team(slug):
 @app.route('/status/<id>', methods=['GET'])
 def status(id):
     """The status page. Shows a single status."""
-    status = Status.query.filter_by(id=id).first()
-    if not status:
-        return page_not_found('Status not found.')
+    statuses = Status.query.filter_by(id=id)
+
+    if not statuses.count():
+        return page_not_found(404)
 
     return render_template(
         'status.html',
-        user=status.user,
-        status=status
+        user=statuses[0].user,
+        statuses=_paginate(statuses)
     )
 
 
@@ -390,10 +388,19 @@ def dateformat(date, format='%Y-%m-%d'):
 
 
 @app.template_filter('gravatar_url')
-def gravatar_url(email):
+def gravatar_url(email, size=None):
     m = hashlib.md5(email.lower())
     hash = m.hexdigest()
-    return 'http://www.gravatar.com/avatar/' + hash
+    url = 'http://www.gravatar.com/avatar/' + hash
+
+    if settings.DEBUG:
+        url += '?d=mm'
+    else:
+        url += '?d=%s%s' % settings.SITE_URL, url_for('static', filename='img/default-avatar.png')
+
+    if size:
+        url += '&s=%s' % size
+    return url
 
 
 TAG_TMPL = '{0} <span class="tag tag-{1}">{1}</span>'
@@ -425,11 +432,12 @@ def format_update(update, project=None):
     # with a letter.
     tags = re.findall(r'(?:^|[^\w\\/])#([a-zA-Z][a-zA-Z0-9_\.-]*)(?:\b|$)',
                       update)
+    tags.sort()
     if tags:
         tags_html = ''
         for tag in tags:
             tags_html = TAG_TMPL.format(tags_html, tag)
-        formatted = '%s %s' % (tags_html, formatted)
+        formatted = '%s <div class="tags">%s</div>' % (formatted, tags_html)
 
     return formatted
 
@@ -474,8 +482,29 @@ def _day(day):
     return datetime.strptime(day, '%Y-%m-%d')
 
 
+def bootstrap():
+    #Add Jinja extensions
+    app.jinja_env.add_extension('helpers.jinja2.ifchanged.IfChangedExtension')
+
+    # Jinja global variables
+    projects = Project.query.order_by(Project.name).filter(Project.statuses.any())
+    teams = Team.query.order_by(Team.name).all()
+
+    if session:
+        user = User.query.filter(User.email == session['email']).first()
+    else:
+        user = None
+
+    app.jinja_env.globals.update(projects = list(projects), teams = teams,
+                                 current_user = user, today=date.today(),
+                                 yesterday=date.today() - timedelta(1))
+
+
 if __name__ == '__main__':
     db.create_all()
+
+    app.before_request(bootstrap)
+
     # Bind to PORT if defined, otherwise default to 5000.
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=settings.DEBUG)

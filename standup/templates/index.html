@@ -1,4 +1,4 @@
-{% from 'includes/macros.html' import projects_menu, teams_menu, show_statuses, date_range %}
+{% from 'includes/macros.html' import status_updates %}
 
 {% extends "base.html" %}
 
@@ -11,11 +11,7 @@
 {% endblock %}
 
 {% block content %}
-  <div class="grid_3">
-    {{ projects_menu(projects) }}
-    {{ teams_menu(teams) }}
-  </div>
-  <div class="grid_5">
-    {{ show_statuses(statuses, page) }}
+  <div class="grid_12">
+    {{ status_updates(statuses, page) }}
   </div>
 {% endblock %}

@@ -1,10 +1,9 @@
-{% from 'includes/macros.html' import show_status, user_banner %}
+{% from 'includes/macros.html' import status_updates %}
 
 {% extends "base.html" %}
 
 {% block content %}
-  <div class="grid_8">
-    {{ user_banner(user) }}
-    {{ show_status(status, show_user=False) }}
+  <div class="grid_12">
+    {{ status_updates(statuses) }}
   </div>
 {% endblock %}
