@@ -23,7 +23,13 @@ $(function() {
                     window.location.reload();
                 },
                 error: function(res, status, xhr) {
-                    alert('login failure ' + res);
+                    console.log('Login failure:' + res.status + ': ' + res.statusText);
+
+                    var message = $('<div></div>');
+                    message.addClass('notice');
+                    message.html('We were unable to sign you in. Please try again.');
+
+                    $('#main-content').prepend(message);
                 }
             });
         },
@@ -35,7 +41,7 @@ $(function() {
                     window.location.reload();
                 },
                 error: function(res, status, xhr) {
-                    console.log('logout failure ' + res);
+                    console.log('Logout failure: ' + res.status + ': ' + res.statusText);
                 }
             });
         }
