@@ -99,7 +99,7 @@ class Status(db.Model):
 
     def replies(self, page=1):
         replies = Status.query.filter(Status.reply_to_id==self.id).order_by(
-            db.desc(Status.created))
+            db.asc(Status.created))
         return _paginate(replies, page)
 
 # TODO: M2M Users <-> Projects
