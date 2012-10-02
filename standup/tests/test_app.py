@@ -111,6 +111,38 @@ class AppTestCase(unittest.TestCase):
         # Verify the status was created
         self.assertEqual(Status.query.first().content, 'test update')
 
+    def test_create_reply(self):
+        """Test creation of replies"""
+        s = status(save=True)
+        sid = s.id
+
+        data = json.dumps({
+            'api_key': settings.API_KEY,
+            'user': 'r1cky',
+            'content': 'reply to status',
+            'reply_to': sid})
+        response = self.app.post(
+            '/api/v1/status/', data=data, content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+
+        # Verify that the status is actually a reply
+        r = Status.query.filter(Status.reply_to_id==sid).first()
+        self.assertEqual(r.content, 'reply to status')
+
+        # Verify that the reply is included in the list of replies
+        s = Status.query.get(sid)
+        assert r in s.replies().items
+
+        # You should not be able to reply to the reply
+        data = json.dumps({
+            'api_key': settings.API_KEY,
+            'user': 'r1cky',
+            'content': 'should not work',
+            'reply_to': r.id})
+        response = self.app.post(
+            '/api/v1/status/', data=data, content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+
     def test_delete_status(self):
         """Test deletion of a status"""
         s = status(save=True)

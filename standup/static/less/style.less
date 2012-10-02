@@ -111,6 +111,12 @@ footer {
   }
 }
 
+h2 {
+  font-family: @OpenSansLight;
+  font-size: 22px;
+  font-weight: normal;
+}
+
 h3 {
   border-bottom: 1px solid #f2f2f2;
   border-top: 1px solid #bebebe;
@@ -135,6 +141,13 @@ h3 {
     color: #666;
     text-decoration: none;
   }
+}
+
+hr {
+  border-bottom: 1px solid #f2f2f2;
+  border-top: 1px solid #bebebe;
+  display: block;
+  height: 0;
 }
 
 header {
@@ -330,6 +343,43 @@ header {
   .box-shadow(~"0 2px 0 0 rgba(0, 0, 0, 0.1), 0 -2px 0 0 rgba(0, 0, 0, 0.2) inset, 0 12px 24px 2px #3089D8 inset");
   color: #fff;
   text-decoration: none;
+}
+
+.comments {
+  line-height: 140%;
+  list-style: none;
+  margin: 30px 0 40px 0;
+  padding: 0;
+
+  li {
+    border-bottom: 1px dotted #aaa;
+    color: #555;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+
+    &:last-of-type {
+      border-bottom: 0;
+    }
+
+    .meta {
+      color: #999;
+      font-size: 12px;
+      line-height: 22px;
+      margin-top: 12px;
+      padding-top: 6px;
+      text-align: right;
+
+      a {
+        float: left;
+        margin-right: 10px;
+      }
+
+      .gravatar {
+        .border-radius(3px);
+        vertical-align: middle;
+      }
+    }
+  }
 }
 
 .error {

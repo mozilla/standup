@@ -1,4 +1,24 @@
-{% macro status_updates(statuses, page, url='/') %}
+{% macro comments(statuses, page=1, url='/') %}
+  <ul class="comments cf">
+    {% for status in statuses.items %}
+      <li class="cf">
+        {{ status.content }}
+        <div class="meta">
+          <a href="{{ url_for('user', slug=status.user.slug) }}">
+            <img class="gravatar" src="{% if status.user.email %}{{ status.user.email|gravatar_url(size=22) }}{% else %}{{ 'None'|gravatar_url(size=60) }}{% endif %}">
+          </a>
+          <a href="{{ url_for('user', slug=status.user.slug) }}">{{ status.user.name }} (@{{ status.user.username }})</a>
+          {{ status.created|dateformat('%A, {S} %B %Y at %-I:%M %p') }}
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+  {% if not statuses.items %}
+    <div class="notice">There are no comments.</div>
+  {% endif %}
+{% endmacro %}
+
+{% macro status_updates(statuses, page=1, url='/') %}
   {% for status in statuses.items %}
     {% if (status.user.username != last_user or last_date != status.created.date()) and not loop.first %}
           </ul>

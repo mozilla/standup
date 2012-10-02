@@ -88,9 +88,16 @@ class Status(db.Model):
         'Project', backref=db.backref('statuses', lazy='dynamic'))
     content = db.Column(db.Text)
     content_html = db.Column(db.Text)
+    reply_to_id = db.Column(db.Integer, db.ForeignKey('status.id'))
+    reply_to = db.relationship('Status', remote_side=[id])
 
     def __repr__(self):
         return '<Status: %s: %s>' % (self.user.username, self.content)
+
+    def replies(self, page=1):
+        replies = Status.query.filter(Status.reply_to_id==self.id).order_by(
+            db.desc(Status.created))
+        return _paginate(replies, page)
 
 # TODO: M2M Users <-> Projects
 
@@ -203,10 +210,13 @@ def status(id):
     if not statuses.count():
         return page_not_found(404)
 
+    status = statuses[0]
+
     return render_template(
         'status.html',
-        user=statuses[0].user,
-        statuses=_paginate(statuses)
+        user=status.user,
+        statuses=_paginate(statuses),
+        replies=status.replies(request.args.get('page', 1))
     )
 
 
@@ -234,11 +244,25 @@ def create_status():
     username = request.json.get('user')
     project_slug = request.json.get('project')
     content = request.json.get('content')
+    reply_to = request.json.get('reply_to')
 
     # Validate we have the required fields.
     if not (username and content):
         return make_response(
             jsonify(dict(error='Missing required fields.')), 400)
+
+    # If this is a reply make sure that the status being replied to exists and
+    # is not itself a reply
+    if reply_to:
+        replied = Status.query.filter_by(id=reply_to).first()
+        if not replied:
+            return make_response(
+                jsonify(dict(error='Status does not exist.')), 400)
+        elif replied.reply_to:
+            return make_response(
+                jsonify(dict(error='Cannot reply to a reply.')), 400)
+    else:
+        replied = None
 
     # Get or create the user
     # TODO: People change their nicks sometimes, figure out what to do.
@@ -249,8 +273,8 @@ def create_status():
         db.session.add(user)
         db.session.commit()
 
-    # Get or create the project
-    if project_slug:
+    # Get or create the project (but not if this is a reply)
+    if project_slug and not replied:
         project = Project.query.filter_by(slug=project_slug).first()
         if not project:
             project = Project(slug=project_slug, name=project_slug)
@@ -261,6 +285,8 @@ def create_status():
     status = Status(user_id=user.id, content=content, content_html=content)
     if project_slug and project:
         status.project_id = project.id
+    if replied:
+        status.reply_to_id = replied.id
     db.session.add(status)
     db.session.commit()
 

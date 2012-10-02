@@ -1,9 +1,14 @@
-{% from 'includes/macros.html' import status_updates %}
+{% from 'includes/macros.html' import comments, status_updates %}
 
 {% extends "base.html" %}
 
 {% block content %}
   <div class="grid_12">
     {{ status_updates(statuses) }}
+  </div>
+  <div class="grid_8 prefix_4">
+    <hr>
+    <h2>Comments</h2>
+    {{ comments(replies) }}
   </div>
 {% endblock %}

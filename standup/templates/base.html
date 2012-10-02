@@ -58,7 +58,7 @@
                 {% if not session['email'] %}
                   <a href="#" id="login">Sign in with Persona</a>
                 {% else %}
-                  <a href="#" id="user-menu"><img src="{{ session['email']|gravatar_url(size=22) }}" alt="{{ current_user.username }}"></a>
+                  <a href="#" id="user-menu"><img src="{{ session['email']|gravatar_url(size=22) }}" alt="{% if current_user %}{{ current_user.username }}{% else %}{{ session['email'] }}{% endif %}"></a>
                   <ul>
                     <li><a href="#" id="logout">Sign out</a></li>
                   </ul>
@@ -89,7 +89,6 @@
               <li><a href="{{ url_for('help') }}">Help &amp; FAQ</a></li>
               <li><a href="https://github.com/rlr/standup/issues">Report a bug</a></li>
               <li><a href="https://github.com/rlr/standup">Contribute</a></li>
-
             </ul>
           </nav>
         </div>
