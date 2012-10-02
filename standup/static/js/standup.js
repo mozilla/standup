@@ -26,10 +26,19 @@ $(function() {
                     console.log('Login failure:' + res.status + ': ' + res.statusText);
 
                     var message = $('<div></div>');
-                    message.addClass('notice');
+                    message.addClass('error');
                     message.html('We were unable to sign you in. Please try again.');
 
+                    message.on('click', function() {
+                      $(this).fadeOut(600);
+                    });
+
+                    message.hide();
                     $('#main-content').prepend(message);
+
+                    message.fadeOut(1, function() {
+                      message.fadeIn(400);
+                    });
                 }
             });
         },
