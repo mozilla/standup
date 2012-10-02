@@ -357,6 +357,26 @@ header {
 
 .pagination {
   margin: 0 0 40px 0;
+  padding: 20px 0 0 0;
+  position: relative;
+
+  &:before {
+    border-bottom: 1px solid #f2f2f2;
+    border-top: 1px solid #bebebe;
+    content: '';
+    display: block;
+    height: 0;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+
+  &.prefix_4 {
+    &:before {
+      left: 320px;
+    }
+  }
 
   .next {
     float: left;
@@ -415,7 +435,7 @@ header {
         margin-right: 140px;
 
         .tags {
-          margin: 6px 0 0 0;
+          margin: 3px 0 0 0;
 
           .tag {
             background-color: #999;
