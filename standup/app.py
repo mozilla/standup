@@ -486,10 +486,8 @@ def _day(day):
     return datetime.strptime(day, '%Y-%m-%d')
 
 
+@app.before_request
 def bootstrap():
-    #Add Jinja extensions
-    app.jinja_env.add_extension('helpers.jinja2.ifchanged.IfChangedExtension')
-
     # Jinja global variables
     projects = Project.query.order_by(Project.name).filter(Project.statuses.any())
     teams = Team.query.order_by(Team.name).all()
@@ -506,9 +504,7 @@ def bootstrap():
 
 if __name__ == '__main__':
     db.create_all()
-
-    app.before_request(bootstrap)
-
+    
     # Bind to PORT if defined, otherwise default to 5000.
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=settings.DEBUG)
