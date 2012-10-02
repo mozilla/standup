@@ -33,7 +33,8 @@ class Team(db.Model):
         """Return the statuses for the team."""
         user_ids = [u.id for u in self.users]
         statuses = Status.query.filter(
-            Status.user_id.in_(user_ids)).order_by(db.desc(Status.created))
+            Status.user_id.in_(user_ids), Status.reply_to==None).order_by(
+            db.desc(Status.created))
         return _paginate(statuses, page, startdate, enddate)
 
 
@@ -55,7 +56,8 @@ class User(db.Model):
 
     def recent_statuses(self, page=1, startdate=None, enddate=None):
         """Return the statuses for the user."""
-        statuses = self.statuses.order_by(db.desc(Status.created))
+        statuses = self.statuses.filter(Status.reply_to==None).order_by(
+            db.desc(Status.created))
         return _paginate(statuses, page, startdate, enddate)
 
 
@@ -72,7 +74,8 @@ class Project(db.Model):
 
     def recent_statuses(self, page=1, startdate=None, enddate=None):
         """Return the statuses for the project."""
-        statuses = self.statuses.order_by(db.desc(Status.created))
+        statuses = self.statuses.filter(Status.reply_to==None).order_by(
+            db.desc(Status.created))
         return _paginate(statuses, page, startdate, enddate)
 
 
@@ -139,7 +142,7 @@ def index():
     return render_template(
         'index.html',
         statuses=_paginate(
-            Status.query.order_by(db.desc(Status.created)),
+            Status.query.filter(Status.reply_to==None).order_by(db.desc(Status.created)),
             request.args.get('page', 1),
             _startdate(request),
             _enddate(request)),)
