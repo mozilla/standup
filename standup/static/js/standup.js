@@ -25,18 +25,23 @@ $(function() {
                 error: function(res, status, xhr) {
                     console.log('Login failure:' + res.status + ': ' + res.statusText);
 
+                    // Remove any old notices
+                    $('.notice.sign-in-error').remove();
+
                     var message = $('<div></div>');
-                    message.addClass('error');
+                    message.addClass('notice error dismissable sign-in-error');
                     message.html('We were unable to sign you in. Please try again.');
 
                     message.on('click', function() {
-                      $(this).fadeOut(600);
+                      $(this).fadeOut(600, function() {
+                        $(this).remove();
+                      });
                     });
 
                     message.hide();
-                    $('#main-content').prepend(message);
+                    $('#main-notices').prepend(message);
 
-                    message.fadeOut(1, function() {
+                    message.fadeOut(0, function() {
                       message.fadeIn(400);
                     });
                 }

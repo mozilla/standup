@@ -382,17 +382,6 @@ header {
   }
 }
 
-.error {
-  background: rgba(255, 0, 0, 0.08);
-  border: 1px solid rgba(255, 0, 0, 0.12);
-  .box-shadow(0 0 0 3px rgba(255, 0, 0, 0.04) inset);
-  color: #c66;
-  display: block;
-  margin-bottom: 40px;
-  padding: 16px 20px;
-  text-align: center;
-}
-
 .error-message {
   background: url('../img/error-splash.png') top center no-repeat;
   font-size: 16px;
@@ -410,6 +399,24 @@ header {
   margin-bottom: 40px;
   padding: 16px 20px;
   text-align: center;
+
+  &.dismissable {
+    cursor: pointer;
+  }
+
+  &.error {
+    background: rgba(255, 0, 0, 0.08);
+    border: 1px solid rgba(255, 0, 0, 0.12);
+    .box-shadow(0 0 0 3px rgba(255, 0, 0, 0.04) inset);
+    color: #c66;
+  }
+
+  &.warn {
+    background: rgba(255, 204, 0, 0.16);
+    border: 1px solid rgba(255, 153, 51, 0.3);
+    .box-shadow(0 0 0 3px rgba(255, 153, 51, 0.08) inset);
+    color: #b48232;
+  }
 }
 
 .page {
@@ -472,7 +479,7 @@ header {
       position: absolute;
       right: 0;
       top: 0;
-      width: 140px;
+      width: 150px;
       z-index: -1;
     }
 
@@ -497,8 +504,10 @@ header {
       }
 
       .update {
+        float: left;
         line-height: 140%;
-        margin-right: 140px;
+        margin-right: 40px;
+        width: 430px;
 
         .tags {
           margin: 3px 0 0 0;
@@ -532,9 +541,39 @@ header {
       }
 
       .update-meta {
-        float: right;
+        float: left;
         line-height: 140%;
-        width: 100px;
+        width: 110px;
+
+        .comment-count,
+        .comment-count:visited {
+          color: #c0c0c0;
+          display: block;
+          margin-right: 70px;
+          padding-left: 18px;
+          position: relative;
+
+          &:before {
+            background: url('../img/icons-sprite.png') -56px -552px no-repeat;
+            content: '';
+            height: 12px;
+            left: 0;
+            opacity: 0.6;
+            position: absolute;
+            top: 3px;
+            .transition-duration(0.3s);
+            .transition-property('opacity');
+            width: 12px;
+          }
+        }
+
+        .comment-count:hover {
+          color: #999;
+
+          &:before {
+            opacity: 1;
+          }
+        }
 
         .post-time,
         .post-time:visited {
@@ -553,11 +592,12 @@ header {
           .border-radius(3px);
           clear: both;
           color: #36c;
-          float: right;
+          display: block;
           line-height: normal;
           margin-top: 4px;
           padding: 2px 6px;
           position: relative;
+          text-align: center;
           z-index: 0;
 
           &:after {
@@ -617,4 +657,14 @@ header {
 
 #main-content {
   padding-bottom: 174px;
+}
+
+#main-notices {
+  .notice {
+    margin-bottom: 20px;
+
+    &:last-of-type {
+      margin-bottom: 40px;
+    }
+  }
 }
