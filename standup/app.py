@@ -12,6 +12,7 @@ from urllib import urlencode
 import settings
 
 app = Flask(__name__)
+app.debug = getattr(settings, 'DEBUG', False)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
     'DATABASE_URL', 'sqlite:///standup_app.db')
 app.secret_key = settings.SESSION_SECRET
@@ -424,7 +425,7 @@ def gravatar_url(email, size=None):
 
     qs = {}
 
-    if settings.DEBUG:
+    if getattr(settings, 'DEBUG', False) or not hasattr(settings, 'SITE_URL'):
         qs['d'] = 'mm'
     else:
         qs['d'] = settings.SITE_URL + url_for('static', filename='img/default-avatar.png')
@@ -529,11 +530,3 @@ def bootstrap():
     app.jinja_env.globals.update(projects = list(projects), teams = teams,
                                  current_user = user, today=date.today(),
                                  yesterday=date.today() - timedelta(1))
-
-
-if __name__ == '__main__':
-    db.create_all()
-    
-    # Bind to PORT if defined, otherwise default to 5000.
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=settings.DEBUG)

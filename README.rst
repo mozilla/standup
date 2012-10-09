@@ -37,14 +37,13 @@ To setup a local dev environment for hacking::
     $ cp ./standup/local_settings.py-dist ./standup/local_settings.py
     $ vim ./standup/local_settings.py
 
-5. Enable and run migrations::
+5. Create the database using::
 
-    $ ./standup/migrations.py version_control
-    $ ./standup/migrations.py upgrade
+    $ ./manage.py db_create
 
 6. Run the app::
 
-    $ python standup/app.py
+    $ ./manage.py runserver
 
 
 Oh, but wait--what can you do with it? Well, for testing purposes, you
@@ -63,7 +62,7 @@ Migrations
 
 To run migrations use::
 
-  $ ./standup/migrations.py upgrade
+  $ ./manage.py db_upgrade
 
 
 Configuration
