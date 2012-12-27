@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 import os
+
 from flask.ext.script import Manager
 from migrate.exceptions import DatabaseAlreadyControlledError
 from migrate.versioning import api as migrate_api
+
 from standup.app import app, db, Team, Project, User, Status
+from standup.utils import slugify
 
 
 manager = Manager(app)
@@ -18,16 +21,6 @@ db_url = os.environ.get('DATABASE_URL', 'sqlite:///%s' % sqlite)
 
 def get_db_version():
     return migrate_api.db_version(url=db_url, repository=db_repo)
-
-
-def slugify(s):
-    if not s:
-        return 'none'
-
-    s = s.lower()
-    for c in ' \'".:;()[]/\\':
-        s = s.replace(c, '_')
-    return s
 
 
 @manager.command

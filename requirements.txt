@@ -14,6 +14,7 @@ wsgiref==0.1.2
 requests==1.0.4
 sqlalchemy-migrate==0.7.2
 bleach==1.1.5
+unidecode
 
 -e git://github.com/mozilla/PyBrowserID.git@7281da84cd9e3ca3b4f5f3073d9096d5dad32f39#egg=PyBrowserID-dev
 psycopg2
