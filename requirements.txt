@@ -3,13 +3,19 @@ Flask-SQLAlchemy==0.16
 Flask-Script==0.3.3
 Jinja2==2.6
 SQLAlchemy==0.7.8
+Tempita==0.5.1
 Werkzeug==0.8.3
+argparse==1.2.1
+decorator==3.4.0
 gunicorn==0.14.5
+html5lib==0.95
 ipython==0.13
 wsgiref==0.1.2
+requests==1.0.4
 sqlalchemy-migrate==0.7.2
 bleach==1.1.5
--e git://github.com/mozilla/PyBrowserID.git@3b6304c54dbc37c7d888885abab0798228db4c11#egg=PyBrowserID
+unidecode
 
+-e git://github.com/mozilla/PyBrowserID.git@7281da84cd9e3ca3b4f5f3073d9096d5dad32f39#egg=PyBrowserID-dev
 psycopg2
 nose

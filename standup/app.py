@@ -1,15 +1,18 @@
-import browserid
 import hashlib
-import os, re
-from bleach import clean, linkify
+import os
+import re
 from datetime import datetime, date, timedelta
-from flask import (Flask, render_template, request, redirect, url_for,
-                   jsonify, make_response, session)
-from flask.ext.sqlalchemy import SQLAlchemy
 from functools import wraps
 from urllib import urlencode
 
+import browserid
+from bleach import clean, linkify
+from flask import (Flask, render_template, request, url_for, jsonify,
+                   make_response, session)
+from flask.ext.sqlalchemy import SQLAlchemy
+
 import settings
+
 
 app = Flask(__name__)
 app.debug = getattr(settings, 'DEBUG', False)
@@ -105,6 +108,7 @@ class Status(db.Model):
 
 # TODO: M2M Users <-> Projects
 
+
 # Views:
 def api_key_required(view):
     @wraps(view)
@@ -123,7 +127,7 @@ def authenticate():
     data = browserid.verify(request.form['assertion'],
                             settings.SITE_URL)
     session['email'] = data['email']
-    response = jsonify({'message':'login successful'})
+    response = jsonify({'message': 'login successful'})
     response.status_code = 200
     return response
 
@@ -132,7 +136,7 @@ def authenticate():
 def logout():
     """Log user out of app."""
     session.pop('email', None)
-    response = jsonify({'message':'logout successful'})
+    response = jsonify({'message': 'logout successful'})
     response.status_code = 200
     return response
 
@@ -143,7 +147,8 @@ def index():
     return render_template(
         'index.html',
         statuses=_paginate(
-            Status.query.filter(Status.reply_to==None).order_by(db.desc(Status.created)),
+            Status.query.filter(Status.reply_to==None).order_by(
+                db.desc(Status.created)),
             request.args.get('page', 1),
             _startdate(request),
             _enddate(request)),)
@@ -229,11 +234,12 @@ def status(id):
 def create_status():
     """Post a new status.
 
-    The status should be posted as JSON using 'application/json' as the
-    content type. The posted JSON needs to have 3 required fields:
-        * user (the username)
-        * content
-        * api_key
+    The status should be posted as JSON using 'application/json' as
+    the content type. The posted JSON needs to have 3 required fields:
+
+    * user (the username)
+    * content
+    * api_key
 
     An example of the JSON::
 
@@ -255,8 +261,8 @@ def create_status():
         return make_response(
             jsonify(dict(error='Missing required fields.')), 400)
 
-    # If this is a reply make sure that the status being replied to exists and
-    # is not itself a reply
+    # If this is a reply make sure that the status being replied to
+    # exists and is not itself a reply
     if reply_to:
         replied = Status.query.filter_by(id=reply_to).first()
         if not replied:
@@ -302,10 +308,12 @@ def create_status():
 def delete_status(id):
     """Delete an existing status
 
-    The status to be deleted should be posted as JSON using 'application/json as
-    the content type. The posted JSON needs to have 2 required fields:
-        * user (the username)
-        * api_key
+    The status to be deleted should be posted as JSON using
+    'application/json as the content type. The posted JSON needs to
+    have 2 required fields:
+
+    * user (the username)
+    * api_key
 
     An example of the JSON:
 
@@ -324,7 +332,8 @@ def delete_status(id):
     status = Status.query.filter(Status.id==id)
 
     if not status.count():
-        return make_response(jsonify(dict(error='Status does not exist.')), 400)
+        return make_response(jsonify(dict(error='Status does not exist.')),
+                             400)
 
     if not status[0].user.username == user:
         return make_response(
@@ -341,15 +350,19 @@ def delete_status(id):
 def update_user(username):
     """Update settings for an existing user.
 
-    The settings to be deleted should be posted as JSON using 'application/json
-    as the content type. The posted JSON needs to have 2 required fields:
-        * user (the username of the IRC user)
-        * api_key
+    The settings to be deleted should be posted as JSON using
+    'application/json as the content type. The posted JSON needs to
+    have 2 required fields:
 
-    You may optionally supply the following settings to overwrite their values:
-        * name
-        * email
-        * github_handle
+    * user (the username of the IRC user)
+    * api_key
+
+    You may optionally supply the following settings to overwrite
+    their values:
+
+    * name
+    * email
+    * github_handle
 
     An example of the JSON:
 
@@ -410,11 +423,12 @@ def something_broke(error):
 
 
 @app.template_filter('dateformat')
-def dateformat(date, format='%Y-%m-%d'):
+def dateformat(date, fmt='%Y-%m-%d'):
     def suffix(d):
-        return 'th' if 11<=d<=13 else {1:'st',2:'nd',3:'rd'}.get(d%10, 'th')
+        suffixes = {1: 'st', 2: 'nd', 3: 'rd'}
+        return 'th' if 11 <= d <= 13 else suffixes.get(d % 10, 'th')
 
-    return date.strftime(format).replace('{S}', str(date.day) + suffix(date.day))
+    return date.strftime(fmt).replace('{S}', str(date.day) + suffix(date.day))
 
 
 @app.template_filter('gravatar_url')
@@ -428,7 +442,8 @@ def gravatar_url(email, size=None):
     if getattr(settings, 'DEBUG', False) or not hasattr(settings, 'SITE_URL'):
         qs['d'] = 'mm'
     else:
-        qs['d'] = settings.SITE_URL + url_for('static', filename='img/default-avatar.png')
+        qs['d'] = settings.SITE_URL + url_for(
+            'static', filename='img/default-avatar.png')
 
     if size:
         qs['s'] = size
@@ -519,7 +534,8 @@ def _day(day):
 @app.before_request
 def bootstrap():
     # Jinja global variables
-    projects = Project.query.order_by(Project.name).filter(Project.statuses.any())
+    projects = Project.query.order_by(Project.name).filter(
+        Project.statuses.any())
     teams = Team.query.order_by(Team.name).all()
 
     if session:
@@ -527,6 +543,6 @@ def bootstrap():
     else:
         user = None
 
-    app.jinja_env.globals.update(projects = list(projects), teams = teams,
-                                 current_user = user, today=date.today(),
+    app.jinja_env.globals.update(projects=list(projects), teams=teams,
+                                 current_user=user, today=date.today(),
                                  yesterday=date.today() - timedelta(1))
