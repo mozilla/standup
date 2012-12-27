@@ -56,6 +56,24 @@ Example::
 
 (Assumes your api_key is set to ou812.)
 
+Also, you can use the ``./manage.py`` script to add teams::
+
+    $ ./manage.py add_team
+    $ ./manage.py add_team "Team Awesome"
+    $ ./manage.py add_team -s "awesome" "Team Awesome"
+
+and projects::
+
+    $ ./manage.py add_project
+    $ ./manage.py add_project "DEATH MARCH"
+    $ ./manage.py add_project -s "death_march" "DEATH MARCH"
+    $ ./manage.py add_project -r "http://github.com/rlr/standups" "DEATH MARCH"
+    $ ./manage.py add_project -c "0000ff" "DEATH MARCH"
+
+And see stats for your instance::
+
+    $ ./manage.py stats
+
 
 Migrations
 ==========
