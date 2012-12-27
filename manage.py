@@ -3,7 +3,8 @@ import os
 from flask.ext.script import Manager
 from migrate.exceptions import DatabaseAlreadyControlledError
 from migrate.versioning import api as migrate_api
-from standup.app import app
+from standup.app import app, db, Team, Project, User, Status
+
 
 manager = Manager(app)
 
@@ -14,8 +15,20 @@ sqlite = os.path.join(app_path, 'standup_app.db')
 db_repo = os.path.join(app_path, 'migrations')
 db_url = os.environ.get('DATABASE_URL', 'sqlite:///%s' % sqlite)
 
+
 def get_db_version():
     return migrate_api.db_version(url=db_url, repository=db_repo)
+
+
+def slugify(s):
+    if not s:
+        return 'none'
+
+    s = s.lower()
+    for c in ' \'".:;()[]/\\':
+        s = s.replace(c, '_')
+    return s
+
 
 @manager.command
 def db_create():
@@ -25,6 +38,7 @@ def db_create():
         db_upgrade()
     except DatabaseAlreadyControlledError:
         print 'ERROR: Database is already version controlled.'
+
 
 @manager.command
 def db_downgrade(version):
@@ -38,6 +52,7 @@ def db_downgrade(version):
     else:
         print 'Downgraded: %s ... %s' % (v1, v2)
 
+
 @manager.command
 def db_upgrade():
     """Upgrade the database"""
@@ -50,15 +65,85 @@ def db_upgrade():
     else:
         print 'Upgraded: %s ... %s' % (v1, v2)
 
+
 @manager.command
 def db_version():
     """Get the current version of the database"""
     print get_db_version()
 
+
 @manager.command
 def new_migration(description):
     migrate_api.script(description, db_repo)
     print 'New migration script created.'
+
+
+@manager.command
+def add_team(name, slug=None):
+    """Creates a team."""
+    if slug == None:
+        slug = slugify(name)
+
+    team = Team.query.filter_by(slug=slug).first()
+    if team:
+        print 'Team "%s" (%s) already exists.' % (team.name, team.slug)
+        return
+
+    team = Team(name=name, slug=slug)
+    db.session.add(team)
+    db.session.commit()
+
+    print 'Team "%s" created!' % team.name
+
+
+@manager.command
+def add_project(name, slug=None, repo_url=None, color=None):
+    """Creates a project."""
+    if slug == None:
+        slug = slugify(name)
+
+    if repo_url == None:
+        repo_url = ''
+
+    if color == None:
+        color = 'FF0000'
+
+    project = Project.query.filter_by(slug=slug).first()
+    if project:
+        print 'Project "%s" (%s) already exists.' % (project.name, project.slug)
+        return
+
+    project = Project(name=name, slug=slug, repo_url=repo_url, color=color)
+    db.session.add(project)
+    db.session.commit()
+
+    print 'Project "%s" created!' % project.name
+
+
+@manager.command
+def stats():
+    """Tells you stats about your standup instance."""
+    print 'STATS'
+    print ''
+
+    print 'DB version: %s' % get_db_version()
+    print 'Users:      %d' % len(User.query.all())
+    print 'Statuses:   %d' % len(Status.query.all())
+    print ''
+
+    teams = Team.query.all()
+    print 'Teams:      %d' % len(teams)
+    for team in teams:
+        print '  %s: %s' % (team.name, team.slug)
+
+    print ''
+
+    projects = Project.query.all()
+    print 'Projects:   %d' % len(projects)
+    for project in projects:
+        print '  %s: %s, %s, %s' % (project.name, project.slug,
+                                    project.repo_url, project.color)
+
 
 if __name__ == '__main__':
     manager.run()
