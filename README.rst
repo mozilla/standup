@@ -78,7 +78,7 @@ These are things you can set in ``standup/local_settings.py``:
 
         For example, if you're running on your local machine, it would be::
 
-            SITE_URL = 'http://localhost:5000'
+            SITE_URL = 'http://127.0.0.1:5000'
 
         No default. You must set this.
 
