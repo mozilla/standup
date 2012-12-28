@@ -8,7 +8,7 @@ from urllib import urlencode
 import browserid
 from bleach import clean, linkify
 from flask import (Flask, render_template, request, url_for, jsonify,
-                   make_response, session)
+                   make_response, session, redirect)
 from flask.ext.sqlalchemy import SQLAlchemy
 
 import settings
@@ -127,6 +127,7 @@ def authenticate():
     data = browserid.verify(request.form['assertion'],
                             settings.SITE_URL)
     session['email'] = data['email']
+
     response = jsonify({'message': 'login successful'})
     response.status_code = 200
     return response
@@ -227,6 +228,51 @@ def status(id):
         statuses=_paginate(statuses),
         replies=status.replies(request.args.get('page', 1))
     )
+
+
+@app.route('/statusize/', methods=['POST'])
+def statusize():
+    """Posts a status from the web."""
+    email = session.get('email')
+    if not email:
+        return page_not_found('You must be logged in to statusize!')
+
+    user = User.query.filter(User.email == session['email']).first()
+
+    if not user:
+        # Create a user if one does not already exist for this email
+        # address.
+        user = User.query.filter_by(email=session['email']).first()
+        if not user:
+            username = email.split('@')[0]
+            user = User(username=username, name=username, email=email,
+                        slug=username, github_handle=username)
+            db.session.add(user)
+            db.session.commit()
+
+    message = request.form.get('message', '')
+
+    if not message:
+        return page_not_found('You cannot statusize nothing!')
+
+    status = Status(user_id=user.id, content=message, content_html=message)
+
+    project = request.form.get('project', '')
+    if project:
+        project = Project.query.filter_by(id=project).first()
+        if project:
+            status.project_id = project.id
+
+    # TODO: reply handling
+
+    db.session.add(status)
+    db.session.commit()
+
+    # Try to go back from where we came.
+    redirect_url = request.form.get('redirect_to',
+                                    request.headers.get('referer',
+                                                        url_for('index')))
+    return redirect(redirect_url)
 
 
 @app.route('/api/v1/status/', methods=['POST'])
@@ -534,8 +580,7 @@ def _day(day):
 @app.before_request
 def bootstrap():
     # Jinja global variables
-    projects = Project.query.order_by(Project.name).filter(
-        Project.statuses.any())
+    projects = Project.query.order_by(Project.name).all()
     teams = Team.query.order_by(Team.name).all()
 
     if session:
