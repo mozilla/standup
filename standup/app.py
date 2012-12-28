@@ -465,7 +465,7 @@ def update_user(username):
 @app.errorhandler(403)
 def forbidden(error=None):
     error = error or 'You shall not pass!'
-    return render_template('403.html', {'error': error}), 403
+    return render_template('403.html', error=error), 403
 
 
 @app.errorhandler(404)
@@ -477,7 +477,7 @@ def page_not_found(error=None):
 @app.errorhandler(500)
 def something_broke(error=None):
     error = error or 'Oops! Stood up too fast and feeling woozy.'
-    return render_template('500.html', {'error': error}), 500
+    return render_template('500.html', error=error), 500
 
 
 @app.template_filter('dateformat')
