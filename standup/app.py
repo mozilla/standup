@@ -13,6 +13,8 @@ from flask.ext.sqlalchemy import SQLAlchemy
 
 import settings
 
+from standup.utils import slugify
+
 
 app = Flask(__name__)
 app.debug = getattr(settings, 'DEBUG', False)
@@ -218,7 +220,7 @@ def status(id):
     statuses = Status.query.filter_by(id=id)
 
     if not statuses.count():
-        return page_not_found(404)
+        return page_not_found('Status not found.')
 
     status = statuses[0]
 
@@ -235,7 +237,7 @@ def statusize():
     """Posts a status from the web."""
     email = session.get('email')
     if not email:
-        return page_not_found('You must be logged in to statusize!')
+        return forbidden('You must be logged in to statusize!')
 
     user = User.query.filter(User.email == session['email']).first()
 
@@ -246,7 +248,7 @@ def statusize():
         if not user:
             username = email.split('@')[0]
             user = User(username=username, name=username, email=email,
-                        slug=username, github_handle=username)
+                        slug=slugify(username), github_handle=username)
             db.session.add(user)
             db.session.commit()
 
@@ -325,12 +327,14 @@ def create_status():
     user = User.query.filter_by(username=username).first()
     if not user:
         user = User(username=username, name=username,
-                    slug=username, github_handle=username)
+                    slug=slugify(username), github_handle=username)
         db.session.add(user)
         db.session.commit()
 
     # Get or create the project (but not if this is a reply)
     if project_slug and not replied:
+        # This forces the slug to be slug-like.
+        project_slug = slugify(project_slug)
         project = Project.query.filter_by(slug=project_slug).first()
         if not project:
             project = Project(slug=project_slug, name=project_slug)
@@ -436,7 +440,7 @@ def update_user(username):
     user = User.query.filter(User.username==username)
 
     if not user.count():
-        user = User(username=username, slug=username)
+        user = User(username=username, slug=slugify(username))
     else:
         user = user[0]
 
@@ -458,14 +462,22 @@ def update_user(username):
     return make_response(jsonify(dict(id=user.id)))
 
 
+@app.errorhandler(403)
+def forbidden(error=None):
+    error = error or 'You shall not pass!'
+    return render_template('403.html', {'error': error}), 403
+
+
 @app.errorhandler(404)
-def page_not_found(error):
-    return render_template('404.html'), 404
+def page_not_found(error=None):
+    error = error or 'Oops! The page you are looking for does not exist.'
+    return render_template('404.html', error=error), 404
 
 
 @app.errorhandler(500)
-def something_broke(error):
-    return render_template('500.html'), 500
+def something_broke(error=None):
+    error = error or 'Oops! Stood up too fast and feeling woozy.'
+    return render_template('500.html', {'error': error}), 500
 
 
 @app.template_filter('dateformat')
