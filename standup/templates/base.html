@@ -74,6 +74,16 @@
       <div id="main-notices" class="grid_12">
         {% block notices %}{% endblock %}
       </div>
+      {% if session['email'] %}
+        <div id="statusize" class="grid_12">
+          <form action="{{ url_for('statusize') }}" method="POST">
+            <textarea name="message" rows=2 cols=30></textarea>
+            <input type="hidden" name="redirect_to" value="{{ request.url }}">
+            <input type="hidden" name="project" value="{{ project.id if project else '' }}">
+            <input type="submit">
+          </form>
+        </div>
+      {% endif %}
       {% block content %}{% endblock %}
     </div>
 

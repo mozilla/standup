@@ -10,6 +10,7 @@ from standup.app import User, Project, Status, format_update, TAG_TMPL
 from standup import settings
 from standup.tests import status, user
 
+
 class AppTestCase(unittest.TestCase):
 
     def setUp(self):
@@ -25,6 +26,57 @@ class AppTestCase(unittest.TestCase):
         os.close(self.db_fd)
         os.unlink(app.app.config['DATABASE'])
 
+
+class StatusizerTestCase(AppTestCase):
+    def test_status_unauthenticated(self):
+        """Test that you get a 403 if you're not authenticated."""
+        with app.app.test_client() as tc:
+            rv = tc.post('/statusize/',
+                         data={'message': 'foo'},
+                         follow_redirects=True)
+            eq_(rv.status_code, 403)
+
+    def test_status(self):
+        """Test posting a status."""
+        with app.app.test_client() as tc:
+            with tc.session_transaction() as sess:
+                sess['email'] = 'joe@example.com'
+
+            rv = tc.post('/statusize/',
+                         data={'message': 'foo'},
+                         follow_redirects=True)
+            eq_(rv.status_code, 200)
+
+    def test_status_no_message(self):
+        """Test posting a status with no message."""
+        with app.app.test_client() as tc:
+            with tc.session_transaction() as sess:
+                sess['email'] = 'joe@example.com'
+
+            rv = tc.post('/statusize/',
+                         data={'message': ''},
+                         follow_redirects=True)
+            # This kicks up a 404, but that's lame.
+            eq_(rv.status_code, 404)
+
+    def test_status_with_project(self):
+        """Test posting a status with no message."""
+        p = Project(name='blackhole', slug='blackhole')
+        app.db.session.add(p)
+        app.db.session.commit()
+        pid = p.id
+
+        with app.app.test_client() as tc:
+            with tc.session_transaction() as sess:
+                sess['email'] = 'joe@example.com'
+
+            rv = tc.post('/statusize/',
+                         data={'message': 'r1cky rocks!', 'project': pid},
+                         follow_redirects=True)
+            eq_(rv.status_code, 200)
+
+
+class APITestCase(AppTestCase):
     def test_create_first_status(self):
         """Test creating the very first status for a project and user."""
         data = json.dumps({
