@@ -92,10 +92,10 @@
   {% if statuses.has_prev or statuses.has_next %}
     <div class="grid_8 prefix_4 pagination cf">
       {% if statuses.has_prev %}
-        <a class="btn prev" href="{{ url }}?page={{ page - 1 }}">Newer &raquo;</a>
+        <a class="btn big prev" href="{{ url }}?page={{ page - 1 }}">Newer &raquo;</a>
       {% endif %}
       {% if statuses.has_next %}
-        <a class="btn next" href="{{ url }}?page={{ page + 1 }}">&laquo; Older</a>
+        <a class="btn big next" href="{{ url }}?page={{ page + 1 }}">&laquo; Older</a>
       {% endif %}
     </div>
   {% endif %}

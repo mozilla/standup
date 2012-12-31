@@ -74,16 +74,24 @@
       <div id="main-notices" class="grid_12">
         {% block notices %}{% endblock %}
       </div>
+
       {% if session['email'] %}
-        <div id="statusize" class="grid_12">
+        <div id="statusize">
           <form action="{{ url_for('statusize') }}" method="POST">
-            <textarea name="message" rows=2 cols=30></textarea>
-            <input type="hidden" name="redirect_to" value="{{ request.url }}">
-            <input type="hidden" name="project" value="{{ project.id if project else '' }}">
-            <input type="submit">
+            <div class="grid_4 alpha"></div>
+            <div class="grid_7 middle">
+              <textarea name="message" placeholder="What's your status?"></textarea>
+              <input type="hidden" name="redirect_to" value="{{ request.url }}" />
+              <input type="hidden" name="project" value="{{ project.id if project else '' }}" />
+            </div>
+            <div class="grid_1 omega">
+              <img class="gravatar" src="{{ session['email']|gravatar_url(size=60) }}">
+              <input type="submit" class="btn" value="Post"/>
+            </div>
           </form>
         </div>
       {% endif %}
+
       {% block content %}{% endblock %}
     </div>
 
