@@ -679,12 +679,16 @@ header {
 #statusize {
   form {
     textarea[name=message] {
-      height: 72px;
-      width: calc(~"100% - 26px");
-      border-radius: 6px;
-      padding: 6px;
-      margin-bottom: 20px;
+      border: 0;
+      .border-radius(6px);
+      .box-sizing(border-box);
+      display: block;
       float: right;
+      height: 92px;
+      margin-bottom: 20px;
+      padding: 6px;
+      resize: none;
+      width: 530px;
     }
   }
 
@@ -694,24 +698,24 @@ header {
     border-style: solid;
     content: '';
     height: 0;
-    right: -14px;
     position: absolute;
+    right: -14px;
     top: 15px;
     width: 0;
   }
 
   .omega {
     .gravatar {
-      .border-radius(3px);
+      .border-radius(6px);
       height: 60px;
-      width: 60px;
-      vertical-align: middle;
       margin-bottom: 5px;
+      vertical-align: middle;
+      width: 60px;
     }
     .btn {
       display: block;
-      width: 60px;
       text-align: center;
+      width: 60px;
     }
   }
 }
