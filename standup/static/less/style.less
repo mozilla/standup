@@ -682,19 +682,29 @@ header {
       border: 0;
       .border-radius(6px);
       .box-sizing(border-box);
+      color: #666;
       display: block;
       float: right;
+      font-family: Helvetica, Arial, sans-serif;
       height: 92px;
       margin-bottom: 20px;
       padding: 12px 20px;
       resize: none;
       width: 530px;
+
+      &::-webkit-input-placeholder {
+        color: #aaa;
+      }
+
+      &:-moz-placeholder {
+        color: #aaa;
+      }
     }
   }
 
   .middle:before {
     border-color: transparent transparent #fff transparent;
-    border-width: 0 16px 16px 0;
+    border-width: 0 14px 14px 0;
     border-style: solid;
     content: '';
     height: 0;
