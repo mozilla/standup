@@ -1,12 +1,6 @@
 $(function() {
     fixTimezones();
 
-    setInterval(function() {
-        if ($('.star-of-david').length < 50) {
-            createSnowflakes();
-        }
-    }, 500);
-
     /* Authenticatication for Persona */
     $('#login').click(function(ev) {
         ev.preventDefault();
@@ -96,17 +90,4 @@ function random(upper, lower) {
         lower = 0;
     }
     return Math.floor(Math.random() * (upper - lower) + 1) + lower;
-}
-
-function createSnowflakes() {
-    var flake = $('<div class="star-of-david"></div>');
-    flake.css('left', random(100) + '%');
-    flake.css('fontSize', random(300, 80) + '%');
-    flake.css('opacity', random(10, 5) * 0.1);
-    $('body').prepend(flake);
-    flake.animate({
-        top: '100%'
-    }, random(16000, 36000), 'linear', function() {
-        $(this).remove();
-    });
 }
