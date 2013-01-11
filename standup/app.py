@@ -128,7 +128,22 @@ def authenticate():
     """Authenticate user with Persona."""
     data = browserid.verify(request.form['assertion'],
                             settings.SITE_URL)
-    session['email'] = data['email']
+    email = data['email']
+    session['email'] = email
+
+    user = User.query.filter(User.email == email).first()
+
+    # Create a user if one does not already exist for this email
+    # address.
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        # TODO: We assume the user wants the first part of their email
+        # address to be their username. Good idea? Probably not.
+        username = email.split('@')[0]
+        user = User(username=username, name=username, email=email,
+                    slug=slugify(username), github_handle=username)
+        db.session.add(user)
+        db.session.commit()
 
     response = jsonify({'message': 'login successful'})
     response.status_code = 200
@@ -239,18 +254,10 @@ def statusize():
     if not email:
         return forbidden('You must be logged in to statusize!')
 
-    user = User.query.filter(User.email == session['email']).first()
+    user = User.query.filter(User.email == email).first()
 
     if not user:
-        # Create a user if one does not already exist for this email
-        # address.
-        user = User.query.filter_by(email=session['email']).first()
-        if not user:
-            username = email.split('@')[0]
-            user = User(username=username, name=username, email=email,
-                        slug=slugify(username), github_handle=username)
-            db.session.add(user)
-            db.session.commit()
+        return forbidden('You must have a user account to statusize!')
 
     message = request.form.get('message', '')
 
@@ -284,20 +291,10 @@ def profile():
     if not email:
         return forbidden('You must be logged in to see a profile!')
 
-    user = User.query.filter(User.email == session['email']).first()
+    user = User.query.filter(User.email == email).first()
 
-    # TODO: This whole "let's create a user whenever we don't have one"
-    # thing is dumb.
     if not user:
-        # Create a user if one does not already exist for this email
-        # address.
-        user = User.query.filter_by(email=session['email']).first()
-        if not user:
-            username = email.split('@')[0]
-            user = User(username=username, name=username, email=email,
-                        slug=slugify(username), github_handle=username)
-            db.session.add(user)
-            db.session.commit()
+        return forbidden('You must have a user account to see your profile!')
 
     return render_template(
         'profile.html',
