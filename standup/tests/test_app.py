@@ -27,6 +27,24 @@ class AppTestCase(unittest.TestCase):
         os.unlink(app.app.config['DATABASE'])
 
 
+class KungFuActionGripProfileTestCase(AppTestCase):
+    def test_profile_unauthenticated(self):
+        """Test that you can't see profile page if you're not logged in."""
+        with app.app.test_client() as tc:
+            rv = tc.get('/profile/')
+            eq_(rv.status_code, 403)
+
+    def test_profile_authenticationified(self):
+        """Test that you can see profile page if you are logged in."""
+        user(email='joe@example.com', save=True)
+        with app.app.test_client() as tc:
+            with tc.session_transaction() as sess:
+                sess['email'] = 'joe@example.com'
+
+            rv = tc.get('/profile/')
+            eq_(rv.status_code, 200)
+
+
 class StatusizerTestCase(AppTestCase):
     def test_status_unauthenticated(self):
         """Test that you get a 403 if you're not authenticated."""
@@ -38,6 +56,7 @@ class StatusizerTestCase(AppTestCase):
 
     def test_status(self):
         """Test posting a status."""
+        user(email='joe@example.com', save=True)
         with app.app.test_client() as tc:
             with tc.session_transaction() as sess:
                 sess['email'] = 'joe@example.com'
@@ -49,6 +68,7 @@ class StatusizerTestCase(AppTestCase):
 
     def test_status_no_message(self):
         """Test posting a status with no message."""
+        user(email='joe@example.com', save=True)
         with app.app.test_client() as tc:
             with tc.session_transaction() as sess:
                 sess['email'] = 'joe@example.com'
@@ -61,6 +81,8 @@ class StatusizerTestCase(AppTestCase):
 
     def test_status_with_project(self):
         """Test posting a status with no message."""
+        user(email='joe@example.com', save=True)
+
         p = Project(name='blackhole', slug='blackhole')
         app.db.session.add(p)
         app.db.session.commit()
