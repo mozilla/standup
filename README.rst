@@ -20,7 +20,7 @@ We developed it with the following priorities:
 Hacking
 =======
 
-To setup a local dev environment for hacking::
+To set up a local dev environment for hacking:
 
 1. Create and activate a new virtual environment.
 2. Clone the repo::
