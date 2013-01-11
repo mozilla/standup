@@ -27,6 +27,21 @@ class AppTestCase(unittest.TestCase):
         os.unlink(app.app.config['DATABASE'])
 
 
+class KungFuActionGripProfileTestCase(AppTestCase):
+    def test_profile_unauthenticated(self):
+        with app.app.test_client() as tc:
+            rv = tc.get('/profile/')
+            eq_(rv.status_code, 403)
+
+    def test_profile_authenticationified(self):
+        with app.app.test_client() as tc:
+            with tc.session_transaction() as sess:
+                sess['email'] = 'joe@example.com'
+
+            rv = tc.get('/profile/')
+            eq_(rv.status_code, 200)
+
+
 class StatusizerTestCase(AppTestCase):
     def test_status_unauthenticated(self):
         """Test that you get a 403 if you're not authenticated."""
