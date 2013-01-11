@@ -277,6 +277,34 @@ def statusize():
     return redirect(redirect_url)
 
 
+@app.route('/profile/', methods=['GET'])
+def profile():
+    """Shows the user's profile page."""
+    email = session.get('email')
+    if not email:
+        return forbidden('You must be logged in to see a profile!')
+
+    user = User.query.filter(User.email == session['email']).first()
+
+    # TODO: This whole "let's create a user whenever we don't have one"
+    # thing is dumb.
+    if not user:
+        # Create a user if one does not already exist for this email
+        # address.
+        user = User.query.filter_by(email=session['email']).first()
+        if not user:
+            username = email.split('@')[0]
+            user = User(username=username, name=username, email=email,
+                        slug=slugify(username), github_handle=username)
+            db.session.add(user)
+            db.session.commit()
+
+    return render_template(
+        'profile.html',
+        user=user,
+        statuses=user.recent_statuses())
+
+
 @app.route('/api/v1/status/', methods=['POST'])
 @api_key_required
 def create_status():
