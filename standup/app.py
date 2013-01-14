@@ -6,10 +6,11 @@ from functools import wraps
 from urllib import urlencode
 
 import browserid
-from bleach import clean, linkify
+from bleach import clean
 from flask import (Flask, render_template, request, url_for, jsonify,
                    make_response, session, redirect)
 from flask.ext.sqlalchemy import SQLAlchemy
+from flaskext.markdown import Markdown
 
 import settings
 
@@ -17,6 +18,7 @@ from standup.utils import slugify
 
 
 app = Flask(__name__)
+Markdown(app)
 app.debug = getattr(settings, 'DEBUG', False)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
     'DATABASE_URL', 'sqlite:///standup_app.db')
@@ -532,8 +534,6 @@ def format_update(update, project=None):
         formatted = re.sub(r'(pull|pr) #?(\d+)',
             r'<a href="%s/pull/\2">\1 \2</a>' % project.repo_url, formatted,
             flags=re.I)
-
-    formatted = linkify(formatted, target='_blank')
 
     # Search for tags on the original, unformatted string. A tag must start
     # with a letter.

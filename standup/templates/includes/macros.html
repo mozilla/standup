@@ -61,7 +61,7 @@
           <ul class="bubble">
     {% endif %}
             <li class="cf">
-              <div class="update">{{ status.content_html|format_update(status.project)|safe }}</div>
+              <div class="update">{{ status.content_html|format_update(status.project)|safe|urlize|markdown }}</div>
               <div class="update-meta">
                 <a class="post-time" href="{{ url_for('status', id=status.id) }}">
                   <time datetime="{{ status.created|dateformat('%Y-%m-%dT%H:%M:%SZ') }}">
