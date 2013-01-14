@@ -568,7 +568,7 @@ def format_update(update, project=None):
     if tags:
         tags_html = ''
         for tag in tags:
-            tags_html = TAG_TMPL.format(tags_html, tag)
+            tags_html = TAG_TMPL.format(tags_html, tag.lower())
         formatted = '%s <div class="tags">%s</div>' % (formatted, tags_html)
 
     return formatted
