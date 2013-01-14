@@ -535,7 +535,7 @@ def gravatar_url(email, size=None):
     return url
 
 
-TAG_TMPL = '{0} <span class="tag tag-{1}">{1}</span>'
+TAG_TMPL = '{0} <span class="tag tag-{1}">{2}</span>'
 
 
 @app.template_filter('format_update')
@@ -568,7 +568,7 @@ def format_update(update, project=None):
     if tags:
         tags_html = ''
         for tag in tags:
-            tags_html = TAG_TMPL.format(tags_html, tag.lower())
+            tags_html = TAG_TMPL.format(tags_html, tag.lower(), tag)
         formatted = '%s <div class="tags">%s</div>' % (formatted, tags_html)
 
     return formatted
