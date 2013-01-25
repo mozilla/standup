@@ -1,6 +1,8 @@
 $(function() {
     fixTimezones();
 
+    var currentUser = localStorage.getItem('personaEmail');
+
     /* Authenticatication for Persona */
     $('#login').click(function(ev) {
         ev.preventDefault();
@@ -13,13 +15,14 @@ $(function() {
     });
 
     navigator.id.watch({
-        loggedInEmail: currentUser,
+        loggedInUser: currentUser,
         onlogin: function(assertion) {
             $.ajax({
                 type: 'POST',
                 url: '/authenticate',
                 data: { assertion: assertion },
                 success: function(res, status, xhr) {
+                    localStorage.setItem('personaEmail', res.email);
                     window.location.reload();
                 },
                 error: function(res, status, xhr) {
@@ -52,6 +55,7 @@ $(function() {
                 type: 'POST',
                 url: '/logout',
                 success: function(res, status, xhr) {
+                    localStorage.removeItem('personaEmail');
                     window.location.reload();
                 },
                 error: function(res, status, xhr) {
