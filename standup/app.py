@@ -18,6 +18,7 @@ from standup.utils import slugify
 
 app = Flask(__name__)
 app.debug = getattr(settings, 'DEBUG', False)
+app.config['SITE_TITLE'] = getattr(settings, 'SITE_TITLE', 'Standup')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
     'DATABASE_URL', 'sqlite:///standup_app.db')
 app.secret_key = settings.SESSION_SECRET

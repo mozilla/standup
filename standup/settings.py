@@ -8,6 +8,8 @@ DEBUG = False
 API_KEY = 'qwertyuiopasdfghjklzxcvbnm1234567890'
 
 SITE_URL = 'http://127.0.0.1:5000'
+SITE_TITLE = 'standup'
+
 SESSION_SECRET = 'asdfghjklqwertyuiopzxcvbnm1234567890'
 
 try:
