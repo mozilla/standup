@@ -146,7 +146,7 @@ def authenticate():
         db.session.add(user)
         db.session.commit()
 
-    response = jsonify({'message': 'login successful'})
+    response = jsonify({'email': user.email})
     response.status_code = 200
     return response
 

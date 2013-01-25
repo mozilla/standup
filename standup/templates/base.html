@@ -7,12 +7,6 @@
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/normalize.css') }}">
   <link rel="stylesheet/less" type="text/css" href="{{ url_for('static', filename='less/style.less') }}">
   <script src="https://login.persona.org/include.js"></script>
-  <script type="text/javascript">
-      var currentUser = null;
-      {% if session['email'] %}
-        currentUser = '{{ session['email'] }}';
-      {% endif %}
-  </script>
   <script src="{{ url_for('static', filename='js/modernizr-2.6.1.js') }}"></script>
   <script src="{{ url_for('static', filename='js/less.js') }}"></script>
   <script src="{{ url_for('static', filename='js/jquery-1.8.2.min.js') }}"></script>
