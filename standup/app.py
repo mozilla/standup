@@ -305,12 +305,15 @@ def profile():
         statuses=user.recent_statuses())
 
 
-@app.route('/api/v1/status/<limit>/', methods=['GET'])
-def get_statuses(limit):
+@app.route('/api/v1/feed/', methods=['GET'])
+def get_statuses():
     """Get all status updates.
 
     Returns id, user (the name), project name and timestamp of statuses.
-    The amount of items to return is determined by the limit attribute.
+
+    The amount of items to return is determined by the limit argument (defaults
+    to 20):
+    /api/v1/feed/?limit=20
 
     An example of the JSON:
 
@@ -323,6 +326,8 @@ def get_statuses(limit):
             }
         }
     """
+
+    limit = request.args.get('limit', 20)
 
     statuses = Status.query.filter(Status.reply_to == None). \
              order_by(db.desc(Status.created)).limit(limit)
