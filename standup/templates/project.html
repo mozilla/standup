@@ -8,6 +8,6 @@
 
 {% block content %}
   <div class="grid_12">
-    {{ status_updates(statuses, page, url=url_for('project', slug=project.slug)) }}
+    {{ status_updates(statuses, page, url=url_for('status.project', slug=project.slug)) }}
   </div>
 {% endblock %}

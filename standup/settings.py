@@ -7,6 +7,13 @@ DEBUG = False
 # The key used to authenticate API calls.
 API_KEY = 'qwertyuiopasdfghjklzxcvbnm1234567890'
 
+BLUEPRINTS = (
+    'standup.apps.api.views',
+    'standup.apps.landings.views',
+    'standup.apps.status.views',
+    'standup.apps.users.views',
+)
+
 SITE_URL = 'http://127.0.0.1:5000'
 SITE_TITLE = 'standup'
 

@@ -17,7 +17,7 @@
   <header>
     <div class="container_12">
       <div class="grid_2">
-        <a class="logo" href="{{ url_for('index') }}">{{ config.SITE_TITLE }}</a>
+        <a class="logo" href="{{ url_for('status.index') }}">{{ config.SITE_TITLE }}</a>
       </div>
       <div class="grid_10">
         <nav>
@@ -28,7 +28,7 @@
                 <ul>
                   {% for team in teams %}
                   <li>
-                    <a {% if team == selected %}class="selected"{% endif %} href="{{ url_for('team', slug=team.slug) }}">
+                    <a {% if team == selected %}class="selected"{% endif %} href="{{ url_for('status.team', slug=team.slug) }}">
                     {{ team.name }}
                     </a>
                   </li>
@@ -41,7 +41,7 @@
               <ul>
                 {% for project in projects %}
                 <li>
-                    <a {% if project == selected %}class="selected"{% endif %} href="{{ url_for('project', slug=project.slug) }}">
+                    <a {% if project == selected %}class="selected"{% endif %} href="{{ url_for('status.project', slug=project.slug) }}">
                     {{ project.name }}
                     </a>
                   </li>
@@ -54,7 +54,7 @@
                 {% else %}
                   <a href="#" id="user-menu"><img src="{{ session['email']|gravatar_url(size=22) }}" alt="{% if current_user %}{{ current_user.username }}{% else %}{{ session['email'] }}{% endif %}"></a>
                   <ul>
-                    <li><a href="{{ url_for('profile') }}">Profile</a></li>
+                    <li><a href="{{ url_for('status.profile') }}">Profile</a></li>
                     <li><a href="#" id="logout">Sign out</a></li>
                   </ul>
                 {% endif %}
@@ -72,7 +72,7 @@
 
       {% if session['email'] %}
         <div id="statusize">
-          <form action="{{ url_for('statusize') }}" method="POST">
+          <form action="{{ url_for('status.statusize') }}" method="POST">
             <div class="grid_4 alpha"></div>
             <div class="grid_7 middle">
               <textarea name="message" placeholder="What's your status?"></textarea>
@@ -102,7 +102,7 @@
         <div class="grid_6">
           <nav>
             <ul>
-              <li><a href="{{ url_for('help') }}">Help &amp; FAQ</a></li>
+              <li><a href="{{ url_for('landings.help') }}">Help &amp; FAQ</a></li>
               <li><a href="https://github.com/rlr/standup/issues">Report a bug</a></li>
               <li><a href="https://github.com/rlr/standup">Contribute</a></li>
             </ul>

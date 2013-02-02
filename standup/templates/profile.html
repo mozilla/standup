@@ -25,7 +25,7 @@
         <dt>teams:</dt>
         <dd>
           {% if user.team %}
-            <a href="{{ url_for('team', slug=user.team.slug) }}">{{ user.team.name }}</a>
+            <a href="{{ url_for('status.team', slug=user.team.slug) }}">{{ user.team.name }}</a>
           {% else %}
             Not on a team.
           {% endif %}
@@ -34,6 +34,6 @@
     </div>
   </div>
   <div class="grid_12">
-    {{ status_updates(statuses, page, url=url_for('user', slug=user.username)) }}
+    {{ status_updates(statuses, page, url=url_for('status.user', slug=user.username)) }}
   </div>
 {% endblock %}

@@ -5,10 +5,10 @@
         <li class="cf">
           {{ status.content }}
           <div class="meta">
-            <a href="{{ url_for('user', slug=status.user.slug) }}">
+            <a href="{{ url_for('status.user', slug=status.user.slug) }}">
               <img class="gravatar" src="{% if status.user.email %}{{ status.user.email|gravatar_url(size=22) }}{% else %}{{ 'None'|gravatar_url(size=60) }}{% endif %}">
             </a>
-            <a href="{{ url_for('user', slug=status.user.slug) }}">{{ status.user.name }} (@{{ status.user.username }})</a>
+            <a href="{{ url_for('status.user', slug=status.user.slug) }}">{{ status.user.name }} (@{{ status.user.username }})</a>
             {{ status.created|dateformat('%A, {S} %B %Y at %-I:%M %p') }}
           </div>
         </li>
@@ -49,11 +49,11 @@
       {% set last_user = status.user.username %}
       <div class="status-block cf">
         <div class="user-meta grid_3 alpha">
-          <h4><a href="{{ url_for('user', slug=status.user.slug) }}">{{ status.user.name }}</a></h4>
-          <a href="{{ url_for('user', slug=status.user.slug) }}">@{{ status.user.username }}</a>
+          <h4><a href="{{ url_for('status.user', slug=status.user.slug) }}">{{ status.user.name }}</a></h4>
+          <a href="{{ url_for('status.user', slug=status.user.slug) }}">@{{ status.user.username }}</a>
         </div>
         <div class="grid_1">
-          <a href="{{ url_for('user', slug=status.user.slug) }}">
+          <a href="{{ url_for('status.user', slug=status.user.slug) }}">
             <img class="gravatar" src="{% if status.user.email %}{{ status.user.email|gravatar_url(size=60) }}{% else %}{{ 'None'|gravatar_url(size=60) }}{% endif %}">
           </a>
         </div>
@@ -63,18 +63,18 @@
             <li class="cf">
               <div class="update">{{ status.content_html|format_update(status.project)|safe|urlize|markdown }}</div>
               <div class="update-meta">
-                <a class="post-time" href="{{ url_for('status', id=status.id) }}">
+                <a class="post-time" href="{{ url_for('status.status', id=status.id) }}">
                   <time datetime="{{ status.created|dateformat('%Y-%m-%dT%H:%M:%SZ') }}">
                     {{ status.created|dateformat('%-I:%M %p') }}
                   </time>
                 </a>
 
-                <a href="{{ url_for('status', id=status.id) }}" class="comment-count">{{ status.replies().items|length }}</a>
+                <a href="{{ url_for('status.status', id=status.id) }}" class="comment-count">{{ status.replies().items|length }}</a>
 
                 {% if status.project %}
                   <a class="project-name"
                      style="{% if status.project.color %}background-color: #{{ status.project.color }}; color: #{{ status.project.color }};{% endif %}"
-                     href="{{ url_for('project', slug=status.project.slug) }}">
+                     href="{{ url_for('status.project', slug=status.project.slug) }}">
                     {{ status.project.name }}
                   </a>
                 {% endif %}

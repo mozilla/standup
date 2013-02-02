@@ -6,7 +6,9 @@ import unittest
 from nose.tools import ok_, eq_
 
 from standup import app
-from standup.app import User, Project, Status, format_update, TAG_TMPL
+from standup.apps.status.models import Project, Status
+from standup.apps.users.models import User
+from standup.filters import format_update, TAG_TMPL
 from standup import settings
 from standup.tests import status, user
 
@@ -372,7 +374,8 @@ class FormatUpdateTest(unittest.TestCase):
     def test_tags(self):
         # Test valid tags.
         for tag in ('#t', '#tag', '#TAG', '#tag123'):
-            expected = '%s <div class="tags">%s</div>' % (tag, TAG_TMPL.format('', tag[1:]),)
+            expected = '%s <div class="tags">%s</div>' % (tag,
+                TAG_TMPL.format('', tag[1:].lower(), tag[1:]),)
             eq_(format_update(tag), expected)
 
         # Test invalid tags.

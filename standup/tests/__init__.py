@@ -1,6 +1,7 @@
 from functools import wraps
-from standup.app import Project, User, Status
 from standup.app import db
+from standup.apps.status.models import Project, Status
+from standup.apps.users.models import User
 
 def with_save(func):
     """Decorate a model maker to add a `save` kwarg.
