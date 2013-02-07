@@ -5,7 +5,8 @@ from flask.ext.script import Manager
 from migrate.exceptions import DatabaseAlreadyControlledError
 from migrate.versioning import api as migrate_api
 
-from standup.app import app, db
+from standup.app import db
+from standup.run import app
 from standup.apps.status.models import Project, Status
 from standup.apps.users.models import Team, User
 from standup.utils import slugify

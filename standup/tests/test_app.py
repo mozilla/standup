@@ -2,9 +2,8 @@ import json
 import os
 import tempfile
 import unittest
-
+from . import BaseTestCase
 from nose.tools import ok_, eq_
-
 from standup import app
 from standup.apps.status.models import Project, Status
 from standup.apps.users.models import User
@@ -12,74 +11,52 @@ from standup.filters import format_update, TAG_TMPL
 from standup import settings
 from standup.tests import status, user
 
-
-class AppTestCase(unittest.TestCase):
-
-    def setUp(self):
-        self.db_fd, app.app.config['DATABASE'] = tempfile.mkstemp()
-        app.app.config['SQLALCHEMY_DATABASE_URI'] = ('sqlite:///%s' %
-            app.app.config['DATABASE'])
-        app.app.config['TESTING'] = True
-        self.app = app.app.test_client()
-        app.db.create_all()
-
-    def tearDown(self):
-        app.db.session.remove()
-        os.close(self.db_fd)
-        os.unlink(app.app.config['DATABASE'])
-
-
-class KungFuActionGripProfileTestCase(AppTestCase):
+class KungFuActionGripProfileTestCase(BaseTestCase):
     def test_profile_unauthenticated(self):
         """Test that you can't see profile page if you're not logged in."""
-        with app.app.test_client() as tc:
-            rv = tc.get('/profile/')
-            eq_(rv.status_code, 403)
+        rv = self.app.get('/profile/')
+        eq_(rv.status_code, 403)
 
     def test_profile_authenticationified(self):
         """Test that you can see profile page if you are logged in."""
         user(email='joe@example.com', save=True)
-        with app.app.test_client() as tc:
-            with tc.session_transaction() as sess:
-                sess['email'] = 'joe@example.com'
+        with self.app.session_transaction() as sess:
+            sess['email'] = 'joe@example.com'
 
-            rv = tc.get('/profile/')
-            eq_(rv.status_code, 200)
+        rv = self.app.get('/profile/')
+        eq_(rv.status_code, 200)
 
 
-class StatusizerTestCase(AppTestCase):
+class StatusizerTestCase(BaseTestCase):
     def test_status_unauthenticated(self):
         """Test that you get a 403 if you're not authenticated."""
-        with app.app.test_client() as tc:
-            rv = tc.post('/statusize/',
-                         data={'message': 'foo'},
-                         follow_redirects=True)
-            eq_(rv.status_code, 403)
+        rv = self.app.post('/statusize/',
+                     data={'message': 'foo'},
+                     follow_redirects=True)
+        eq_(rv.status_code, 403)
 
     def test_status(self):
         """Test posting a status."""
         user(email='joe@example.com', save=True)
-        with app.app.test_client() as tc:
-            with tc.session_transaction() as sess:
-                sess['email'] = 'joe@example.com'
+        with self.app.session_transaction() as sess:
+            sess['email'] = 'joe@example.com'
 
-            rv = tc.post('/statusize/',
-                         data={'message': 'foo'},
-                         follow_redirects=True)
-            eq_(rv.status_code, 200)
+        rv = self.app.post('/statusize/',
+                     data={'message': 'foo'},
+                     follow_redirects=True)
+        eq_(rv.status_code, 200)
 
     def test_status_no_message(self):
         """Test posting a status with no message."""
         user(email='joe@example.com', save=True)
-        with app.app.test_client() as tc:
-            with tc.session_transaction() as sess:
-                sess['email'] = 'joe@example.com'
+        with self.app.session_transaction() as sess:
+            sess['email'] = 'joe@example.com'
 
-            rv = tc.post('/statusize/',
-                         data={'message': ''},
-                         follow_redirects=True)
-            # This kicks up a 404, but that's lame.
-            eq_(rv.status_code, 404)
+        rv = self.app.post('/statusize/',
+                     data={'message': ''},
+                     follow_redirects=True)
+        # This kicks up a 404, but that's lame.
+        eq_(rv.status_code, 404)
 
     def test_status_with_project(self):
         """Test posting a status with no message."""
@@ -90,17 +67,16 @@ class StatusizerTestCase(AppTestCase):
         app.db.session.commit()
         pid = p.id
 
-        with app.app.test_client() as tc:
-            with tc.session_transaction() as sess:
-                sess['email'] = 'joe@example.com'
+        with self.app.session_transaction() as sess:
+            sess['email'] = 'joe@example.com'
 
-            rv = tc.post('/statusize/',
-                         data={'message': 'r1cky rocks!', 'project': pid},
-                         follow_redirects=True)
-            eq_(rv.status_code, 200)
+        rv = self.app.post('/statusize/',
+                     data={'message': 'r1cky rocks!', 'project': pid},
+                     follow_redirects=True)
+        eq_(rv.status_code, 200)
 
 
-class APITestCase(AppTestCase):
+class APITestCase(BaseTestCase):
     def test_create_first_status(self):
         """Test creating the very first status for a project and user."""
         data = json.dumps({

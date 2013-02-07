@@ -1,7 +1,21 @@
+import os
+import unittest
 from functools import wraps
-from standup.app import db
+from standup import test_settings
+from standup.app import create_app, db
 from standup.apps.status.models import Project, Status
 from standup.apps.users.models import User
+
+class BaseTestCase(unittest.TestCase):
+
+    def setUp(self):
+        app = create_app(test_settings)
+        app.config['TESTING'] = True
+        self.app = app.test_client()
+        db.create_all()
+
+    def tearDown(self):
+        db.drop_all()
 
 def with_save(func):
     """Decorate a model maker to add a `save` kwarg.

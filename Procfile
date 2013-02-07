@@ -1,1 +1,1 @@
-web: gunicorn standup.app:app -b 0.0.0.0:$PORT -w 3
+web: gunicorn standup.wsgi:app -b 0.0.0.0:$PORT -w 3
