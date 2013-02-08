@@ -1,4 +1,5 @@
-from flask import render_template
+from flask import render_template, request
+from standup.utils import json_requested, jsonify
 
 def register_error_handlers(app):
     app.register_error_handler(403, forbidden)
@@ -6,16 +7,28 @@ def register_error_handlers(app):
     app.register_error_handler(500, something_broke)
 
 
-def forbidden(error=None):
-    error = error or 'You shall not pass!'
-    return render_template('403.html', error=error), 403
+def api_error(code, message):
+    error = dict(request=request.path, message=message)
+    return jsonify(error), code
 
 
-def page_not_found(error=None):
-    error = error or 'Oops! The page you are looking for does not exist.'
-    return render_template('404.html', error=error), 404
+def error(code, message, template):
+    if json_requested():
+        return api_error(code, str(message))
+    else:
+        return render_template(template, error=message), code
 
 
-def something_broke(error=None):
-    error = error or 'Oops! Stood up too fast and feeling woozy.'
-    return render_template('500.html', error=error), 500
+def forbidden(message=None):
+    message = message or 'You shall not pass!'
+    return error(403, message, '403.html')
+
+
+def page_not_found(message=None):
+    message = message or 'Oops! The page you are looking for does not exist.'
+    return error(404, message, '404.html')
+
+
+def something_broke(message=None):
+    message = message or 'Oops! Stood up too fast and feeling woozy.'
+    return error(500, message, '500.html')
