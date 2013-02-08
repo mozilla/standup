@@ -29,9 +29,11 @@ class User(db.Model):
     email = db.Column(db.String(100), unique=True)
     github_handle = db.Column(db.String(100), unique=True)
     is_admin = db.Column(db.Boolean, default=False)
-    team_id = db.Column(db.Integer, db.ForeignKey('team.id'))
-    team = db.relationship(
-        'Team', backref=db.backref('users', lazy='dynamic'))
+    team_users = db.Table('team_users',
+        db.Column('team_id', db.Integer, db.ForeignKey('team.id')),
+        db.Column('user_id', db.Integer, db.ForeignKey('user.id')))
+    team = db.relationship('Team', secondary=team_users,
+                           backref=db.backref('users', lazy='dynamic'))
 
     def __repr__(self):
         return '<User: [%s] %s>' % (self.username, self.name)
