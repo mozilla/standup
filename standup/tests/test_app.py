@@ -3,7 +3,6 @@ import os
 import tempfile
 import unittest
 
-
 from nose.tools import ok_, eq_
 
 from standup import main
@@ -12,6 +11,7 @@ from standup.apps.status.models import Project, Status
 from standup.apps.users.models import User
 from standup.filters import format_update, TAG_TMPL
 from standup.tests import BaseTestCase, status, user
+
 
 class KungFuActionGripProfileTestCase(BaseTestCase):
     def test_profile_unauthenticated(self):

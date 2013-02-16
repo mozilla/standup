@@ -1,21 +1,25 @@
-import os
 import unittest
 from functools import wraps
+
 from standup import test_settings
-from standup.main import create_app, db
 from standup.apps.status.models import Project, Status
 from standup.apps.users.models import User
+from standup.main import create_app, db
+
+
+_test_app = create_app(test_settings)
+_test_app.config['TESTING'] = True
+
 
 class BaseTestCase(unittest.TestCase):
-
     def setUp(self):
-        app = create_app(test_settings)
-        app.config['TESTING'] = True
-        self.app = app.test_client()
+        super(BaseTestCase, self).setUp()
+        self.app = _test_app.test_client()
         db.create_all()
 
     def tearDown(self):
         db.drop_all()
+
 
 def with_save(func):
     """Decorate a model maker to add a `save` kwarg.
@@ -34,6 +38,7 @@ def with_save(func):
 
     return saving_func
 
+
 @with_save
 def project(**kwargs):
     defaults = dict(name='Test Project',
@@ -41,6 +46,7 @@ def project(**kwargs):
     defaults.update(kwargs)
 
     return Project(**defaults)
+
 
 @with_save
 def user(**kwargs):
@@ -51,6 +57,7 @@ def user(**kwargs):
     defaults.update(kwargs)
 
     return User(**defaults)
+
 
 @with_save
 def status(**kwargs):
