@@ -78,10 +78,21 @@ And see stats for your instance::
 Migrations
 ==========
 
-To run migrations use::
+To upgrade the database use::
 
   $ ./manage.py db_upgrade
 
+You may optionally pass a version that you wish to upgrade to::
+
+  $ ./manage.py db_upgrade 8
+
+If you wish to downgrade, you must specify what version to downgrade to::
+
+  $ ./manage.py db_downgrade 4
+
+Finally you can check the current version of the database by using::
+
+  $ ./manage.py db_version
 
 Configuration
 =============

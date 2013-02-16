@@ -51,10 +51,10 @@ def db_downgrade(version):
 
 
 @manager.command
-def db_upgrade():
+def db_upgrade(version=None):
     """Upgrade the database"""
     v1 = get_db_version()
-    migrate_api.upgrade(url=db_url, repository=db_repo)
+    migrate_api.upgrade(url=db_url, repository=db_repo, version=version)
     v2 = get_db_version()
 
     if v1 == v2:
