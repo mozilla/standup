@@ -3,11 +3,14 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql.expression import ColumnClause
 from migrate import *
 
+
 meta = MetaData()
+
 
 team_users = Table('team_users', meta,
                    Column('team_id', Integer, ForeignKey('team.id')),
                    Column('user_id', Integer, ForeignKey('user.id')))
+
 
 def upgrade(migrate_engine):
     # Upgrade operations go here. Don't create your own engine; bind
@@ -33,6 +36,7 @@ def upgrade(migrate_engine):
             team_users.insert(values=values).execute()
 
     user.c.team_id.drop()
+
 
 def downgrade(migrate_engine):
     # Operations to reverse the above upgrade go here.
