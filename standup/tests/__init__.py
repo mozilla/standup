@@ -14,7 +14,7 @@ _test_app.config['TESTING'] = True
 class BaseTestCase(unittest.TestCase):
     def setUp(self):
         super(BaseTestCase, self).setUp()
-        self.app = _test_app.test_client()
+        self.client = _test_app.test_client()
         db.create_all()
 
     def tearDown(self):

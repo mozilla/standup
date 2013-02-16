@@ -1,6 +1,4 @@
 import json
-import os
-import tempfile
 import unittest
 
 from nose.tools import ok_, eq_
@@ -16,47 +14,47 @@ from standup.tests import BaseTestCase, status, user
 class KungFuActionGripProfileTestCase(BaseTestCase):
     def test_profile_unauthenticated(self):
         """Test that you can't see profile page if you're not logged in."""
-        rv = self.app.get('/profile/')
+        rv = self.client.get('/profile/')
         eq_(rv.status_code, 403)
 
     def test_profile_authenticationified(self):
         """Test that you can see profile page if you are logged in."""
         user(email='joe@example.com', save=True)
-        with self.app.session_transaction() as sess:
+        with self.client.session_transaction() as sess:
             sess['email'] = 'joe@example.com'
 
-        rv = self.app.get('/profile/')
+        rv = self.client.get('/profile/')
         eq_(rv.status_code, 200)
 
 
 class StatusizerTestCase(BaseTestCase):
     def test_status_unauthenticated(self):
         """Test that you get a 403 if you're not authenticated."""
-        rv = self.app.post('/statusize/',
-                     data={'message': 'foo'},
-                     follow_redirects=True)
+        rv = self.client.post('/statusize/',
+                           data={'message': 'foo'},
+                           follow_redirects=True)
         eq_(rv.status_code, 403)
 
     def test_status(self):
         """Test posting a status."""
         user(email='joe@example.com', save=True)
-        with self.app.session_transaction() as sess:
+        with self.client.session_transaction() as sess:
             sess['email'] = 'joe@example.com'
 
-        rv = self.app.post('/statusize/',
-                     data={'message': 'foo'},
-                     follow_redirects=True)
+        rv = self.client.post('/statusize/',
+                           data={'message': 'foo'},
+                           follow_redirects=True)
         eq_(rv.status_code, 200)
 
     def test_status_no_message(self):
         """Test posting a status with no message."""
         user(email='joe@example.com', save=True)
-        with self.app.session_transaction() as sess:
+        with self.client.session_transaction() as sess:
             sess['email'] = 'joe@example.com'
 
-        rv = self.app.post('/statusize/',
-                     data={'message': ''},
-                     follow_redirects=True)
+        rv = self.client.post('/statusize/',
+                           data={'message': ''},
+                           follow_redirects=True)
         # This kicks up a 404, but that's lame.
         eq_(rv.status_code, 404)
 
@@ -69,12 +67,12 @@ class StatusizerTestCase(BaseTestCase):
         main.db.session.commit()
         pid = p.id
 
-        with self.app.session_transaction() as sess:
+        with self.client.session_transaction() as sess:
             sess['email'] = 'joe@example.com'
 
-        rv = self.app.post('/statusize/',
-                     data={'message': 'r1cky rocks!', 'project': pid},
-                     follow_redirects=True)
+        rv = self.client.post('/statusize/',
+                           data={'message': 'r1cky rocks!', 'project': pid},
+                           follow_redirects=True)
         eq_(rv.status_code, 200)
 
 
@@ -82,11 +80,11 @@ class APITestCase(BaseTestCase):
     def test_create_first_status(self):
         """Test creating the very first status for a project and user."""
         data = json.dumps({
-            'api_key': settings.API_KEY,
-            'user': 'r1cky',
-            'project': 'sumodev',
-            'content': 'bug 123456'})
-        response = self.app.post(
+                'api_key': settings.API_KEY,
+                'user': 'r1cky',
+                'project': 'sumodev',
+                'content': 'bug 123456'})
+        response = self.client.post(
             '/api/v1/status/', data=data, content_type='application/json')
         self.assertEqual(response.status_code, 200)
         assert 'bug 123456' in response.data
@@ -115,50 +113,50 @@ class APITestCase(BaseTestCase):
         """Verify validation of required fields."""
         # Missing user
         data = json.dumps({
-            'api_key': settings.API_KEY,
-            'project': 'sumodev',
-            'content': 'bug 123456'})
-        response = self.app.post(
+                'api_key': settings.API_KEY,
+                'project': 'sumodev',
+                'content': 'bug 123456'})
+        response = self.client.post(
             '/api/v1/status/', data=data, content_type='application/json')
         self.assertEqual(response.status_code, 400)
 
         # Missing content
         data = json.dumps({
-            'api_key': settings.API_KEY,
-            'user': 'r1cky',
-            'project': 'sumodev'})
-        response = self.app.post(
+                'api_key': settings.API_KEY,
+                'user': 'r1cky',
+                'project': 'sumodev'})
+        response = self.client.post(
             '/api/v1/status/', data=data, content_type='application/json')
         self.assertEqual(response.status_code, 400)
 
     def test_create_status_invalid_api_key(self):
         """Request with invalid API key should return 403."""
         data = json.dumps({
-            'api_key': settings.API_KEY + '123',
-            'user': 'r1cky',
-            'project': 'sumodev',
-            'content': 'bug 123456'})
-        response = self.app.post(
+                'api_key': settings.API_KEY + '123',
+                'user': 'r1cky',
+                'project': 'sumodev',
+                'content': 'bug 123456'})
+        response = self.client.post(
             '/api/v1/status/', data=data, content_type='application/json')
         self.assertEqual(response.status_code, 403)
 
     def test_create_status_missing_api_key(self):
         """Request without an API key should return 403."""
         data = json.dumps({
-            'user': 'r1cky',
-            'project': 'sumodev',
-            'content': 'bug 123456'})
-        response = self.app.post(
+                'user': 'r1cky',
+                'project': 'sumodev',
+                'content': 'bug 123456'})
+        response = self.client.post(
             '/api/v1/status/', data=data, content_type='application/json')
         self.assertEqual(response.status_code, 403)
 
     def test_create_status_no_project(self):
         """Statuses can be created without a project"""
         data = json.dumps({
-            'api_key': settings.API_KEY,
-            'user': 'r1cky',
-            'content': 'test update'})
-        response = self.app.post(
+                'api_key': settings.API_KEY,
+                'user': 'r1cky',
+                'content': 'test update'})
+        response = self.client.post(
             '/api/v1/status/', data=data, content_type='application/json')
         self.assertEqual(response.status_code, 200)
 
@@ -171,11 +169,11 @@ class APITestCase(BaseTestCase):
         sid = s.id
 
         data = json.dumps({
-            'api_key': settings.API_KEY,
-            'user': 'r1cky',
-            'content': 'reply to status',
-            'reply_to': sid})
-        response = self.app.post(
+                'api_key': settings.API_KEY,
+                'user': 'r1cky',
+                'content': 'reply to status',
+                'reply_to': sid})
+        response = self.client.post(
             '/api/v1/status/', data=data, content_type='application/json')
         self.assertEqual(response.status_code, 200)
 
@@ -189,11 +187,11 @@ class APITestCase(BaseTestCase):
 
         # You should not be able to reply to the reply
         data = json.dumps({
-            'api_key': settings.API_KEY,
-            'user': 'r1cky',
-            'content': 'should not work',
-            'reply_to': r.id})
-        response = self.app.post(
+                'api_key': settings.API_KEY,
+                'user': 'r1cky',
+                'content': 'should not work',
+                'reply_to': r.id})
+        response = self.client.post(
             '/api/v1/status/', data=data, content_type='application/json')
         self.assertEqual(response.status_code, 400)
 
@@ -203,9 +201,9 @@ class APITestCase(BaseTestCase):
         id = s.id
 
         data = json.dumps({
-            'api_key': settings.API_KEY,
-            'user': s.user.username})
-        response = self.app.delete(
+                'api_key': settings.API_KEY,
+                'user': s.user.username})
+        response = self.client.delete(
             '/api/v1/status/%s/' % s.id, data=data,
             content_type='application/json')
         self.assertEqual(response.status_code, 200)
@@ -219,7 +217,7 @@ class APITestCase(BaseTestCase):
 
         # Missing user
         data = json.dumps({'api_key': settings.API_KEY})
-        response = self.app.delete(
+        response = self.client.delete(
             '/api/v1/status/%s/' % s.id, data=data,
             content_type='application/json')
         self.assertEqual(response.status_code, 400)
@@ -228,9 +226,9 @@ class APITestCase(BaseTestCase):
         """Test that only user who created the status can delete it"""
         s = status(save=True)
         data = json.dumps({
-            'api_key': settings.API_KEY,
-            'user': s.user.username + '123'})
-        response = self.app.delete(
+                'api_key': settings.API_KEY,
+                'user': s.user.username + '123'})
+        response = self.client.delete(
             '/api/v1/status/%s/' % s.id, data=data,
             content_type='application/json')
         self.assertEqual(response.status_code, 403)
@@ -239,9 +237,9 @@ class APITestCase(BaseTestCase):
         """Request with invalid API key should return 403"""
         s = status(save=True)
         data = json.dumps({
-            'api_key': settings.API_KEY + '123',
-            'user': s.user.username})
-        response = self.app.delete(
+                'api_key': settings.API_KEY + '123',
+                'user': s.user.username})
+        response = self.client.delete(
             '/api/v1/status/%s/' % s.id, data=data,
             content_type='application/json')
         self.assertEqual(response.status_code, 403)
@@ -250,7 +248,7 @@ class APITestCase(BaseTestCase):
         """Request with missing API key should return 403"""
         s = status(save=True)
         data = json.dumps({'user': s.user.username})
-        response = self.app.delete(
+        response = self.client.delete(
             '/api/v1/status/%s/' % s.id, data=data,
             content_type='application/json')
         self.assertEqual(response.status_code, 403)
@@ -261,12 +259,12 @@ class APITestCase(BaseTestCase):
         id = u.id
 
         data = json.dumps({
-            'api_key': settings.API_KEY,
-            'user': u.username,
-            'email': 'test@test.com',
-            'github_handle': 'test',
-            'name': 'Test'})
-        response = self.app.post(
+                'api_key': settings.API_KEY,
+                'user': u.username,
+                'email': 'test@test.com',
+                'github_handle': 'test',
+                'name': 'Test'})
+        response = self.client.post(
             '/api/v1/user/%s/' % u.username, data=data,
             content_type='application/json')
         self.assertEqual(response.status_code, 200)
@@ -290,12 +288,12 @@ class APITestCase(BaseTestCase):
         username = u.username
 
         data = json.dumps({
-            'api_key': settings.API_KEY,
-            'user': a.username,
-            'email': 'test@test.com',
-            'github_handle': 'test',
-            'name': 'Test'})
-        response = self.app.post(
+                'api_key': settings.API_KEY,
+                'user': a.username,
+                'email': 'test@test.com',
+                'github_handle': 'test',
+                'name': 'Test'})
+        response = self.client.post(
             '/api/v1/user/%s/' % username, data=data,
             content_type='application/json')
         self.assertEqual(response.status_code, 200)
@@ -307,10 +305,10 @@ class APITestCase(BaseTestCase):
         self.assertEqual(u.name, 'Test')
 
         data = json.dumps({
-            'api_key': settings.API_KEY,
-            'user': username,
-            'email': 'test@test.com'})
-        response = self.app.post(
+                'api_key': settings.API_KEY,
+                'user': username,
+                'email': 'test@test.com'})
+        response = self.client.post(
             '/api/v1/user/%s/' % aid, data=data,
             content_type='application/json')
         self.assertEqual(response.status_code, 403)
@@ -321,7 +319,7 @@ class APITestCase(BaseTestCase):
 
         # Missing user
         data = json.dumps({'api_key': settings.API_KEY})
-        response = self.app.post(
+        response = self.client.post(
             '/api/v1/user/%s/' % u.id, data=data,
             content_type='application/json')
         self.assertEqual(response.status_code, 400)
@@ -330,9 +328,9 @@ class APITestCase(BaseTestCase):
         """Request with invalid API key should return 403"""
         u = user(save=True)
         data = json.dumps({
-            'api_key': settings.API_KEY + '123',
-            'user': u.username})
-        response = self.app.post(
+                'api_key': settings.API_KEY + '123',
+                'user': u.username})
+        response = self.client.post(
             '/api/v1/user/%s/' % u.id, data=data,
             content_type='application/json')
         self.assertEqual(response.status_code, 403)
@@ -342,7 +340,7 @@ class APITestCase(BaseTestCase):
         """Request with invalid API key should return 403"""
         u = user(save=True)
         data = json.dumps({'user': u.username})
-        response = self.app.post(
+        response = self.client.post(
             '/api/v1/user/%s/' % u.id, data=data,
             content_type='application/json')
         self.assertEqual(response.status_code, 403)
@@ -352,8 +350,8 @@ class FormatUpdateTest(unittest.TestCase):
     def test_tags(self):
         # Test valid tags.
         for tag in ('#t', '#tag', '#TAG', '#tag123'):
-            expected = '%s <div class="tags">%s</div>' % (tag,
-                TAG_TMPL.format('', tag[1:].lower(), tag[1:]),)
+            expected = '%s <div class="tags">%s</div>' % (
+                tag, TAG_TMPL.format('', tag[1:].lower(), tag[1:]))
             eq_(format_update(tag), expected)
 
         # Test invalid tags.
