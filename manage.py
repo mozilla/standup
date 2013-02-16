@@ -69,6 +69,7 @@ def db_version():
 
 @manager.command
 def new_migration(description):
+    """Create a new migration"""
     migrate_api.script(description, db_repo)
     print 'New migration script created.'
 
