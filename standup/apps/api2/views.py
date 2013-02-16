@@ -1,8 +1,11 @@
 from flask import Blueprint, jsonify
-from standup.app import db
+
 from standup.apps.status.models import Status
+from standup.main import db
+
 
 blueprint = Blueprint('api_v2', __name__, url_prefix='/api/v2')
+
 
 @blueprint.route('/', methods=['GET'])
 @blueprint.route('/feed/', methods=['GET'])
@@ -11,11 +14,12 @@ def feed(request):
 
     Returns id, user (the name), project name and timestamp of statuses.
 
-    The amount of items to return is determined by the limit argument (defaults
-    to 20):
-    /api/v2/feed/?limit=20
+    The amount of items to return is determined by the limit argument
+    (defaults to 20)::
 
-    An example of the JSON:
+        /api/v2/feed/?limit=20
+
+    An example of the JSON::
 
         {
             "1": {
@@ -25,12 +29,12 @@ def feed(request):
                 "timestamp": "2013-01-11T21:13:30.806236"
             }
         }
-    """
 
+    """
     limit = request.args.get('limit', 20)
 
-    statuses = Status.query.filter(Status.reply_to == None).\
-    order_by(db.desc(Status.created)).limit(limit)
+    statuses = (Status.query.filter(Status.reply_to == None)
+                      .order_by(db.desc(Status.created)).limit(limit))
 
     data={}
     for row in statuses:

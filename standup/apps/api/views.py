@@ -1,11 +1,14 @@
 from flask import Blueprint, jsonify, make_response, request
-from standup.app import db
-from standup.utils import slugify
+
 from standup.apps.api.decorators import api_key_required
 from standup.apps.status.models import Project, Status
 from standup.apps.users.models import User
+from standup.main import db
+from standup.utils import slugify
+
 
 blueprint = Blueprint('api_v1', __name__, url_prefix='/api/v1')
+
 
 @blueprint.route('/feed/', methods=['GET'])
 def get_statuses():
@@ -13,11 +16,12 @@ def get_statuses():
 
     Returns id, user (the name), project name and timestamp of statuses.
 
-    The amount of items to return is determined by the limit argument (defaults
-    to 20):
-    /api/v1/feed/?limit=20
+    The amount of items to return is determined by the limit argument
+    (defaults to 20)::
 
-    An example of the JSON:
+        /api/v1/feed/?limit=20
+
+    An example of the JSON::
 
         {
             "1": {
@@ -27,8 +31,8 @@ def get_statuses():
                 "timestamp": "2013-01-11T21:13:30.806236"
             }
         }
-    """
 
+    """
     limit = request.args.get('limit', 20)
 
     statuses = Status.query.filter(Status.reply_to == None).\
@@ -68,6 +72,7 @@ def create_status():
             "content": "working on bug 123456",
             "api_key": "qwertyuiopasdfghjklzxcvbnm1234567890"
         }
+
     """
     # The data we need
     username = request.json.get('user')
@@ -136,12 +141,13 @@ def delete_status(id):
     * user (the username)
     * api_key
 
-    An example of the JSON:
+    An example of the JSON::
 
         {
             "user": "r1cky",
             "api_key": "qwertyuiopasdfghjklzxcvbnm1234567890"
         }
+
     """
     # The data we need
     user = request.json.get('user')
@@ -185,15 +191,15 @@ def update_user(username):
     * email
     * github_handle
 
-    An example of the JSON:
+    An example of the JSON::
 
         {
             "user": "r1cky",
             "email": "ricky@email.com"
             "api_key": "qwertyuiopasdfghjklzxcvbnm1234567890"
         }
-    """
 
+    """
     # The data we need
     authorname = request.json.get('user')
 

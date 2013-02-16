@@ -1,6 +1,8 @@
 from flask import Blueprint, render_template
 
+
 blueprint = Blueprint('landings', __name__)
+
 
 @blueprint.route('/help')
 def help():

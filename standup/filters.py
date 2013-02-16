@@ -1,11 +1,15 @@
 import hashlib
 import re
-from bleach import clean
-from flask import url_for
-from standup import settings
 from urllib import urlencode
 
+from bleach import clean
+from flask import url_for
+
+from standup import settings
+
+
 TAG_TMPL = '{0} <span class="tag tag-{1}">{2}</span>'
+
 
 def register_filters(app):
     app.add_template_filter(dateformat)
@@ -51,20 +55,22 @@ def format_update(update, project=None):
     formatted = clean(update, tags=[])
 
     # Linkify "bug #n" and "bug n" text.
-    formatted = re.sub(r'(bug) #?(\d+)',
+    formatted = re.sub(
+        r'(bug) #?(\d+)',
         r'<a href="http://bugzilla.mozilla.org/show_bug.cgi?id=\2">\1 \2</a>',
         formatted, flags=re.I)
 
     # Linkify "pull #n" and "pull n" text.
     if project and project.repo_url:
-        formatted = re.sub(r'(pull|pr) #?(\d+)',
+        formatted = re.sub(
+            r'(pull|pr) #?(\d+)',
             r'<a href="%s/pull/\2">\1 \2</a>' % project.repo_url, formatted,
             flags=re.I)
 
     # Search for tags on the original, unformatted string. A tag must start
     # with a letter.
     tags = re.findall(r'(?:^|[^\w\\/])#([a-zA-Z][a-zA-Z0-9_\.-]*)(?:\b|$)',
-        update)
+                      update)
     tags.sort()
     if tags:
         tags_html = ''

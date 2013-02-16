@@ -1,6 +1,7 @@
-from standup.app import db
 from standup.apps.status.models import Status
 from standup.apps.status.helpers import paginate
+from standup.main import db
+
 
 class Team(db.Model):
     """A team of users in the organization."""

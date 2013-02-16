@@ -1,11 +1,14 @@
 import browserid
 from flask import Blueprint, jsonify, request, session
+
 from standup import settings
-from standup.utils import slugify
-from standup.app import db
 from standup.apps.users.models import User
+from standup.main import db
+from standup.utils import slugify
+
 
 blueprint = Blueprint('users', __name__)
+
 
 @blueprint.route('/authenticate', methods=['POST'])
 def authenticate():
@@ -32,6 +35,7 @@ def authenticate():
     response = jsonify({'email': user.email})
     response.status_code = 200
     return response
+
 
 @blueprint.route('/logout', methods=['POST'])
 def logout():

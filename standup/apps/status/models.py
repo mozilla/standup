@@ -1,6 +1,8 @@
 from datetime import datetime
-from standup.app import db
+
 from standup.apps.status.helpers import paginate
+from standup.main import db
+
 
 class Project(db.Model):
     """A project that does standups."""

@@ -2,7 +2,7 @@ import os
 import unittest
 from functools import wraps
 from standup import test_settings
-from standup.app import create_app, db
+from standup.main import create_app, db
 from standup.apps.status.models import Project, Status
 from standup.apps.users.models import User
 

@@ -1,6 +1,9 @@
-from flask import jsonify, make_response, request
 from functools import wraps
+
+from flask import jsonify, make_response, request
+
 from standup import settings
+
 
 def api_key_required(view):
     @wraps(view)

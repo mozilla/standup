@@ -1,18 +1,23 @@
 import os
 from datetime import date, timedelta
+
 from flask import Flask, request, session
-from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.markdown import Markdown
+from flask.ext.sqlalchemy import SQLAlchemy
+
 from standup.errors import register_error_handlers
 from standup.filters import register_filters
 
+
 db = SQLAlchemy()
+
 
 def create_app(settings):
     app = Flask(__name__)
     app.debug = getattr(settings, 'DEBUG', False)
     app.config['SITE_TITLE'] = getattr(settings, 'SITE_TITLE', 'Standup')
-    app.config['SQLALCHEMY_DATABASE_URI'] = getattr(settings, 'DATABASE_URL',
+    app.config['SQLALCHEMY_DATABASE_URI'] = getattr(
+        settings, 'DATABASE_URL',
         os.environ.get('DATABASE_URL', 'sqlite:///standup_app.db'))
     app.secret_key = settings.SESSION_SECRET
     Markdown(app)
@@ -27,8 +32,9 @@ def create_app(settings):
 
     # Register blueprints
     for blueprint in settings.BLUEPRINTS:
-        app.register_blueprint(getattr(
-            __import__(blueprint, fromlist=['blueprint']), 'blueprint'))
+        app.register_blueprint(
+            getattr(
+                __import__(blueprint, fromlist=['blueprint']), 'blueprint'))
 
     @app.context_processor
     def inject_page():

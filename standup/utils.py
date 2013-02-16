@@ -1,9 +1,12 @@
 import json
 import re
+
 from flask import Response, request
 from unidecode import unidecode
 
+
 _PUNCT_RE = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.]+')
+
 
 def slugify(text, delim=u'-'):
     """Generates an ASCII-only slug."""

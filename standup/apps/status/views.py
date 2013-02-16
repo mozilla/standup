@@ -1,12 +1,15 @@
 from flask import (Blueprint, redirect, render_template, request, session,
                    url_for)
-from standup.app import db
-from standup.errors import forbidden, page_not_found
+
 from standup.apps.status.helpers import enddate, paginate, startdate
 from standup.apps.status.models import Project, Status
 from standup.apps.users.models import Team, User
+from standup.errors import forbidden, page_not_found
+from standup.main import db
+
 
 blueprint = Blueprint('status', __name__)
+
 
 @blueprint.route('/')
 def index():
@@ -19,6 +22,7 @@ def index():
             request.args.get('page', 1),
             startdate(request),
             enddate(request)),)
+
 
 @blueprint.route('/user/<slug>', methods=['GET'])
 def user(slug):
@@ -33,6 +37,7 @@ def user(slug):
             request.args.get('page', 1),
             startdate(request),
             enddate(request)))
+
 
 @blueprint.route('/project/<slug>', methods=['GET'])
 def project(slug):

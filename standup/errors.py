@@ -1,5 +1,7 @@
 from flask import render_template, request
+
 from standup.utils import json_requested, jsonify
+
 
 def register_error_handlers(app):
     app.register_error_handler(403, forbidden)

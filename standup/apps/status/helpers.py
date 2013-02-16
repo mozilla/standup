@@ -1,6 +1,7 @@
 import re
 from datetime import date, datetime, timedelta
 
+
 def paginate(statuses, page=1, startdate=None, enddate=None):
     from standup.apps.status.models import Status
     if startdate:

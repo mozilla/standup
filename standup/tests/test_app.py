@@ -2,14 +2,16 @@ import json
 import os
 import tempfile
 import unittest
-from . import BaseTestCase
+
+
 from nose.tools import ok_, eq_
-from standup import app
+
+from standup import main
+from standup import settings
 from standup.apps.status.models import Project, Status
 from standup.apps.users.models import User
 from standup.filters import format_update, TAG_TMPL
-from standup import settings
-from standup.tests import status, user
+from standup.tests import BaseTestCase, status, user
 
 class KungFuActionGripProfileTestCase(BaseTestCase):
     def test_profile_unauthenticated(self):
@@ -63,8 +65,8 @@ class StatusizerTestCase(BaseTestCase):
         user(email='joe@example.com', save=True)
 
         p = Project(name='blackhole', slug='blackhole')
-        app.db.session.add(p)
-        app.db.session.commit()
+        main.db.session.add(p)
+        main.db.session.commit()
         pid = p.id
 
         with self.app.session_transaction() as sess:
@@ -99,8 +101,8 @@ class APITestCase(BaseTestCase):
     def test_format_update(self):
         p = Project(name='mdndev', slug='mdndev',
                     repo_url='https://github.com/mozilla/kuma')
-        app.db.session.add(p)
-        app.db.session.commit()
+        main.db.session.add(p)
+        main.db.session.commit()
         content = "#merge pull #1 and pR 2 to fix bug #3 and BUg 4"
         formatted_update = format_update(content, project=p)
         ok_('tag-merge' in formatted_update)
@@ -276,8 +278,8 @@ class APITestCase(BaseTestCase):
         self.assertEqual(u.name, 'Test')
 
     def test_update_user_by_admins(self):
-        """Test that an admin can update another users settings and non-admins
-        cannot update other users settings
+        """Test that an admin can update another users settings and
+        non-admins cannot update other users settings
         """
         u = user(save=True)
         a = user(username='admin', slug='admin', email='admin@mail.com',
