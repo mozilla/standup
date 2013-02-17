@@ -52,7 +52,7 @@ tool you can use to create statuses.
 
 Example::
 
-    $ ./scripts/standup-cmd localhost:5000 ou812 willkg sumo "hi!"
+    $ ./scripts/standup-cmd localhost:5000 ou812 willkg sumo "hi."
 
 (This assumes your ``API_KEY`` is set to ou812.)
 
