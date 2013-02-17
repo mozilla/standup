@@ -7,6 +7,7 @@ from flask.ext.sqlalchemy import SQLAlchemy
 
 from standup.errors import register_error_handlers
 from standup.filters import register_filters
+from standup.mdext import nixheaders
 
 
 db = SQLAlchemy()
@@ -21,7 +22,12 @@ def create_app(settings):
         settings, 'DATABASE_URL',
         os.environ.get('DATABASE_URL', 'sqlite:///standup_app.db'))
     app.secret_key = settings.SESSION_SECRET
-    Markdown(app)
+
+    md = Markdown(app)
+    # TODO: We might want to expose Markdown extensions to the config
+    # file.
+    md.register_extension(nixheaders.makeExtension)
+
     db.app = app
     db.init_app(app)
 
