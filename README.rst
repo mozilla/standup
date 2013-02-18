@@ -2,18 +2,18 @@
  README
 ========
 
-standup is an app to log daily status updates.
+standup is an app that logs daily status updates.
 It is currently in super early active development, check back later.
 
 We developed it with the following priorities:
 
-1. Let's the team, stake holders and everyone else see status for team
+1. Lets the team, stake holders and everyone else see status for team
    members across projects.
 
-2. Let's us do that asynchronously. Conference calls were getting
+2. Lets us do that asynchronously. Conference calls were getting
    difficult to schedule because of the range of timezones we're in.
 
-3. Let's us see who's blocked on what---then scrummasters can go
+3. Lets us see who's blocked on what---then scrummasters can go
    through and work to unblock people.
 
 
@@ -54,17 +54,15 @@ Example::
 
     $ ./scripts/standup-cmd localhost:5000 ou812 willkg sumo "hi!"
 
-(Assumes your api_key is set to ou812.)
+(This assumes your ``API_KEY`` is set to ou812.)
 
 Also, you can use the ``./manage.py`` script to add teams::
 
-    $ ./manage.py add_team
     $ ./manage.py add_team "Team Awesome"
     $ ./manage.py add_team -s "awesome" "Team Awesome"
 
 and projects::
 
-    $ ./manage.py add_project
     $ ./manage.py add_project "DEATH MARCH"
     $ ./manage.py add_project -s "death_march" "DEATH MARCH"
     $ ./manage.py add_project -r "http://github.com/rlr/standups" "DEATH MARCH"
@@ -109,7 +107,8 @@ These are things you can set in ``standup/local_settings.py``:
 
             SITE_URL = 'http://127.0.0.1:5000'
 
-        No default. You must set this.
+        You have to set this in production, but a default (the above) is
+        supplied for ease-of-development.
 
     SESSION_SECRET
         Secret string used for creating session variables. This can be
@@ -119,7 +118,8 @@ These are things you can set in ``standup/local_settings.py``:
 
             SESSION_SECRET = '1234'
 
-        No default. You must set this.
+        You have to set this in production, but a default (the above) is
+        supplied for ease-of-development.
 
     API_KEY
         The key used for using the API. You use this for the standup-irc
