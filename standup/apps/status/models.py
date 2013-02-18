@@ -17,7 +17,7 @@ class Project(db.Model):
 
     def recent_statuses(self, page=1, startdate=None, enddate=None):
         """Return the statuses for the project."""
-        statuses = self.statuses.filter(Status.reply_to==None).order_by(
+        statuses = self.statuses.filter(Status.reply_to == None).order_by(
             db.desc(Status.created))
         return paginate(statuses, page, startdate, enddate)
 
@@ -41,6 +41,6 @@ class Status(db.Model):
         return '<Status: %s: %s>' % (self.user.username, self.content)
 
     def replies(self, page=1):
-        replies = Status.query.filter(Status.reply_to_id==self.id).order_by(
+        replies = Status.query.filter(Status.reply_to_id == self.id).order_by(
             db.asc(Status.created))
         return paginate(replies, page)

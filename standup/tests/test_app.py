@@ -6,7 +6,7 @@ from nose.tools import ok_, eq_
 from standup import main
 from standup import settings
 from standup.apps.status.models import Project, Status
-from standup.apps.users.models import User
+from standup.apps.users.models import Team, User
 from standup.filters import format_update, TAG_TMPL
 from standup.tests import BaseTestCase, status, user
 
@@ -45,6 +45,69 @@ class StatusizerTestCase(BaseTestCase):
                            data={'message': 'foo'},
                            follow_redirects=True)
         eq_(rv.status_code, 200)
+
+    def test_feeds(self):
+        """Test that the site-wise Atom feed appears and functions properly."""
+        user(email='joe@example.com', save=True)
+        with self.client.session_transaction() as sess:
+            sess['email'] = 'joe@example.com'
+
+        # Ensure the Atom link appears in the rendered HTML.
+        rv = self.client.get('/')
+        self.assertIn(('<link rel="alternate" type="application/atom+xml" '
+                       'href="%s/statuses.xml"') % settings.SITE_URL, rv.data,
+                       'Main Atom feed should be available on any page.')
+
+        # Make sure the Atom feed works with no status updates.
+        rv = self.client.get('/statuses.xml')
+        eq_(rv.status_code, 200)
+
+        # Make sure the Atom feed displays statuses.
+        self.client.post('/statusize/', data={'message': 'foo'},
+                         follow_redirects=True)
+        rv = self.client.get('/statuses.xml')
+        self.assertIn('<entry', rv.data,
+                      '<entry> tag should appear in Atom feed.')
+        self.assertIn('<content type="html">&lt;p&gt;foo&lt;/p&gt;</content>',
+                      rv.data, 'Status update should appear in Atom feed.')
+
+    def test_contextual_feeds(self):
+        """Test that team/project/user Atom feeds appear as <link> tags."""
+        user(email='joe@example.com', save=True)
+        with self.client.session_transaction() as sess:
+            sess['email'] = 'joe@example.com'
+
+        t = Team(name='Scooby Gang', slug='scoobies')
+        main.db.session.add(t)
+        p = Project(name='Kill The Master', slug='master')
+        main.db.session.add(p)
+        u = User(username='buffy', email="buffy@sunnydalehigh.edu",
+                 name='Buffy Summers', slug='buffy')
+        main.db.session.add(u)
+        main.db.session.commit()
+
+        rv = self.client.get('/')
+        self.assertIn(('<link rel="alternate" type="application/atom+xml" '
+                       'href="%s/statuses.xml"') % settings.SITE_URL, rv.data,
+                       'Main Atom feed should be available on any page.')
+        self.assertNotIn(('<link rel="alternate" type="application/atom+xml" '
+                          'href="%s/project/') % settings.SITE_URL, rv.data,
+                         'Contextual Atom Feed should not appear on index.')
+
+        rv = self.client.get('/team/scoobies')
+        self.assertIn(('<link rel="alternate" type="application/atom+xml" '
+                       'href="%s/team/') % settings.SITE_URL, rv.data,
+                      'Contextual Atom Feed should appear on team page.')
+
+        rv = self.client.get('/project/master')
+        self.assertIn(('<link rel="alternate" type="application/atom+xml" '
+                       'href="%s/project/') % settings.SITE_URL, rv.data,
+                      'Contextual Atom Feed should appear on project page.')
+
+        rv = self.client.get('/user/buffy')
+        self.assertIn(('<link rel="alternate" type="application/atom+xml" '
+                       'href="%s/user/') % settings.SITE_URL, rv.data,
+                      'Contextual Atom Feed should appear on user page.')
 
     def test_status_no_message(self):
         """Test posting a status with no message."""
