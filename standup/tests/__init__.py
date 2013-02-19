@@ -7,14 +7,14 @@ from standup.apps.users.models import User
 from standup.main import create_app, db
 
 
-_test_app = create_app(test_settings)
-_test_app.config['TESTING'] = True
+testing_app = create_app(test_settings)
+testing_app.config['TESTING'] = True
 
 
 class BaseTestCase(unittest.TestCase):
     def setUp(self):
         super(BaseTestCase, self).setUp()
-        self.client = _test_app.test_client()
+        self.client = testing_app.test_client()
         db.create_all()
 
     def tearDown(self):
