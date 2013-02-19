@@ -13,12 +13,15 @@ class Team(db.Model):
         return '<Team: %s>' % self.name
 
     def recent_statuses(self, page=1, startdate=None, enddate=None):
-        """Return the statuses for the team."""
-        user_ids = [u.id for u in self.users]
-        statuses = Status.query.filter(
-            Status.user_id.in_(user_ids), Status.reply_to==None).order_by(
-            db.desc(Status.created))
+        """Return a single page of the most recent statuses from this team."""
+        statuses = self.statuses().filter(Status.reply_to == None).order_by(
+                db.desc(Status.created))
         return paginate(statuses, page, startdate, enddate)
+
+    def statuses(self):
+        """Return all statuses from this team."""
+        user_ids = [u.id for u in self.users]
+        return Status.query.filter(Status.user_id.in_(user_ids))
 
 
 class User(db.Model):
@@ -40,7 +43,7 @@ class User(db.Model):
         return '<User: [%s] %s>' % (self.username, self.name)
 
     def recent_statuses(self, page=1, startdate=None, enddate=None):
-        """Return the statuses for the user."""
-        statuses = self.statuses.filter(Status.reply_to==None).order_by(
+        """Return a single page of the most recent statuses from this user."""
+        statuses = self.statuses.filter(Status.reply_to == None).order_by(
             db.desc(Status.created))
         return paginate(statuses, page, startdate, enddate)

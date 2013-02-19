@@ -11,3 +11,7 @@
     {{ status_updates(statuses, page, url=url_for('status.team', slug=team.slug)) }}
   </div>
 {% endblock %}
+
+{% block atom_feed %}
+  <link rel="alternate" type="application/atom+xml" href="{{ config.SITE_URL + url_for('status.team_feed', slug=team.slug) }}" title="{{ config.SITE_TITLE }} Feed for {{ team.name }} team" />
+{% endblock atom_feed %}

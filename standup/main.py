@@ -16,6 +16,7 @@ def create_app(settings):
     app = Flask(__name__)
     app.debug = getattr(settings, 'DEBUG', False)
     app.config['SITE_TITLE'] = getattr(settings, 'SITE_TITLE', 'Standup')
+    app.config['SITE_URL'] = getattr(settings, 'SITE_URL')
     app.config['SQLALCHEMY_DATABASE_URI'] = getattr(
         settings, 'DATABASE_URL',
         os.environ.get('DATABASE_URL', 'sqlite:///standup_app.db'))
