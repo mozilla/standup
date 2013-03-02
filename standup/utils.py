@@ -31,3 +31,12 @@ def jsonify(obj):
     """
     dump = json.dumps(obj)
     return Response(dump, mimetype='application/json')
+
+
+def truthiness(str):
+    """Returns a boolean from a string"""
+    try:
+        return (str(str).lower() == 'true' or str(str).lower() == 't'
+                or str == '1')
+    except (TypeError, ValueError):
+        return False

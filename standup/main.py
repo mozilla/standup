@@ -1,5 +1,5 @@
-import os
 from datetime import date, timedelta
+from types import FunctionType, ModuleType
 
 from flask import Flask, request, session
 from flask.ext.markdown import Markdown
@@ -15,13 +15,17 @@ db = SQLAlchemy()
 
 def create_app(settings):
     app = Flask(__name__)
-    app.debug = getattr(settings, 'DEBUG', False)
-    app.config['SITE_TITLE'] = getattr(settings, 'SITE_TITLE', 'Standup')
-    app.config['SITE_URL'] = getattr(settings, 'SITE_URL')
-    app.config['SQLALCHEMY_DATABASE_URI'] = getattr(
-        settings, 'DATABASE_URL',
-        os.environ.get('DATABASE_URL', 'sqlite:///standup_app.db'))
-    app.secret_key = settings.SESSION_SECRET
+
+    # Import settings from file
+    for name in dir(settings):
+        value = getattr(settings, name)
+        if not (name.startswith('_') or isinstance(value, ModuleType)
+                or isinstance(value, FunctionType)):
+            app.config[name] = value
+
+    # Additional settings
+    app.config['SQLALCHEMY_DATABASE_URI'] = app.config.get('DATABASE_URL')
+    app.secret_key = app.config.get('SESSION_SECRET')
 
     md = Markdown(app)
     # TODO: We might want to expose Markdown extensions to the config
