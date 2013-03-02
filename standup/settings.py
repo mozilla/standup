@@ -19,6 +19,8 @@ INSTALLED_APPS = (
     'users'
 )
 
+API2_TIMELINE_MAX_RESULTS = os.environ.get('API2_TIMELINE_MAX_RESULTS', 800)
+
 SITE_URL = os.environ.get('SITE_URL', 'http://127.0.0.1:5000')
 SITE_TITLE = os.environ.get('SITE_TITLE', 'standup')
 

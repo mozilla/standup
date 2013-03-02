@@ -2,6 +2,7 @@ from flask import current_app
 from sqlalchemy import (Boolean, Column, desc, ForeignKey, Integer, String,
                         Table)
 from sqlalchemy.orm import backref, relationship
+from standup import OrderedDict
 from standup.apps.status.models import Status
 from standup.apps.status.helpers import paginate
 from standup.database import get_session
@@ -57,3 +58,14 @@ class User(Model):
         statuses = self.statuses.filter_by(reply_to=None)\
             .order_by(desc(Status.created))
         return paginate(statuses, page, startdate, enddate)
+
+    def export(self):
+        data = OrderedDict()
+        data['id'] = self.id
+        data['username'] = self.username
+        data['name'] = self.name
+        data['slug'] = self.slug
+        data['email'] = self.email
+        data['github_handle'] = self.github_handle
+        data['is_admin'] = self.is_admin
+        return data

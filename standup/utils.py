@@ -33,9 +33,9 @@ def jsonify(obj):
     return Response(dump, mimetype='application/json')
 
 
-def truthify(str):
+def truthify(string):
     """Returns a boolean from a string"""
     try:
-        return str(str).lower() in ['true', 't', '1']
-    except (TypeError, ValueError):
+        return str(string).lower() in ['true', 't', '1']
+    except (TypeError, ValueError, UnicodeEncodeError):
         return False

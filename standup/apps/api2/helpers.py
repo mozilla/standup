@@ -1,16 +1,10 @@
-def numerify(str, default=None, lower=None, upper=None):
-    try:
-        num = int(str)
-    except (TypeError, ValueError):
-        if default:
-            num = default
-        else:
-            raise
-
-    if upper and num > int(upper):
-        num = int(upper)
-
-    if lower and num < int(lower):
-        num = int(lower)
-
+def numerify(string, default=None, min=None, max=None):
+    """Converts a string to an integer"""
+    if string is None:
+        string = int(default)
+    num = int(string)
+    if min is not None and num < int(min):
+        num = min
+    if max is not None and num > int(max):
+        num = max
     return num

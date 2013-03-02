@@ -1,53 +1,72 @@
-from flask import Blueprint, current_app, jsonify, request
+from flask import Blueprint, current_app, request
 from sqlalchemy import desc
-from standup import OrderedDict
+from standup.apps.api2.helpers import numerify
 from standup.apps.status.models import Status
 from standup.database import get_session
+from standup.errors import api_error
+from standup.utils import jsonify, truthify
 
 
 blueprint = Blueprint('api_v2', __name__, url_prefix='/api/v2')
 
+TIMELINE_MAX_RESULTS = 800
 
-@blueprint.route('/', methods=['GET'])
-@blueprint.route('/feed/', methods=['GET'])
-def feed():
-    """Get all status updates.
 
-    Returns id, user (the name), project name and timestamp of statuses.
+@blueprint.route('/statuses/home_timeline.json', methods=['GET'])
+def home_timeline():
+    """Get a collection of the most recent status updates."""
+    app = current_app
+    db = get_session(app)
 
-    The amount of items to return is determined by the limit argument
-    (defaults to 20)::
+    # Parameteres
+    try:
+        count = numerify(request.args.get('count'), default=20)
+    except (TypeError, ValueError):
+        return api_error(400, 'Error in `count` parameter: invalid count.')
+    since_id = request.args.get('since_id')
+    max_id = request.args.get('max_id')
+    trim_user = truthify(request.args.get('trim_user'))
+    trim_project = truthify(request.args.get('trim_project'))
+    include_replies = request.args.get('include_replies')
 
-        /api/v2/feed/?limit=20
+    statuses = db.query(Status)
 
-    An example of the JSON::
+    if since_id:
+        try:
+            since_id = numerify(since_id)
+            if since_id < 1:
+                return api_error(400, 'Error in `since_id` parameter: '
+                                      'invalid id.')
+        except (TypeError, ValueError):
+            return api_error(400, 'Error in `since_id` parameter: invalid id.')
+        statuses = statuses.filter(Status.id > since_id)
 
-        {
-            "1": {
-                "user": "r1cky",
-                "content": "working on bug 123456",
-                "project": "sumodev",
-                "timestamp": "2013-01-11T21:13:30.806236"
-            }
-        }
+    if max_id:
+        try:
+            max_id = numerify(max_id)
+            if max_id < 1:
+                return api_error(400, 'Error in `max_id` parameter: '
+                                      'invalid id.')
+        except (TypeError, ValueError):
+            return api_error(400, 'Error in `max_id` parameter: invalid id.')
+        statuses = statuses.filter(Status.id <= max_id)
 
-    """
-    db = get_session(current_app)
+    if not truthify(include_replies):
+        statuses = statuses.filter_by(reply_to_id=None)
 
-    limit = request.args.get('limit', 20)
+    MAX = app.config.get('API2_TIMELINE_MAX_RESULTS', TIMELINE_MAX_RESULTS)
+    if count > MAX:
+        return api_error(400, 'Error in `count` parameter: must not be more '
+                              'than %s' % MAX)
+    elif count < 1:
+        return api_error(400, 'Error in `count` parameter: must not be less '
+                              'than 1')
+    else:
+        statuses = statuses.order_by(desc(Status.created)).limit(count)
 
-    statuses = db.query(Status).filter_by(reply_to=None)\
-        .order_by(desc(Status.created)).limit(limit)
-
-    data = OrderedDict()
-    for row in statuses:
-        id = row.id
-        created = row.created.isoformat()
-        if row.project is not None:
-            project_name = row.project.name
-        else:
-            project_name = None
-        data[id] = (dict(author=row.user.name, content=row.content,
-                         timestamp=created, project=project_name))
+    data = []
+    for status in statuses:
+        data.append(status.export(trim_user=trim_user,
+                                  trim_project=trim_project))
 
     return jsonify(data)

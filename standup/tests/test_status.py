@@ -112,6 +112,16 @@ class ModelsTestCase(BaseTestCase):
 
         eq_(page.pages, 2)
 
+    def test_status_reply_count(self):
+        """Test the reply_count property of the Status model."""
+        with self.app.app_context():
+            u = user(save=True)
+            s = status(user=u, project=None, save=True)
+            for i in range(5):
+                status(user=u, project=None, reply_to=s, save=True)
+
+            eq_(s.reply_count, 5)
+
     def test_project_repr(self):
         """Test the __repr__ function of the Project model."""
         with self.app.app_context():

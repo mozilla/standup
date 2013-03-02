@@ -130,6 +130,12 @@ These are things you can set in ``standup/local_settings.py``:
 
         Defaults to something ridiculous.
 
+    API2_TIMELINES_MAX_RESULTS
+        Sets the maximum number of results that can be requested from the
+        timeline endpoints of the API (v2).
+
+        Defaults to 800.
+
     DEBUG
         Either ``True`` or ``False``. Determines whether it prints lots of
         stuff to the console and whether errors get a debugging-friendly
