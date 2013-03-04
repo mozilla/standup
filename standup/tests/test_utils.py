@@ -5,8 +5,8 @@ from standup.utils import slugify
 
 def test_slugify():
     for text, expected in (
-        ('foo', 'foo'),
-        ('Foo$$$', 'foo'),
-        ('James\' Rifles', 'james-rifles')):
+        (u'foo', 'foo'),
+        (u'Foo$$$', 'foo'),
+        (u'James\' Rifles', 'james-rifles')):
 
         eq_(slugify(text), expected)

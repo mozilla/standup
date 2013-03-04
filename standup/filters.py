@@ -46,6 +46,9 @@ def gravatar_url(email, size=None):
 
 
 def format_update(update, project=None):
+    BUG_RE = re.compile(r'(bug) #?(\d+)', flags=re.I)
+    PULL_RE = re.compile(r'(pull|pr) #?(\d+)', flags=re.I)
+
     def set_target(attrs,
                    new=False):
         attrs['target'] = '_blank'
@@ -55,17 +58,14 @@ def format_update(update, project=None):
     formatted = clean(update, tags=[])
 
     # Linkify "bug #n" and "bug n" text.
-    formatted = re.sub(
-        r'(bug) #?(\d+)',
+    formatted = BUG_RE.sub(
         r'<a href="http://bugzilla.mozilla.org/show_bug.cgi?id=\2">\1 \2</a>',
-        formatted, flags=re.I)
+        formatted)
 
     # Linkify "pull #n" and "pull n" text.
     if project and project.repo_url:
-        formatted = re.sub(
-            r'(pull|pr) #?(\d+)',
-            r'<a href="%s/pull/\2">\1 \2</a>' % project.repo_url, formatted,
-            flags=re.I)
+        formatted = PULL_RE.sub(
+            r'<a href="%s/pull/\2">\1 \2</a>' % project.repo_url, formatted)
 
     # Search for tags on the original, unformatted string. A tag must start
     # with a letter.

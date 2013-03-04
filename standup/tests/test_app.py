@@ -54,9 +54,8 @@ class StatusizerTestCase(BaseTestCase):
 
         # Ensure the Atom link appears in the rendered HTML.
         rv = self.client.get('/')
-        self.assertIn(('<link rel="alternate" type="application/atom+xml" '
-                       'href="%s/statuses.xml"') % settings.SITE_URL, rv.data,
-                       'Main Atom feed should be available on any page.')
+        assert ('<link rel="alternate" type="application/atom+xml" '
+                'href="%s/statuses.xml"') % settings.SITE_URL in rv.data
 
         # Make sure the Atom feed works with no status updates.
         rv = self.client.get('/statuses.xml')
@@ -66,10 +65,9 @@ class StatusizerTestCase(BaseTestCase):
         self.client.post('/statusize/', data={'message': 'foo'},
                          follow_redirects=True)
         rv = self.client.get('/statuses.xml')
-        self.assertIn('<entry', rv.data,
-                      '<entry> tag should appear in Atom feed.')
-        self.assertIn('<content type="html">&lt;p&gt;foo&lt;/p&gt;</content>',
-                      rv.data, 'Status update should appear in Atom feed.')
+        assert '<entry' in rv.data
+        assert ('<content type="html">&lt;p&gt;foo&lt;/p&gt;'
+                '</content>') in rv.data
 
     def test_contextual_feeds(self):
         """Test that team/project/user Atom feeds appear as <link> tags."""
@@ -87,27 +85,22 @@ class StatusizerTestCase(BaseTestCase):
         main.db.session.commit()
 
         rv = self.client.get('/')
-        self.assertIn(('<link rel="alternate" type="application/atom+xml" '
-                       'href="%s/statuses.xml"') % settings.SITE_URL, rv.data,
-                       'Main Atom feed should be available on any page.')
-        self.assertNotIn(('<link rel="alternate" type="application/atom+xml" '
-                          'href="%s/project/') % settings.SITE_URL, rv.data,
-                         'Contextual Atom Feed should not appear on index.')
+        assert ('<link rel="alternate" type="application/atom+xml" '
+                'href="%s/statuses.xml"') % settings.SITE_URL in rv.data
+        assert ('<link rel="alternate" type="application/atom+xml" '
+                'href="%s/project/') % settings.SITE_URL not in rv.data
 
         rv = self.client.get('/team/scoobies')
-        self.assertIn(('<link rel="alternate" type="application/atom+xml" '
-                       'href="%s/team/') % settings.SITE_URL, rv.data,
-                      'Contextual Atom Feed should appear on team page.')
+        assert ('<link rel="alternate" type="application/atom+xml" '
+                'href="%s/team/') % settings.SITE_URL in rv.data
 
         rv = self.client.get('/project/master')
-        self.assertIn(('<link rel="alternate" type="application/atom+xml" '
-                       'href="%s/project/') % settings.SITE_URL, rv.data,
-                      'Contextual Atom Feed should appear on project page.')
+        assert ('<link rel="alternate" type="application/atom+xml" '
+                'href="%s/project/') % settings.SITE_URL in rv.data
 
         rv = self.client.get('/user/buffy')
-        self.assertIn(('<link rel="alternate" type="application/atom+xml" '
-                       'href="%s/user/') % settings.SITE_URL, rv.data,
-                      'Contextual Atom Feed should appear on user page.')
+        assert ('<link rel="alternate" type="application/atom+xml" '
+                'href="%s/user/') % settings.SITE_URL in rv.data
 
     def test_status_no_message(self):
         """Test posting a status with no message."""
