@@ -2,6 +2,9 @@
  README
 ========
 
+.. image:: https://travis-ci.org/rlr/standup.png
+   :target: https://travis-ci.org/rlr/standup
+
 standup is an app that logs daily status updates.
 It is currently in super early active development, check back later.
 
