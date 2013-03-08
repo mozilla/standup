@@ -5,15 +5,11 @@
   <title>{% block title %}{% endblock %}</title>
   <meta name="description" content="Daily standup updates for your projects.">
   <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}" />
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/normalize.css') }}">
-  <link rel="stylesheet/less" type="text/css" href="{{ url_for('static', filename='less/style.less') }}">
+  {{ css('common') }}
   <link rel="alternate" type="application/atom+xml" href="{{ config.SITE_URL + url_for('status.index_feed') }}" title="{{ config.SITE_TITLE }} Feed" />
   {% block atom_feed %}{% endblock atom_feed %}
   <script src="https://login.persona.org/include.js"></script>
-  <script src="{{ url_for('static', filename='js/modernizr-2.6.1.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/less.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/jquery-1.8.2.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/standup.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/vendor/modernizr-2.6.1.js') }}"></script>
 </head>
 <body>
   <div class="page">
@@ -114,5 +110,10 @@
       </div>
     </footer>
   </div>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="{{ url_for('static', filename='js/vendor/jquery-1.9.1.min.js') }}"><\/script>')</script>
+
+  {{ js('common') }}
 </body>
 </html>

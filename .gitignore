@@ -1,5 +1,7 @@
 *.pyc
 *.db
 *.swp
+*.less.css
+.coverage
 .env
 local_settings.py

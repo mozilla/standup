@@ -2,6 +2,7 @@ from datetime import date, timedelta
 from types import FunctionType, ModuleType
 
 from flask import Flask, request, session
+from flask.ext.funnel import Funnel
 from flask.ext.markdown import Markdown
 from flask.ext.sqlalchemy import SQLAlchemy
 
@@ -34,6 +35,8 @@ def create_app(settings):
 
     db.app = app
     db.init_app(app)
+
+    Funnel(app)
 
     # Register error handlers
     register_error_handlers(app)

@@ -2,6 +2,7 @@
 import os
 
 from flask.ext.script import Manager
+from flask.ext.funnel.manager import manager as funnel_manager
 
 from migrate.exceptions import DatabaseAlreadyControlledError
 from migrate.versioning import api as migrate_api
@@ -15,6 +16,9 @@ from standup.utils import slugify
 
 manager = Manager(app)
 
+# Add the Flask-Funnel manager
+manager.add_command('funnel', funnel_manager)
+
 app_path = os.path.join(os.path.relpath(os.path.dirname(
     os.path.abspath(__file__)), os.getcwd()), 'standup')
 sqlite = os.path.join(app_path, 'standup_app.db')
@@ -25,6 +29,21 @@ db_url = os.environ.get('DATABASE_URL', 'sqlite:///%s' % sqlite)
 
 def get_db_version():
     return migrate_api.db_version(url=db_url, repository=db_repo)
+
+
+@manager.command
+def get_config(key=None):
+    if key is not None:
+        if key in app.config:
+            print "%s: %s" % key, app.config[key]
+        else:
+            print "Setting does not exist."
+    else:
+        for k, v in app.config.iteritems():
+            try:
+                print "%s: %s" % (k, str(v))
+            except UnicodeEncodeError:
+                print u'%s:%s' % (k, unicode(v))
 
 
 @manager.command

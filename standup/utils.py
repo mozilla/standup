@@ -2,6 +2,7 @@ import json
 import re
 
 from flask import Response, request
+from types import BooleanType
 from unidecode import unidecode
 
 
@@ -33,10 +34,9 @@ def jsonify(obj):
     return Response(dump, mimetype='application/json')
 
 
-def truthiness(str):
+def truthify(str):
     """Returns a boolean from a string"""
     try:
-        return (str(str).lower() == 'true' or str(str).lower() == 't'
-                or str == '1')
+        return str(str).lower() in ['true', 't', '1']
     except (TypeError, ValueError):
         return False
