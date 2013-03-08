@@ -26,13 +26,11 @@ def upgrade(migrate_engine):
         pass
     team_users.create()
 
-    # Create a session
-    Session = sessionmaker(bind=migrate_engine)
-    session = Session()
+    result = user.select().execute().fetchall()
 
-    for u in session.query(user).all():
-        if u.team_id:
-            values={'team_id': u.team_id, 'user_id': u.id,}
+    for row in result:
+        if row.team_id:
+            values={'team_id': row.team_id, 'user_id': row.id,}
             team_users.insert(values=values).execute()
 
     user.c.team_id.drop()
@@ -48,14 +46,10 @@ def downgrade(migrate_engine):
     team_id = Column('team_id', Integer, ForeignKey('team.id'))
     team_id.create(user)
 
-    # Create a session
-    Session = sessionmaker(bind=migrate_engine)
-    session = Session()
+    result = team_users.select().execute().fetchall()
 
-    for team_user in session.query(team_users).all():
-        values = {'team_id': team_user.team_id}
-        user.update(values=values).where(user.c.id==team_user.user_id).execute()
-
-    session.commit()
+    for row in result:
+        values = {'team_id': row.team_id,}
+        user.update(values=values).where(user.c.id==row.user_id).execute()
 
     team_users.drop()
