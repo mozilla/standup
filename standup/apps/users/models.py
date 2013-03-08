@@ -1,13 +1,19 @@
+from flask import current_app
+from sqlalchemy import Boolean, Column, desc, ForeignKey, Integer, String, Table
+from sqlalchemy.orm import backref, relationship
 from standup.apps.status.models import Status
 from standup.apps.status.helpers import paginate
-from standup.main import db
+from standup.database import get_session
+from standup.database.classes import Model
 
 
-class Team(db.Model):
+class Team(Model):
     """A team of users in the organization."""
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100))
-    slug = db.Column(db.String(100), unique=True)
+    __tablename__ = 'team'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(100))
+    slug = Column(String(100), unique=True)
 
     def __repr__(self):
         return '<Team: %s>' % self.name
@@ -15,29 +21,32 @@ class Team(db.Model):
     def recent_statuses(self, page=1, startdate=None, enddate=None):
         """Return a single page of the most recent statuses from this team."""
         statuses = self.statuses().filter(Status.reply_to == None).order_by(
-                db.desc(Status.created))
+                desc(Status.created))
         return paginate(statuses, page, startdate, enddate)
 
     def statuses(self):
         """Return all statuses from this team."""
+        db = get_session(current_app)
         user_ids = [u.id for u in self.users]
-        return Status.query.filter(Status.user_id.in_(user_ids))
+        return db.query(Status).filter(Status.user_id.in_(user_ids))
 
 
-class User(db.Model):
+class User(Model):
     """A standup participant."""
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(100), unique=True)
-    name = db.Column(db.String(100))
-    slug = db.Column(db.String(100), unique=True)
-    email = db.Column(db.String(100), unique=True)
-    github_handle = db.Column(db.String(100), unique=True)
-    is_admin = db.Column(db.Boolean, default=False)
-    team_users = db.Table('team_users',
-        db.Column('team_id', db.Integer, db.ForeignKey('team.id')),
-        db.Column('user_id', db.Integer, db.ForeignKey('user.id')))
-    team = db.relationship('Team', secondary=team_users,
-                           backref=db.backref('users', lazy='dynamic'))
+    __tablename__ = 'user'
+
+    id = Column(Integer, primary_key=True)
+    username = Column(String(100), unique=True)
+    name = Column(String(100))
+    slug = Column(String(100), unique=True)
+    email = Column(String(100), unique=True)
+    github_handle = Column(String(100), unique=True)
+    is_admin = Column(Boolean, default=False)
+    team_users = Table('team_users', Model.metadata,
+                       Column('team_id', Integer, ForeignKey('team.id')),
+                       Column('user_id', Integer, ForeignKey('user.id')))
+    team = relationship('Team', secondary=team_users,
+                           backref=backref('users', lazy='dynamic'))
 
     def __repr__(self):
         return '<User: [%s] %s>' % (self.username, self.name)
@@ -45,5 +54,5 @@ class User(db.Model):
     def recent_statuses(self, page=1, startdate=None, enddate=None):
         """Return a single page of the most recent statuses from this user."""
         statuses = self.statuses.filter(Status.reply_to == None).order_by(
-            db.desc(Status.created))
+            desc(Status.created))
         return paginate(statuses, page, startdate, enddate)

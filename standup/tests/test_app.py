@@ -7,6 +7,7 @@ from standup import main
 from standup import settings
 from standup.apps.status.models import Project, Status
 from standup.apps.users.models import Team, User
+from standup.database import get_session
 from standup.filters import format_update, TAG_TMPL
 from standup.tests import BaseTestCase, status, user
 
@@ -71,18 +72,20 @@ class StatusizerTestCase(BaseTestCase):
 
     def test_contextual_feeds(self):
         """Test that team/project/user Atom feeds appear as <link> tags."""
+        db = get_session(self.app)
+
         user(email='joe@example.com', save=True)
         with self.client.session_transaction() as sess:
             sess['email'] = 'joe@example.com'
 
         t = Team(name='Scooby Gang', slug='scoobies')
-        main.db.session.add(t)
+        db.add(t)
         p = Project(name='Kill The Master', slug='master')
-        main.db.session.add(p)
+        db.add(p)
         u = User(username='buffy', email="buffy@sunnydalehigh.edu",
                  name='Buffy Summers', slug='buffy')
-        main.db.session.add(u)
-        main.db.session.commit()
+        db.add(u)
+        db.commit()
 
         rv = self.client.get('/')
         assert ('<link rel="alternate" type="application/atom+xml" '
@@ -116,11 +119,13 @@ class StatusizerTestCase(BaseTestCase):
 
     def test_status_with_project(self):
         """Test posting a status with no message."""
+        db = get_session(self.app)
+
         user(email='joe@example.com', save=True)
 
         p = Project(name='blackhole', slug='blackhole')
-        main.db.session.add(p)
-        main.db.session.commit()
+        db.add(p)
+        db.commit()
         pid = p.id
 
         with self.client.session_transaction() as sess:
@@ -135,6 +140,8 @@ class StatusizerTestCase(BaseTestCase):
 class APITestCase(BaseTestCase):
     def test_create_first_status(self):
         """Test creating the very first status for a project and user."""
+        db = get_session(self.app)
+
         data = json.dumps({
                 'api_key': settings.API_KEY,
                 'user': 'r1cky',
@@ -146,17 +153,19 @@ class APITestCase(BaseTestCase):
         assert 'bug 123456' in response.data
 
         # Verify the user was created.
-        self.assertEqual(User.query.first().username, 'r1cky')
+        self.assertEqual(db.query(User).first().username, 'r1cky')
         # Verify the project was created.
-        self.assertEqual(Project.query.first().slug, 'sumodev')
+        self.assertEqual(db.query(Project).first().slug, 'sumodev')
         # Verify the status was created.
-        self.assertEqual(Status.query.first().content, 'bug 123456')
+        self.assertEqual(db.query(Status).first().content, 'bug 123456')
 
     def test_format_update(self):
+        db = get_session(self.app)
+
         p = Project(name='mdndev', slug='mdndev',
                     repo_url='https://github.com/mozilla/kuma')
-        main.db.session.add(p)
-        main.db.session.commit()
+        db.add(p)
+        db.commit()
         content = "#merge pull #1 and pR 2 to fix bug #3 and BUg 4"
         formatted_update = format_update(content, project=p)
         ok_('tag-merge' in formatted_update)
@@ -208,6 +217,8 @@ class APITestCase(BaseTestCase):
 
     def test_create_status_no_project(self):
         """Statuses can be created without a project"""
+        db = get_session(self.app)
+
         data = json.dumps({
                 'api_key': settings.API_KEY,
                 'user': 'r1cky',
@@ -217,42 +228,47 @@ class APITestCase(BaseTestCase):
         self.assertEqual(response.status_code, 200)
 
         # Verify the status was created
-        self.assertEqual(Status.query.first().content, 'test update')
+        self.assertEqual(db.query(Status).first().content, 'test update')
 
     def test_create_reply(self):
         """Test creation of replies"""
-        s = status(save=True)
-        sid = s.id
+        db = get_session(self.app)
 
-        data = json.dumps({
-                'api_key': settings.API_KEY,
-                'user': 'r1cky',
-                'content': 'reply to status',
-                'reply_to': sid})
-        response = self.client.post(
-            '/api/v1/status/', data=data, content_type='application/json')
-        self.assertEqual(response.status_code, 200)
+        with self.app.app_context():
+            s = status(save=True)
+            sid = s.id
 
-        # Verify that the status is actually a reply
-        r = Status.query.filter(Status.reply_to_id==sid).first()
-        self.assertEqual(r.content, 'reply to status')
+            data = json.dumps({
+                    'api_key': settings.API_KEY,
+                    'user': 'r1cky',
+                    'content': 'reply to status',
+                    'reply_to': sid})
+            response = self.client.post(
+                '/api/v1/status/', data=data, content_type='application/json')
+            self.assertEqual(response.status_code, 200)
 
-        # Verify that the reply is included in the list of replies
-        s = Status.query.get(sid)
-        assert r in s.replies().items
+            # Verify that the status is actually a reply
+            r = db.query(Status).filter(Status.reply_to_id==sid).first()
+            self.assertEqual(r.content, 'reply to status')
 
-        # You should not be able to reply to the reply
-        data = json.dumps({
-                'api_key': settings.API_KEY,
-                'user': 'r1cky',
-                'content': 'should not work',
-                'reply_to': r.id})
-        response = self.client.post(
-            '/api/v1/status/', data=data, content_type='application/json')
-        self.assertEqual(response.status_code, 400)
+            # Verify that the reply is included in the list of replies
+            s = db.query(Status).get(sid)
+            assert r in s.replies().items
+
+            # You should not be able to reply to the reply
+            data = json.dumps({
+                    'api_key': settings.API_KEY,
+                    'user': 'r1cky',
+                    'content': 'should not work',
+                    'reply_to': r.id})
+            response = self.client.post(
+                '/api/v1/status/', data=data, content_type='application/json')
+            self.assertEqual(response.status_code, 400)
 
     def test_delete_status(self):
         """Test deletion of a status"""
+        db = get_session(self.app)
+
         s = status(save=True)
         id = s.id
 
@@ -265,7 +281,7 @@ class APITestCase(BaseTestCase):
         self.assertEqual(response.status_code, 200)
 
         # Verify the status was deleted
-        self.assertEqual(Status.query.get(id), None)
+        self.assertEqual(db.query(Status).get(id), None)
 
     def test_delete_status_validation(self):
         """Verify validation of required fields"""
@@ -311,6 +327,8 @@ class APITestCase(BaseTestCase):
 
     def test_update_user(self):
         """Test that a user can update their own settings"""
+        db = get_session(self.app)
+
         u = user(save=True)
         id = u.id
 
@@ -325,7 +343,7 @@ class APITestCase(BaseTestCase):
             content_type='application/json')
         self.assertEqual(response.status_code, 200)
 
-        u = User.query.get(id)
+        u = db.query(User).get(id)
 
         self.assertEqual(u.email, 'test@test.com')
         self.assertEqual(u.github_handle, 'test')
@@ -335,6 +353,8 @@ class APITestCase(BaseTestCase):
         """Test that an admin can update another users settings and
         non-admins cannot update other users settings
         """
+        db = get_session(self.app)
+
         u = user(save=True)
         a = user(username='admin', slug='admin', email='admin@mail.com',
                  is_admin=True, save=True)
@@ -354,7 +374,7 @@ class APITestCase(BaseTestCase):
             content_type='application/json')
         self.assertEqual(response.status_code, 200)
 
-        u = User.query.get(uid)
+        u = db.query(User).get(uid)
 
         self.assertEqual(u.email, 'test@test.com')
         self.assertEqual(u.github_handle, 'test')

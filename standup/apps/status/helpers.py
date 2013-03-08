@@ -1,6 +1,8 @@
 import re
 from datetime import date, datetime, timedelta
 
+from standup.database.helpers import paginate as _paginate
+
 
 def paginate(statuses, page=1, startdate=None, enddate=None):
     from standup.apps.status.models import Status
@@ -8,7 +10,7 @@ def paginate(statuses, page=1, startdate=None, enddate=None):
         statuses = statuses.filter(Status.created >= startdate)
     if enddate:
         statuses = statuses.filter(Status.created <= enddate)
-    return statuses.paginate(int(page))
+    return _paginate(statuses, int(page))
 
 
 def startdate(request):

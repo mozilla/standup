@@ -1,16 +1,17 @@
-from flask import (Blueprint, redirect, render_template, request, session,
-                   url_for)
+from flask import (Blueprint, current_app, redirect, render_template, request,
+                   session, url_for)
 from jinja2.filters import urlize
 from markdown import markdown
 from urlparse import urljoin
 from werkzeug.contrib.atom import AtomFeed
 
+from sqlalchemy import desc
 from standup.apps.status.helpers import enddate, paginate, startdate
 from standup.apps.status.models import Project, Status
 from standup.apps.users.models import Team, User
+from standup.database import get_session
 from standup.errors import forbidden, page_not_found
 from standup.filters import format_update
-from standup.main import db
 
 
 blueprint = Blueprint('status', __name__)
@@ -47,11 +48,13 @@ def render_feed(title, statuses):
 @blueprint.route('/')
 def index():
     """The home page."""
+    db = get_session(current_app)
+
     return render_template(
         'index.html',
         statuses=paginate(
-            Status.query.filter(Status.reply_to == None).order_by(
-                db.desc(Status.created)),
+            db.query(Status).filter(Status.reply_to == None).order_by(
+                desc(Status.created)),
             request.args.get('page', 1),
             startdate(request),
             enddate(request)),)
@@ -60,8 +63,10 @@ def index():
 @blueprint.route('/statuses.xml')
 def index_feed():
     """Output every status in an Atom feed."""
-    statuses = (Status.query.filter(Status.reply_to == None)
-                            .order_by(db.desc(Status.created)))
+    db = get_session(current_app)
+
+    statuses = (db.query(Status).filter(Status.reply_to == None)
+                .order_by(desc(Status.created)))
 
     return render_feed('All status updates', statuses)
 
@@ -69,7 +74,9 @@ def index_feed():
 @blueprint.route('/user/<slug>', methods=['GET'])
 def user(slug):
     """The user page. Shows a user's statuses."""
-    user = User.query.filter_by(slug=slug).first()
+    db = get_session(current_app)
+
+    user = db.query(User).filter_by(slug=slug).first()
     if not user:
         return page_not_found('User not found.')
     return render_template(
@@ -84,12 +91,14 @@ def user(slug):
 @blueprint.route('/user/<slug>.xml', methods=['GET'])
 def user_feed(slug):
     """A user's Atom feed. Output every status from this user."""
-    user = User.query.filter_by(slug=slug).first()
+    db = get_session(current_app)
+
+    user = db.query(User).filter_by(slug=slug).first()
     if not user:
         return page_not_found('User not found.')
 
     statuses = (user.statuses.filter(Status.reply_to == None)
-                             .order_by(db.desc(Status.created)))
+                             .order_by(desc(Status.created)))
 
     return render_feed('Updates by %s' % user.username, statuses)
 
@@ -97,14 +106,16 @@ def user_feed(slug):
 @blueprint.route('/project/<slug>', methods=['GET'])
 def project(slug):
     """The project page. Shows a project's statuses."""
-    project = Project.query.filter_by(slug=slug).first()
+    db = get_session(current_app)
+
+    project = db.query(Project).filter_by(slug=slug).first()
     if not project:
         return page_not_found('Project not found.')
 
     return render_template(
         'project.html',
         project=project,
-        projects=Project.query.order_by(Project.name).filter(
+        projects = db.query(Project).order_by(Project.name).filter(
             Project.statuses.any()),
         statuses=project.recent_statuses(
             request.args.get('page', 1),
@@ -115,12 +126,14 @@ def project(slug):
 @blueprint.route('/project/<slug>.xml', methods=['GET'])
 def project_feed(slug):
     """Project Atom feed. Shows all statuses for a project."""
-    project = Project.query.filter_by(slug=slug).first()
+    db = get_session(current_app)
+
+    project = db.query(Project).filter_by(slug=slug).first()
     if not project:
         return page_not_found('Project not found.')
 
     statuses = (project.statuses.filter(Status.reply_to == None)
-                                .order_by(db.desc(Status.created)))
+                                .order_by(desc(Status.created)))
 
     return render_feed('Updates for %s' % project.name, statuses)
 
@@ -128,7 +141,9 @@ def project_feed(slug):
 @blueprint.route('/team/<slug>', methods=['GET'])
 def team(slug):
     """The team page. Shows statuses for all users in the team."""
-    team = Team.query.filter_by(slug=slug).first()
+    db = get_session(current_app)
+
+    team = db.query(Team).filter_by(slug=slug).first()
     if not team:
         return page_not_found('Team not found.')
 
@@ -136,7 +151,7 @@ def team(slug):
         'team.html',
         team=team,
         users=team.users,
-        teams=Team.query.order_by(Team.name).all(),
+        teams = db.query(Team).order_by(Team.name).all(),
         statuses=team.recent_statuses(
             request.args.get('page', 1),
             startdate(request),
@@ -146,12 +161,14 @@ def team(slug):
 @blueprint.route('/team/<slug>.xml', methods=['GET'])
 def team_feed(slug):
     """The team status feed. Shows all updates from a team in Atom format."""
-    team = Team.query.filter_by(slug=slug).first()
+    db = get_session(current_app)
+
+    team = db.query(Team).filter_by(slug=slug).first()
     if not team:
         return page_not_found('Team not found.')
 
     statuses = (team.statuses().filter(Status.reply_to == None)
-                               .order_by(db.desc(Status.created)))
+                               .order_by(desc(Status.created)))
 
     return render_feed('Updates from %s' % team.name, statuses)
 
@@ -159,7 +176,9 @@ def team_feed(slug):
 @blueprint.route('/status/<id>', methods=['GET'])
 def status(id):
     """The status page. Shows a single status."""
-    statuses = Status.query.filter_by(id=id)
+    db = get_session(current_app)
+
+    statuses = db.query(Status).filter_by(id=id)
 
     if not statuses.count():
         return page_not_found('Status not found.')
@@ -177,11 +196,13 @@ def status(id):
 @blueprint.route('/statusize/', methods=['POST'])
 def statusize():
     """Posts a status from the web."""
+    db = get_session(current_app)
+
     email = session.get('email')
     if not email:
         return forbidden('You must be logged in to statusize!')
 
-    user = User.query.filter(User.email == email).first()
+    user = db.query(User).filter(User.email == email).first()
 
     if not user:
         return forbidden('You must have a user account to statusize!')
@@ -195,14 +216,14 @@ def statusize():
 
     project = request.form.get('project', '')
     if project:
-        project = Project.query.filter_by(id=project).first()
+        project = db.query(Project).filter_by(id=project).first()
         if project:
             status.project_id = project.id
 
     # TODO: reply handling
 
-    db.session.add(status)
-    db.session.commit()
+    db.add(status)
+    db.commit()
 
     # Try to go back from where we came.
     redirect_url = request.form.get('redirect_to',
@@ -214,11 +235,13 @@ def statusize():
 @blueprint.route('/profile/', methods=['GET'])
 def profile():
     """Shows the user's profile page."""
+    db = get_session(current_app)
+
     email = session.get('email')
     if not email:
         return forbidden('You must be logged in to see a profile!')
 
-    user = User.query.filter(User.email == email).first()
+    user = db.query(User).filter(User.email == email).first()
 
     if not user:
         return forbidden('You must have a user account to see your profile!')

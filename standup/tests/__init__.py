@@ -1,10 +1,13 @@
 import unittest
 from functools import wraps
 
+from flask import current_app
 from standup import test_settings
 from standup.apps.status.models import Project, Status
 from standup.apps.users.models import User
-from standup.main import create_app, db
+from standup.database import get_session
+from standup.database.classes import Model
+from standup.main import create_app
 
 
 testing_app = create_app(test_settings)
@@ -14,11 +17,19 @@ testing_app.config['TESTING'] = True
 class BaseTestCase(unittest.TestCase):
     def setUp(self):
         super(BaseTestCase, self).setUp()
+        self.app = testing_app
         self.client = testing_app.test_client()
-        db.create_all()
+        for app in testing_app.installed_apps:
+            try:
+                __import__('%s.models' % app)
+            except ImportError:
+                pass
+        db = get_session(self.app)
+        Model.metadata.create_all(db.bind)
 
     def tearDown(self):
-        db.drop_all()
+        db = get_session(self.app)
+        Model.metadata.drop_all(db.bind)
 
 
 def with_save(func):
@@ -32,8 +43,9 @@ def with_save(func):
         save = kwargs.pop('save', False)
         ret = func(*args, **kwargs)
         if save:
-            db.session.add(ret)
-            db.session.commit()
+            db = get_session(testing_app)
+            db.add(ret)
+            db.commit()
         return ret
 
     return saving_func

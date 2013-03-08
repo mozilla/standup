@@ -11,11 +11,11 @@ DEBUG = truthify(os.environ.get('DEBUG', False))
 # The key used to authenticate API calls.
 API_KEY = os.environ.get('API_KEY', 'qwertyuiopasdfghjklzxcvbnm1234567890')
 
-BLUEPRINTS = (
-    'standup.apps.api.views',
-    'standup.apps.landings.views',
-    'standup.apps.status.views',
-    'standup.apps.users.views',
+INSTALLED_APPS = (
+    'api',
+    'landings',
+    'status',
+    'users'
 )
 
 SITE_URL = os.environ.get('SITE_URL', 'http://127.0.0.1:5000')

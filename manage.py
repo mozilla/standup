@@ -7,24 +7,24 @@ from flask.ext.funnel.manager import manager as funnel_manager
 from migrate.exceptions import DatabaseAlreadyControlledError
 from migrate.versioning import api as migrate_api
 
-from standup.main import db
-from standup.wsgi import app
 from standup.apps.status.models import Project, Status
 from standup.apps.users.models import Team, User
+from standup.database import get_session
 from standup.utils import slugify
+from standup.wsgi import app
 
 
 manager = Manager(app)
+db = get_session(app)
 
 # Add the Flask-Funnel manager
 manager.add_command('funnel', funnel_manager)
 
 app_path = os.path.join(os.path.relpath(os.path.dirname(
     os.path.abspath(__file__)), os.getcwd()), 'standup')
-sqlite = os.path.join(app_path, 'standup_app.db')
 
 db_repo = os.path.join(app_path, 'migrations')
-db_url = os.environ.get('DATABASE_URL', 'sqlite:///%s' % sqlite)
+db_url = app.config.get('DATABASE_URL')
 
 
 def get_db_version():
@@ -101,14 +101,14 @@ def add_team(name, slug=None):
     if slug == None:
         slug = slugify(name)
 
-    team = Team.query.filter_by(slug=slug).first()
+    team = db.query(Team).filter_by(slug=slug).first()
     if team:
         print 'Team "%s" (%s) already exists.' % (team.name, team.slug)
         return
 
     team = Team(name=name, slug=slug)
-    db.session.add(team)
-    db.session.commit()
+    db.add(team)
+    db.commit()
 
     print 'Team "%s" created!' % team.name
 
@@ -125,14 +125,14 @@ def add_project(name, slug=None, repo_url=None, color=None):
     if color == None:
         color = 'FF0000'
 
-    project = Project.query.filter_by(slug=slug).first()
+    project = db.query(Project).filter_by(slug=slug).first()
     if project:
         print 'Project "%s" (%s) already exists.' % (project.name, project.slug)
         return
 
     project = Project(name=name, slug=slug, repo_url=repo_url, color=color)
-    db.session.add(project)
-    db.session.commit()
+    db.add(project)
+    db.commit()
 
     print 'Project "%s" created!' % project.name
 
@@ -144,18 +144,18 @@ def stats():
     print ''
 
     print 'DB version: %s' % get_db_version()
-    print 'Users:      %d' % len(User.query.all())
-    print 'Statuses:   %d' % len(Status.query.all())
+    print 'Users:      %d' % db.query(User).count()
+    print 'Statuses:   %d' % db.query(Status).count()
     print ''
 
-    teams = Team.query.all()
+    teams = db.query(Team).all()
     print 'Teams:      %d' % len(teams)
     for team in teams:
         print '  %s: %s' % (team.name, team.slug)
 
     print ''
 
-    projects = Project.query.all()
+    projects = db.query(Project).all()
     print 'Projects:   %d' % len(projects)
     for project in projects:
         print '  %s: %s, %s, %s' % (project.name, project.slug,

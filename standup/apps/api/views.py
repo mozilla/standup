@@ -1,9 +1,9 @@
-from flask import Blueprint, jsonify, make_response, request
-
+from flask import Blueprint, current_app, jsonify, make_response, request
+from sqlalchemy import desc
 from standup.apps.api.decorators import api_key_required
 from standup.apps.status.models import Project, Status
 from standup.apps.users.models import User
-from standup.main import db
+from standup.database import get_session
 from standup.utils import slugify
 
 
@@ -33,10 +33,12 @@ def get_statuses():
         }
 
     """
+    db = get_session(current_app)
+
     limit = request.args.get('limit', 20)
 
-    statuses = Status.query.filter(Status.reply_to == None).\
-    order_by(db.desc(Status.created)).limit(limit)
+    statuses = db.query(Status).filter(Status.reply_to == None).\
+    order_by(desc(Status.created)).limit(limit)
 
     data={}
     for row in statuses:
@@ -74,6 +76,8 @@ def create_status():
         }
 
     """
+    db = get_session(current_app)
+
     # The data we need
     username = request.json.get('user')
     project_slug = request.json.get('project')
@@ -88,7 +92,7 @@ def create_status():
     # If this is a reply make sure that the status being replied to
     # exists and is not itself a reply
     if reply_to:
-        replied = Status.query.filter_by(id=reply_to).first()
+        replied = db.query(Status).filter_by(id=reply_to).first()
         if not replied:
             return make_response(
                 jsonify(dict(error='Status does not exist.')), 400)
@@ -100,22 +104,22 @@ def create_status():
 
     # Get or create the user
     # TODO: People change their nicks sometimes, figure out what to do.
-    user = User.query.filter_by(username=username).first()
+    user = db.query(User).filter_by(username=username).first()
     if not user:
         user = User(username=username, name=username,
             slug=slugify(username), github_handle=username)
-        db.session.add(user)
-        db.session.commit()
+        db.add(user)
+        db.commit()
 
     # Get or create the project (but not if this is a reply)
     if project_slug and not replied:
         # This forces the slug to be slug-like.
         project_slug = slugify(project_slug)
-        project = Project.query.filter_by(slug=project_slug).first()
+        project = db.query(Project).filter_by(slug=project_slug).first()
         if not project:
             project = Project(slug=project_slug, name=project_slug)
-            db.session.add(project)
-            db.session.commit()
+            db.add(project)
+            db.commit()
 
     # Create the status
     status = Status(user_id=user.id, content=content, content_html=content)
@@ -123,8 +127,8 @@ def create_status():
         status.project_id = project.id
     if replied:
         status.reply_to_id = replied.id
-    db.session.add(status)
-    db.session.commit()
+    db.add(status)
+    db.commit()
 
     return jsonify(dict(id=status.id, content=content))
 
@@ -149,6 +153,8 @@ def delete_status(id):
         }
 
     """
+    db = get_session(current_app)
+
     # The data we need
     user = request.json.get('user')
 
@@ -156,7 +162,7 @@ def delete_status(id):
         return make_response(
             jsonify(dict(error='Missing required fields.')), 400)
 
-    status = Status.query.filter(Status.id==id)
+    status = db.query(Status).filter(Status.id==id)
 
     if not status.count():
         return make_response(jsonify(dict(error='Status does not exist.')),
@@ -167,7 +173,7 @@ def delete_status(id):
             jsonify(dict(error='You cannot delete this status.')), 403)
 
     status.delete()
-    db.session.commit()
+    db.commit()
 
     return make_response(jsonify(dict(id=id)))
 
@@ -200,6 +206,8 @@ def update_user(username):
         }
 
     """
+    db = get_session(current_app)
+
     # The data we need
     authorname = request.json.get('user')
 
@@ -212,9 +220,9 @@ def update_user(username):
         return make_response(
             jsonify(dict(error='Missing required fields')), 400)
 
-    author = User.query.filter(User.username==authorname)[0]
+    author = db.query(User).filter(User.username==authorname).first()
 
-    user = User.query.filter(User.username==username)
+    user = db.query(User).filter(User.username==username)
 
     if not user.count():
         user = User(username=username, slug=slugify(username))
@@ -234,6 +242,6 @@ def update_user(username):
     if github_handle:
         user.github_handle = github_handle
 
-    db.session.commit()
+    db.commit()
 
     return make_response(jsonify(dict(id=user.id)))

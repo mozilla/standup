@@ -4,7 +4,6 @@ decorator==3.4.0
 Fabric==1.6.0
 Flask==0.9
 Flask-Funnel==0.1.6
-Flask-SQLAlchemy==0.16
 Flask-Script==0.5.3
 Flask-Markdown==0.3
 gunicorn==0.14.5
@@ -14,7 +13,7 @@ Jinja2==2.6
 nose
 psycopg2
 requests==1.0.4
-SQLAlchemy==0.7.8
+SQLAlchemy==0.7.10
 sqlalchemy-migrate==0.7.2
 Tempita==0.5.1
 unidecode

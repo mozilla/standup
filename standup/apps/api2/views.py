@@ -1,7 +1,8 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, current_app, jsonify
 
+from sqlalchemy import desc
 from standup.apps.status.models import Status
-from standup.main import db
+from standup.database import get_session
 
 
 blueprint = Blueprint('api_v2', __name__, url_prefix='/api/v2')
@@ -31,10 +32,12 @@ def feed(request):
         }
 
     """
+    db = get_session(current_app)
+
     limit = request.args.get('limit', 20)
 
-    statuses = (Status.query.filter(Status.reply_to == None)
-                      .order_by(db.desc(Status.created)).limit(limit))
+    statuses = (db.query(Status).filter(Status.reply_to == None)
+                      .order_by(desc(Status.created)).limit(limit))
 
     data={}
     for row in statuses:
