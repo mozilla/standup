@@ -151,3 +151,14 @@ Testing
 We use nose for testing. To run the tests, do::
 
     $ nosetests
+
+Remember to run tests before submitting pull requests!
+
+Also, we are trying to keep 100% test coverage, so make sure to check the coverage report
+as well. You can do that by running tests like this::
+
+    $ nosetests --with-coverage --cover-package=standup --cover-inclusive -v
+
+Or if you like, use our fab script::
+
+    $ fab test

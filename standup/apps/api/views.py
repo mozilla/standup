@@ -1,10 +1,12 @@
-from flask import Blueprint, current_app, jsonify, make_response, request
+from collections import OrderedDict
+
+from flask import Blueprint, current_app, make_response, request
 from sqlalchemy import desc
 from standup.apps.api.decorators import api_key_required
 from standup.apps.status.models import Project, Status
 from standup.apps.users.models import User
 from standup.database import get_session
-from standup.utils import slugify
+from standup.utils import slugify, jsonify
 
 
 blueprint = Blueprint('api_v1', __name__, url_prefix='/api/v1')
@@ -40,13 +42,13 @@ def get_statuses():
     statuses = db.query(Status).filter(Status.reply_to == None).\
     order_by(desc(Status.created)).limit(limit)
 
-    data={}
+    data = OrderedDict()
     for row in statuses:
         id = row.id
         created = row.created.isoformat()
-        try:
+        if row.project is not None:
             project_name = row.project.name
-        except:
+        else:
             project_name = None
         data[id] = (dict(author=row.user.name, content=row.content,
             timestamp=created, project=project_name))

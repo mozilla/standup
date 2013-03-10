@@ -1,5 +1,6 @@
 argparse==1.2.1
 bleach==1.1.5
+coverage==3.6
 decorator==3.4.0
 Fabric==1.6.0
 Flask==0.9
@@ -10,6 +11,7 @@ gunicorn==0.14.5
 html5lib==0.95
 ipython==0.13
 Jinja2==2.6
+mock==1.0.1
 nose
 psycopg2
 requests==1.0.4

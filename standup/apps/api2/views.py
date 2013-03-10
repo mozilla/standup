@@ -1,4 +1,4 @@
-from flask import Blueprint, current_app, jsonify
+from flask import Blueprint, current_app, jsonify, request
 
 from sqlalchemy import desc
 from standup.apps.status.models import Status
@@ -10,7 +10,7 @@ blueprint = Blueprint('api_v2', __name__, url_prefix='/api/v2')
 
 @blueprint.route('/', methods=['GET'])
 @blueprint.route('/feed/', methods=['GET'])
-def feed(request):
+def feed():
     """Get all status updates.
 
     Returns id, user (the name), project name and timestamp of statuses.

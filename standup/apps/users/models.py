@@ -45,7 +45,7 @@ class User(Model):
     team_users = Table('team_users', Model.metadata,
                        Column('team_id', Integer, ForeignKey('team.id')),
                        Column('user_id', Integer, ForeignKey('user.id')))
-    team = relationship('Team', secondary=team_users,
+    teams = relationship('Team', secondary=team_users,
                            backref=backref('users', lazy='dynamic'))
 
     def __repr__(self):

@@ -2,7 +2,6 @@ import json
 import re
 
 from flask import Response, request
-from types import BooleanType
 from unidecode import unidecode
 
 

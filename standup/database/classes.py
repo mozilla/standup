@@ -1,5 +1,6 @@
 from math import ceil
 
+from flask import abort
 from sqlalchemy.ext.declarative import declarative_base
 
 
@@ -21,6 +22,16 @@ class Pagination(object):
         #: the items for the current page
         self.items = items
 
+    def _paginate(self, page):
+        if page < 1:
+            abort(404)
+        offset = (page - 1) * self.per_page
+        items = self.query.limit(self.per_page).offset(offset).all()
+        if not items and page != 1:
+            abort(404)
+        return Pagination(self.query, page, self.per_page,
+                          self.query.count(), items)
+
     @property
     def pages(self):
         """The total number of pages"""
@@ -28,10 +39,9 @@ class Pagination(object):
 
     def prev(self):
         """Returns a :class:`Pagination` object for the previous page."""
-        assert self.query is not None, 'a query object is required '\
-                                       'for this method to work'
-        return Pagination(self.query, self.page - 1, self.per_page,
-                          self.query.count())
+        assert self.query is not None, ('a query object is required '
+                                        'for this method to work')
+        return self._paginate(self.page - 1)
 
     @property
     def prev_num(self):
@@ -45,10 +55,9 @@ class Pagination(object):
 
     def next(self):
         """Returns a :class:`Pagination` object for the next page."""
-        assert self.query is not None, 'a query object is required '\
-                                       'for this method to work'
-        return Pagination(self.query, self.page + 1, self.per_page,
-                          self.query.count())
+        assert self.query is not None, ('a query object is required '
+                                        'for this method to work')
+        return self._paginate(self.page + 1)
 
     @property
     def has_next(self):
@@ -59,17 +68,3 @@ class Pagination(object):
     def next_num(self):
         """Number of the next page"""
         return self.page + 1
-
-    def iter_pages(self, left_edge=2, left_current=2,
-                   right_current=5, right_edge=2):
-        """Iterates over the page numbers in the pagination."""
-        last = 0
-        for num in xrange(1, self.pages + 1):
-            if (num <= left_edge or
-                (num > self.page - left_current - 1 and
-                 num < self.page + right_current) or
-                num > self.pages - right_edge):
-                if last + 1 != num:
-                    yield None
-                yield num
-                last = num

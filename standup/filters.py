@@ -3,9 +3,7 @@ import re
 from urllib import urlencode
 
 from bleach import clean
-from flask import url_for
-
-from standup import settings
+from flask import current_app, url_for
 
 
 TAG_TMPL = '{0} <span class="tag tag-{1}">{2}</span>'
@@ -26,16 +24,17 @@ def dateformat(date, fmt='%Y-%m-%d'):
 
 
 def gravatar_url(email, size=None):
+    app = current_app
     m = hashlib.md5(email.lower())
     hash = m.hexdigest()
     url = 'http://www.gravatar.com/avatar/' + hash
 
     qs = {}
 
-    if getattr(settings, 'DEBUG', False) or not hasattr(settings, 'SITE_URL'):
+    if app.debug or not app.config.has_key('SITE_URL'):
         qs['d'] = 'mm'
     else:
-        qs['d'] = settings.SITE_URL + url_for(
+        qs['d'] = app.config.get('SITE_URL') + url_for(
             'static', filename='img/default-avatar.png')
 
     if size:
@@ -48,11 +47,6 @@ def gravatar_url(email, size=None):
 def format_update(update, project=None):
     BUG_RE = re.compile(r'(bug) #?(\d+)', flags=re.I)
     PULL_RE = re.compile(r'(pull|pr) #?(\d+)', flags=re.I)
-
-    def set_target(attrs,
-                   new=False):
-        attrs['target'] = '_blank'
-        return attrs
 
     # Remove icky stuff.
     formatted = clean(update, tags=[])

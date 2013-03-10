@@ -13,6 +13,7 @@ API_KEY = os.environ.get('API_KEY', 'qwertyuiopasdfghjklzxcvbnm1234567890')
 
 INSTALLED_APPS = (
     'api',
+    'api2',
     'landings',
     'status',
     'users'
