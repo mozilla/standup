@@ -12,6 +12,7 @@ from standup.errors import register_error_handlers
 from standup.filters import register_filters
 from standup.mdext import nixheaders
 
+
 def _get_apps_full_names(apps):
     names = []
     for app in apps:
@@ -24,6 +25,7 @@ def _get_apps_full_names(apps):
 
         names.append('.'.join(parts))
     return names
+
 
 def create_app(settings):
     app = Flask(__name__)
@@ -72,7 +74,7 @@ def create_app(settings):
         teams = db.query(Team).order_by(Team.name).all()
 
         if session:
-            user = db.query(User).filter(User.email == session['email']).first()
+            user = db.query(User).filter_by(email=session['email']).first()
         else:
             user = None
 

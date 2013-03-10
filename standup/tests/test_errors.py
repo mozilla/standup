@@ -3,6 +3,7 @@ from nose.tools import eq_
 from standup.errors import something_broke
 from standup.tests import BaseTestCase
 
+
 class ErrorsTestCase(BaseTestCase):
     def __init__(self, *args, **kwargs):
         super(ErrorsTestCase, self).__init__(*args, **kwargs)

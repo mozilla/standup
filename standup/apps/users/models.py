@@ -1,5 +1,6 @@
 from flask import current_app
-from sqlalchemy import Boolean, Column, desc, ForeignKey, Integer, String, Table
+from sqlalchemy import (Boolean, Column, desc, ForeignKey, Integer, String,
+                        Table)
 from sqlalchemy.orm import backref, relationship
 from standup.apps.status.models import Status
 from standup.apps.status.helpers import paginate
@@ -20,8 +21,8 @@ class Team(Model):
 
     def recent_statuses(self, page=1, startdate=None, enddate=None):
         """Return a single page of the most recent statuses from this team."""
-        statuses = self.statuses().filter(Status.reply_to == None).order_by(
-                desc(Status.created))
+        statuses = self.statuses().filter_by(reply_to=None)\
+            .order_by(desc(Status.created))
         return paginate(statuses, page, startdate, enddate)
 
     def statuses(self):
@@ -46,13 +47,13 @@ class User(Model):
                        Column('team_id', Integer, ForeignKey('team.id')),
                        Column('user_id', Integer, ForeignKey('user.id')))
     teams = relationship('Team', secondary=team_users,
-                           backref=backref('users', lazy='dynamic'))
+                         backref=backref('users', lazy='dynamic'))
 
     def __repr__(self):
         return '<User: [%s] %s>' % (self.username, self.name)
 
     def recent_statuses(self, page=1, startdate=None, enddate=None):
         """Return a single page of the most recent statuses from this user."""
-        statuses = self.statuses.filter(Status.reply_to == None).order_by(
-            desc(Status.created))
+        statuses = self.statuses.filter_by(reply_to=None)\
+            .order_by(desc(Status.created))
         return paginate(statuses, page, startdate, enddate)

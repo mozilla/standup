@@ -1,6 +1,5 @@
 from datetime import datetime
 from sqlalchemy import *
-from migrate import *
 
 meta = MetaData()
 
@@ -35,6 +34,7 @@ status = Table('status', meta,
                Column('content', Text),
                Column('content_html', Text))
 
+
 def upgrade(migrate_engine):
     """Add the color and repo_url fields to the project table """
     meta.bind = migrate_engine
@@ -42,6 +42,7 @@ def upgrade(migrate_engine):
     user.create()
     project.create()
     status.create()
+
 
 def downgrade(migrate_engine):
     """Remove the color and repo_url fields from the project table"""

@@ -53,7 +53,7 @@ def index():
     return render_template(
         'index.html',
         statuses=paginate(
-            db.query(Status).filter(Status.reply_to == None).order_by(
+            db.query(Status).filter_by(reply_to=None).order_by(
                 desc(Status.created)),
             request.args.get('page', 1),
             startdate(request),
@@ -65,8 +65,8 @@ def index_feed():
     """Output every status in an Atom feed."""
     db = get_session(current_app)
 
-    statuses = (db.query(Status).filter(Status.reply_to == None)
-                .order_by(desc(Status.created)))
+    statuses = db.query(Status).filter_by(reply_to=None)\
+        .order_by(desc(Status.created))
 
     return render_feed('All status updates', statuses)
 
@@ -97,8 +97,8 @@ def user_feed(slug):
     if not user:
         return page_not_found('User not found.')
 
-    statuses = (user.statuses.filter(Status.reply_to == None)
-                             .order_by(desc(Status.created)))
+    statuses = user.statuses.filter_by(reply_to=None)\
+        .order_by(desc(Status.created))
 
     return render_feed('Updates by %s' % user.username, statuses)
 
@@ -115,7 +115,7 @@ def project(slug):
     return render_template(
         'project.html',
         project=project,
-        projects = db.query(Project).order_by(Project.name).filter(
+        projects=db.query(Project).order_by(Project.name).filter(
             Project.statuses.any()),
         statuses=project.recent_statuses(
             request.args.get('page', 1),
@@ -132,8 +132,8 @@ def project_feed(slug):
     if not project:
         return page_not_found('Project not found.')
 
-    statuses = (project.statuses.filter(Status.reply_to == None)
-                                .order_by(desc(Status.created)))
+    statuses = project.statuses.filter_by(reply_to=None)\
+        .order_by(desc(Status.created))
 
     return render_feed('Updates for %s' % project.name, statuses)
 
@@ -151,7 +151,7 @@ def team(slug):
         'team.html',
         team=team,
         users=team.users,
-        teams = db.query(Team).order_by(Team.name).all(),
+        teams=db.query(Team).order_by(Team.name).all(),
         statuses=team.recent_statuses(
             request.args.get('page', 1),
             startdate(request),
@@ -167,8 +167,8 @@ def team_feed(slug):
     if not team:
         return page_not_found('Team not found.')
 
-    statuses = (team.statuses().filter(Status.reply_to == None)
-                               .order_by(desc(Status.created)))
+    statuses = team.statuses().filter_by(reply_to=None)\
+        .order_by(desc(Status.created))
 
     return render_feed('Updates from %s' % team.name, statuses)
 
@@ -226,9 +226,8 @@ def statusize():
     db.commit()
 
     # Try to go back from where we came.
-    redirect_url = request.form.get('redirect_to',
-        request.headers.get('referer',
-            url_for('status.index')))
+    referer = request.headers.get('referer', url_for('status.index'))
+    redirect_url = request.form.get('redirect_to', referer)
     return redirect(redirect_url)
 
 

@@ -3,6 +3,7 @@ from functools import wraps
 from flask import current_app, request
 from standup.errors import api_error
 
+
 def api_key_required(view):
     @wraps(view)
     def wrapper(*args, **kwargs):

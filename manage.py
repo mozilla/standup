@@ -98,7 +98,7 @@ def new_migration(description):
 @manager.command
 def add_team(name, slug=None):
     """Creates a team."""
-    if slug == None:
+    if slug is None:
         slug = slugify(name)
 
     team = db.query(Team).filter_by(slug=slug).first()
@@ -116,18 +116,19 @@ def add_team(name, slug=None):
 @manager.command
 def add_project(name, slug=None, repo_url=None, color=None):
     """Creates a project."""
-    if slug == None:
+    if slug is None:
         slug = slugify(name)
 
-    if repo_url == None:
+    if repo_url is None:
         repo_url = ''
 
-    if color == None:
+    if color is None:
         color = 'FF0000'
 
     project = db.query(Project).filter_by(slug=slug).first()
     if project:
-        print 'Project "%s" (%s) already exists.' % (project.name, project.slug)
+        print 'Project "%s" (%s) already exists.' % (project.name,
+                                                     project.slug)
         return
 
     project = Project(name=name, slug=slug, repo_url=repo_url, color=color)

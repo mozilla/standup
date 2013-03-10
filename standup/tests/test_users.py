@@ -74,7 +74,8 @@ class ViewsTestCase(BaseTestCase):
             mocked.return_value = {'email': u.email}
             eq_(mocked()['email'], u.email)
 
-            response = self.client.post('/authenticate', data={'assertion': ''})
+            response = self.client.post('/authenticate',
+                                        data={'assertion': ''})
             eq_(response.status_code, 200)
             data = json.loads(response.data)
             assert 'email' in data
@@ -89,7 +90,8 @@ class ViewsTestCase(BaseTestCase):
             mocked.return_value = {'email': 'john@doe.com'}
             eq_(mocked()['email'], 'john@doe.com')
 
-            response = self.client.post('/authenticate', data={'assertion': ''})
+            response = self.client.post('/authenticate',
+                                        data={'assertion': ''})
             eq_(response.status_code, 200)
             data = json.loads(response.data)
             assert 'email' in data

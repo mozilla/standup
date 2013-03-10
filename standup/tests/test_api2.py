@@ -7,6 +7,7 @@ from standup.apps.api2.decorators import api_key_required
 from standup.apps.api2.helpers import numerify
 from standup.tests import BaseTestCase, project, status, user
 
+
 class HelpersTestCase(unittest.TestCase):
     def test_numerify(self):
         """Test the `numerify` helper function"""
@@ -34,7 +35,8 @@ class HelpersTestCase(unittest.TestCase):
         except TypeError:
             assert True
 
-        # Throws a value error when an invalid value is provided with no default
+        # Throws a value error when an invalid value is provided with no
+        # default
         try:
             numerify('a')
         except ValueError:

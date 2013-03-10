@@ -1,5 +1,6 @@
-from flask import Blueprint, current_app, jsonify, request
+from collections import OrderedDict
 
+from flask import Blueprint, current_app, jsonify, request
 from sqlalchemy import desc
 from standup.apps.status.models import Status
 from standup.database import get_session
@@ -36,18 +37,18 @@ def feed():
 
     limit = request.args.get('limit', 20)
 
-    statuses = (db.query(Status).filter(Status.reply_to == None)
-                      .order_by(desc(Status.created)).limit(limit))
+    statuses = db.query(Status).filter_by(reply_to=None)\
+        .order_by(desc(Status.created)).limit(limit)
 
-    data={}
+    data = OrderedDict()
     for row in statuses:
         id = row.id
         created = row.created.isoformat()
-        try:
+        if row.project is not None:
             project_name = row.project.name
-        except:
+        else:
             project_name = None
         data[id] = (dict(author=row.user.name, content=row.content,
-            timestamp=created, project=project_name))
+                         timestamp=created, project=project_name))
 
     return jsonify(data)

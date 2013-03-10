@@ -82,7 +82,7 @@ class HelpersTestCase(BaseTestCase):
         eq_(page.pages, 4)
 
         page = paginate(s, page=1, startdate=datetime(2012, 5, 28),
-                         enddate=datetime(2012, 6, 28))
+                        enddate=datetime(2012, 6, 28))
         eq_(page.pages, 2)
 
         page = paginate(s, page=1, enddate=datetime(2012, 6, 28))
@@ -287,9 +287,8 @@ class ViewsTestCase(BaseTestCase):
 class StatusizerTestCase(BaseTestCase):
     def test_status_unauthenticated(self):
         """Test that you get a 403 if you're not authenticated."""
-        rv = self.client.post('/statusize/',
-                           data={'message': 'foo'},
-                           follow_redirects=True)
+        rv = self.client.post('/statusize/', data={'message': 'foo'},
+                              follow_redirects=True)
         eq_(rv.status_code, 403)
 
     def test_status(self):
@@ -300,9 +299,8 @@ class StatusizerTestCase(BaseTestCase):
         with self.client.session_transaction() as sess:
             sess['email'] = 'joe@example.com'
 
-        rv = self.client.post('/statusize/',
-                           data={'message': 'foo'},
-                           follow_redirects=True)
+        rv = self.client.post('/statusize/', data={'message': 'foo'},
+                              follow_redirects=True)
         eq_(rv.status_code, 200)
 
     def test_status_no_user(self):
@@ -323,9 +321,8 @@ class StatusizerTestCase(BaseTestCase):
         with self.client.session_transaction() as sess:
             sess['email'] = 'joe@example.com'
 
-        rv = self.client.post('/statusize/',
-                           data={'message': ''},
-                           follow_redirects=True)
+        rv = self.client.post('/statusize/', data={'message': ''},
+                              follow_redirects=True)
         # This kicks up a 404, but that's lame.
         eq_(rv.status_code, 404)
 
@@ -345,8 +342,8 @@ class StatusizerTestCase(BaseTestCase):
             sess['email'] = 'joe@example.com'
 
         rv = self.client.post('/statusize/',
-                           data={'message': 'r1cky rocks!', 'project': pid},
-                           follow_redirects=True)
+                              data={'message': 'r1cky rocks!', 'project': pid},
+                              follow_redirects=True)
         eq_(rv.status_code, 200)
 
 

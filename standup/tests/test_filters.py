@@ -15,6 +15,7 @@ def test_tags():
     for tag in ('#1', '#.abc', '#?abc'):
         eq_(format_update(tag), tag)
 
+
 def test_gravatar_url():
     """Test that the gravatar url is generated correctly"""
     app = Flask(__name__)

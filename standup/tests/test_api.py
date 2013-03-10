@@ -120,7 +120,7 @@ class APITestCase(BaseTestCase):
             eq_(response.status_code, 200)
 
             # Verify that the status is actually a reply
-            r = db.query(Status).filter(Status.reply_to_id==sid).first()
+            r = db.query(Status).filter(Status.reply_to_id == sid).first()
             eq_(r.content, 'reply to status')
 
             # Verify that the reply is included in the list of replies
@@ -309,7 +309,6 @@ class APITestCase(BaseTestCase):
         response = self.client.post('/api/v1/user/%s/' % u.id, data=data,
                                     content_type='application/json')
         eq_(response.status_code, 403)
-
 
     def test_udate_user_invalid_api_key(self):
         """Request with invalid API key should return 403"""

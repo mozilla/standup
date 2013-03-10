@@ -1,7 +1,4 @@
 from sqlalchemy import *
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.sql.expression import ColumnClause
-from migrate import *
 
 
 meta = MetaData()
@@ -30,7 +27,7 @@ def upgrade(migrate_engine):
 
     for row in result:
         if row.team_id:
-            values={'team_id': row.team_id, 'user_id': row.id,}
+            values = {'team_id': row.team_id, 'user_id': row.id}
             team_users.insert(values=values).execute()
 
     user.c.team_id.drop()
@@ -49,7 +46,7 @@ def downgrade(migrate_engine):
     result = team_users.select().execute().fetchall()
 
     for row in result:
-        values = {'team_id': row.team_id,}
-        user.update(values=values).where(user.c.id==row.user_id).execute()
+        values = {'team_id': row.team_id}
+        user.update(values=values).where(user.c.id == row.user_id).execute()
 
     team_users.drop()

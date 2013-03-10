@@ -70,4 +70,3 @@ class HelpersTestCase(BaseTestCase):
                 paginate(self.query, 6, error_out=False)
             except FakeException:
                 self.fail('paginate errored out')
-

@@ -1,6 +1,6 @@
 from collections import OrderedDict
 
-from flask import Blueprint, current_app, make_response, request
+from flask import Blueprint, current_app, request
 from sqlalchemy import desc
 from standup.apps.api.decorators import api_key_required
 from standup.apps.status.models import Project, Status
@@ -39,8 +39,8 @@ def get_statuses():
 
     limit = request.args.get('limit', 20)
 
-    statuses = db.query(Status).filter(Status.reply_to == None).\
-    order_by(desc(Status.created)).limit(limit)
+    statuses = db.query(Status).filter_by(reply_to=None)\
+        .order_by(desc(Status.created)).limit(limit)
 
     data = OrderedDict()
     for row in statuses:
@@ -51,7 +51,7 @@ def get_statuses():
         else:
             project_name = None
         data[id] = (dict(author=row.user.name, content=row.content,
-            timestamp=created, project=project_name))
+                         timestamp=created, project=project_name))
 
     return jsonify(data)
 
@@ -88,19 +88,16 @@ def create_status():
 
     # Validate we have the required fields.
     if not (username and content):
-        return make_response(
-            jsonify(dict(error='Missing required fields.')), 400)
+        return jsonify(dict(error='Missing required fields.')), 400
 
     # If this is a reply make sure that the status being replied to
     # exists and is not itself a reply
     if reply_to:
         replied = db.query(Status).filter_by(id=reply_to).first()
         if not replied:
-            return make_response(
-                jsonify(dict(error='Status does not exist.')), 400)
+            return jsonify(dict(error='Status does not exist.')), 400
         elif replied.reply_to:
-            return make_response(
-                jsonify(dict(error='Cannot reply to a reply.')), 400)
+            return jsonify(dict(error='Cannot reply to a reply.')), 400
     else:
         replied = None
 
@@ -108,8 +105,8 @@ def create_status():
     # TODO: People change their nicks sometimes, figure out what to do.
     user = db.query(User).filter_by(username=username).first()
     if not user:
-        user = User(username=username, name=username,
-            slug=slugify(username), github_handle=username)
+        user = User(username=username, name=username, slug=slugify(username),
+                    github_handle=username)
         db.add(user)
         db.commit()
 
@@ -161,23 +158,20 @@ def delete_status(id):
     user = request.json.get('user')
 
     if not (id and user):
-        return make_response(
-            jsonify(dict(error='Missing required fields.')), 400)
+        return jsonify(dict(error='Missing required fields.')), 400
 
-    status = db.query(Status).filter(Status.id==id)
+    status = db.query(Status).filter_by(id=id)
 
     if not status.count():
-        return make_response(jsonify(dict(error='Status does not exist.')),
-            400)
+        return jsonify(dict(error='Status does not exist.')), 400
 
     if not status[0].user.username == user:
-        return make_response(
-            jsonify(dict(error='You cannot delete this status.')), 403)
+        return jsonify(dict(error='You cannot delete this status.')), 403
 
     status.delete()
     db.commit()
 
-    return make_response(jsonify(dict(id=id)))
+    return jsonify(dict(id=id))
 
 
 @blueprint.route('/user/<username>/', methods=['POST'])
@@ -219,12 +213,11 @@ def update_user(username):
     github_handle = request.json.get('github_handle')
 
     if not (username and authorname and (name or email or github_handle)):
-        return make_response(
-            jsonify(dict(error='Missing required fields')), 400)
+        return jsonify(dict(error='Missing required fields')), 400
 
-    author = db.query(User).filter(User.username==authorname).first()
+    author = db.query(User).filter_by(username=authorname).first()
 
-    user = db.query(User).filter(User.username==username)
+    user = db.query(User).filter_by(username=username)
 
     if not user.count():
         user = User(username=username, slug=slugify(username))
@@ -232,8 +225,7 @@ def update_user(username):
         user = user[0]
 
     if author.username != user.username and not author.is_admin:
-        return make_response(
-            jsonify(dict(error='You cannot modify this user.')), 403)
+        return jsonify(dict(error='You cannot modify this user.')), 403
 
     if name:
         user.name = name
@@ -246,4 +238,4 @@ def update_user(username):
 
     db.commit()
 
-    return make_response(jsonify(dict(id=user.id)))
+    return jsonify(dict(id=user.id))

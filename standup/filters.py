@@ -31,7 +31,7 @@ def gravatar_url(email, size=None):
 
     qs = {}
 
-    if app.debug or not app.config.has_key('SITE_URL'):
+    if app.debug or not 'SITE_URL' in app.config:
         qs['d'] = 'mm'
     else:
         qs['d'] = app.config.get('SITE_URL') + url_for(
