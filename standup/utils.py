@@ -1,6 +1,6 @@
-import json
 import re
 
+import simplejson as json
 from flask import Response, request
 from unidecode import unidecode
 

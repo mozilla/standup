@@ -1,7 +1,6 @@
-from collections import OrderedDict
-
 from flask import Blueprint, current_app, request
 from sqlalchemy import desc
+from standup import OrderedDict
 from standup.apps.api.decorators import api_key_required
 from standup.apps.status.models import Project, Status
 from standup.apps.users.models import User

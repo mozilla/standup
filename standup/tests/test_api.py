@@ -1,11 +1,10 @@
-import json
+import simplejson as json
 
 from nose.tools import ok_, eq_
 from standup.apps.status.models import Project, Status
 from standup.apps.users.models import User
 from standup.database import get_session
 from standup.filters import format_update
-
 from standup.tests import BaseTestCase, load_json, project, status, user
 
 

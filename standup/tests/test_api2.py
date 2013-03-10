@@ -1,6 +1,6 @@
-import json
 import unittest
 
+import simplejson as json
 from flask import render_template_string
 from nose.tools import eq_
 from standup.apps.api2.decorators import api_key_required

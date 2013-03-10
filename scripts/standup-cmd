@@ -5,8 +5,9 @@ This is the command-line script for standups. Makes testing easier.
 """
 
 import httplib
-import json
 import sys
+
+import simplejson as json
 
 
 USAGE = "usage: standup-cmd HOST APIKEY USER PROJECT CONTENT"

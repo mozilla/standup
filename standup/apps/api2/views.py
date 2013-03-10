@@ -1,7 +1,6 @@
-from collections import OrderedDict
-
 from flask import Blueprint, current_app, jsonify, request
 from sqlalchemy import desc
+from standup import OrderedDict
 from standup.apps.status.models import Status
 from standup.database import get_session
 

@@ -1,6 +1,5 @@
 from flask import abort
 from nose.tools import eq_
-from standup.errors import something_broke
 from standup.tests import BaseTestCase
 
 

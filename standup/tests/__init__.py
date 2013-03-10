@@ -1,10 +1,9 @@
-import json
 import unittest
-from collections import OrderedDict
 from functools import wraps
 
+import simplejson as json
 from flask import current_app, Request
-from standup import test_settings
+from standup import OrderedDict, test_settings
 from standup.apps.status.models import Project, Status
 from standup.apps.users.models import Team, User
 from standup.database import get_session

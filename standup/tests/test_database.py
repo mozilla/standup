@@ -35,8 +35,12 @@ class HelpersTestCase(BaseTestCase):
             prev = page.prev()
             eq_(prev.has_prev, False)
 
-            with self.assertRaises(FakeException):
+            try:
                 prev.prev()
+            except FakeException:
+                pass
+            else:
+                self.fail('Did not error out')
 
             page = paginate(self.query, 9, per_page=10)
             eq_(page.has_next, True)
@@ -45,8 +49,12 @@ class HelpersTestCase(BaseTestCase):
             next = page.next()
             eq_(next.has_next, False)
 
-            with self.assertRaises(FakeException):
+            try:
                 next.next()
+            except FakeException:
+                pass
+            else:
+                self.fail('Did not error out')
 
     def test_paginate_errors(self):
         """Test the paginate function erroring out"""
@@ -55,16 +63,24 @@ class HelpersTestCase(BaseTestCase):
                 raise FakeException()
             mocked.side_effect = exceptionify
 
-            with self.assertRaises(FakeException):
+            try:
                 paginate(self.query, 0)
+            except FakeException:
+                pass
+            else:
+                self.fail('paginate did not error out')
 
             try:
                 paginate(self.query, 0, error_out=False)
             except FakeException:
                 self.fail('paginate errored out')
 
-            with self.assertRaises(FakeException):
+            try:
                 paginate(self.query, 6)
+            except FakeException:
+                pass
+            else:
+                self.fail('paginate did not error out')
 
             try:
                 paginate(self.query, 6, error_out=False)

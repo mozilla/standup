@@ -1,5 +1,4 @@
-import json
-
+import simplejson as json
 from mock import patch
 from nose.tools import eq_
 from standup.apps.users.models import User
