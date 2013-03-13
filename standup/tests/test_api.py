@@ -13,9 +13,12 @@ class APITestCase(BaseTestCase):
         """Test creating the very first status for a project and user."""
         db = get_session(self.app)
 
+        with self.app.app_context():
+            u = user(username='r1cky', save=True)
+
         data = json.dumps({
             'api_key': self.app.config.get('API_KEY'),
-            'user': 'r1cky',
+            'user': u.username,
             'project': 'sumodev',
             'content': 'bug 123456'})
         response = self.client.post('/api/v1/status/', data=data,
@@ -29,6 +32,17 @@ class APITestCase(BaseTestCase):
         eq_(db.query(Project).first().slug, 'sumodev')
         # Verify the status was created.
         eq_(db.query(Status).first().content, 'bug 123456')
+
+    def test_create_status_no_user(self):
+        """Test attempting to create a status with no user."""
+        data = json.dumps({
+            'api_key': self.app.config.get('API_KEY'),
+            'user': 'r1cky',
+            'project': 'sumodev',
+            'content': 'bug 123456'})
+        response = self.client.post('/api/v1/status/', data=data,
+                                    content_type='application/json')
+        eq_(response.status_code, 400)
 
     def test_format_update(self):
         db = get_session(self.app)
@@ -90,9 +104,12 @@ class APITestCase(BaseTestCase):
         """Statuses can be created without a project"""
         db = get_session(self.app)
 
+        with self.app.app_context():
+            u = user(save=True)
+
         data = json.dumps({
             'api_key': self.app.config.get('API_KEY'),
-            'user': 'r1cky',
+            'user': u.username,
             'content': 'test update'})
         response = self.client.post('/api/v1/status/', data=data,
                                     content_type='application/json')
@@ -106,12 +123,13 @@ class APITestCase(BaseTestCase):
         db = get_session(self.app)
 
         with self.app.app_context():
-            s = status(save=True)
+            u = user(save=True)
+            s = status(user=u, save=True)
             sid = s.id
 
             data = json.dumps({
                 'api_key': self.app.config.get('API_KEY'),
-                'user': 'r1cky',
+                'user': u.username,
                 'content': 'reply to status',
                 'reply_to': sid})
             response = self.client.post('/api/v1/status/', data=data,
@@ -261,6 +279,7 @@ class APITestCase(BaseTestCase):
         uid = u.id
         aid = a.id
         username = u.username
+        adminname = a.username
 
         data = json.dumps({
             'api_key': self.app.config.get('API_KEY'),
@@ -282,7 +301,7 @@ class APITestCase(BaseTestCase):
             'api_key': self.app.config.get('API_KEY'),
             'user': username,
             'email': 'test@test.com'})
-        response = self.client.post('/api/v1/user/%s/' % aid, data=data,
+        response = self.client.post('/api/v1/user/%s/' % adminname, data=data,
                                     content_type='application/json')
         eq_(response.status_code, 403)
 

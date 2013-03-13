@@ -101,14 +101,10 @@ def create_status():
     else:
         replied = None
 
-    # Get or create the user
-    # TODO: People change their nicks sometimes, figure out what to do.
+    # Get the user
     user = db.query(User).filter_by(username=username).first()
     if not user:
-        user = User(username=username, name=username, slug=slugify(username),
-                    github_handle=username)
-        db.add(user)
-        db.commit()
+        return jsonify(dict(error='User does not exist.')), 400
 
     # Get or create the project (but not if this is a reply)
     if project_slug and not replied:
@@ -219,12 +215,10 @@ def update_user(username):
 
     author = db.query(User).filter_by(username=authorname).first()
 
-    user = db.query(User).filter_by(username=username)
+    user = db.query(User).filter_by(username=username).first()
 
-    if not user.count():
-        user = User(username=username, slug=slugify(username))
-    else:
-        user = user[0]
+    if not user or not author:
+        return jsonify(dict(error='User does not exist.')), 400
 
     if author.username != user.username and not author.is_admin:
         return jsonify(dict(error='You cannot modify this user.')), 403
