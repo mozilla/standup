@@ -23,14 +23,14 @@ def error(code, message, template):
 
 def forbidden(message=None):
     message = message or 'You shall not pass!'
-    return error(403, message, '403.html')
+    return error(403, message, 'errors/403.html')
 
 
 def page_not_found(message=None):
     message = message or 'Oops! The page you are looking for does not exist.'
-    return error(404, message, '404.html')
+    return error(404, message, 'errors/404.html')
 
 
 def something_broke(message=None):
     message = message or 'Oops! Stood up too fast and feeling woozy.'
-    return error(500, message, '500.html')
+    return error(500, message, 'errors/500.html')

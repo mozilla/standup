@@ -38,6 +38,13 @@ class BaseTestCase(unittest.TestCase):
         db.close()
 
 
+def login(client, user):
+    """Sets up session variables for login"""
+    with client.session_transaction() as sess:
+        sess['email'] = user.email
+        sess['user_id'] = user.id
+
+
 def with_save(func):
     """Decorate a model maker to add a `save` kwarg.
 

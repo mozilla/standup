@@ -111,6 +111,10 @@ footer {
   }
 }
 
+h1 {
+  font-size: 48px;
+}
+
 h2 {
   font-family: @OpenSansLight;
   font-size: 22px;
@@ -299,6 +303,23 @@ header {
   }
 }
 
+input[type='text'],
+.fake-input {
+  background: #fff;
+  border: 1px solid #ccc;
+  .box-shadow(0 0 0 2px #eee inset);
+  cursor: text;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  padding: 10px;
+
+  &.disabled {
+    background: #f5f5f5;
+    .box-shadow(0 0 0 2px #e5e5e5 inset);
+    color:  #666;
+  }
+}
+
 .box {
   background: #fff;
   .shadowed();
@@ -418,6 +439,13 @@ header {
     color: #c66;
   }
 
+  &.success {
+    background: rgba(0, 204, 0, 0.12);
+    border: rgba(0, 102, 0, 0.32);
+    .box-shadow(0 0 0 3px rgba(0, 153, 0, 0.06) inset);
+    color:  #090;
+  }
+
   &.warn {
     background: rgba(255, 204, 0, 0.16);
     border: 1px solid rgba(255, 153, 51, 0.3);
@@ -518,6 +546,16 @@ header {
 
         img {
           max-width: 430px;
+        }
+
+        > p {
+          &:first-of-type {
+            margin-top: 0;
+          }
+
+          &:last-of-type {
+            margin-bottom: 0;
+          }
         }
 
         .tags {

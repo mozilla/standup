@@ -100,3 +100,21 @@
     </div>
   {% endif %}
 {% endmacro %}
+
+{% macro statusize() %}
+  <div id="statusize">
+    <form action="{{ url_for('status.statusize') }}" method="POST">
+      {{ csrf()|safe }}
+      <div class="grid_4 alpha"></div>
+      <div class="grid_7 middle">
+        <textarea name="message" placeholder="What's your status?"></textarea>
+        <input type="hidden" name="redirect_to" value="{{ request.url }}" />
+        <input type="hidden" name="project" value="{{ project.id if project else '' }}" />
+      </div>
+      <div class="grid_1 omega">
+        <img class="gravatar" src="{{ current_user.email|gravatar_url(size=60) }}">
+        <input type="submit" class="btn" value="Post"/>
+      </div>
+    </form>
+  </div>
+{% endmacro %}

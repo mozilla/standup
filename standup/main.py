@@ -1,16 +1,19 @@
 from datetime import date, timedelta
 from types import FunctionType, ModuleType
 
-from flask import Flask, request, session
+from flask import Flask, redirect, request, session, url_for
 from flask.ext.funnel import Funnel
 from flask.ext.markdown import Markdown
-
+from flask.ext.seasurf import SeaSurf
 from standup.apps.status.models import Project
 from standup.apps.users.models import Team, User
 from standup.database import get_session
 from standup.errors import register_error_handlers
 from standup.filters import register_filters
 from standup.mdext import nixheaders
+
+
+csrf = SeaSurf()
 
 
 def _get_apps_full_names(apps):
@@ -41,14 +44,17 @@ def create_app(settings):
     app.installed_apps = _get_apps_full_names(settings.INSTALLED_APPS)
     app.secret_key = app.config.get('SESSION_SECRET')
 
-    #Markdown
+    # Markdown
     md = Markdown(app)
     # TODO: We might want to expose Markdown extensions to the config
     # file.
     md.register_extension(nixheaders.makeExtension)
 
-    #Flask-Funnel
+    # Flask-Funnel
     Funnel(app)
+
+    # SeaSurf
+    csrf.init_app(app)
 
     # Register error handlers
     register_error_handlers(app)
@@ -66,21 +72,45 @@ def create_app(settings):
     def inject_page():
         return dict(page=int(request.args.get('page', 1)))
 
-    @app.before_request
-    def bootstrap():
-        # Jinja global variables
+    @app.context_processor
+    def globals():
         db = get_session(app)
-        projects = db.query(Project).order_by(Project.name).all()
-        teams = db.query(Team).order_by(Team.name).all()
 
-        if session:
+        ctx = dict()
+
+        # Projects, teams and current user
+        ctx['projects'] = db.query(Project).order_by(Project.name)
+        ctx['teams'] = db.query(Team).order_by(Team.name)
+        if session and 'user_id' in session:
+            user = db.query(User).get(session['user_id'])
+            if user:
+                ctx['current_user'] = user
+
+        # Time stuff
+        ctx['today'] = date.today()
+        ctx['yesterday'] = date.today() - timedelta(1)
+
+        # CSRF
+        def csrf_field():
+            return ('<div style="display: none;">'
+                    '<input type="hidden" name="_csrf_token" value="%s">'
+                    '</div>' % csrf._get_token())
+        ctx['csrf'] = csrf_field
+
+        return ctx
+
+    @app.before_request
+    def validate_user():
+        db = get_session(app)
+
+        if session and 'email' in session and not 'user_id' in session:
             user = db.query(User).filter_by(email=session['email']).first()
-        else:
-            user = None
 
-        app.jinja_env.globals.update(projects=list(projects), teams=teams,
-                                     current_user=user, today=date.today(),
-                                     yesterday=date.today() - timedelta(1))
+            if not user:
+                if request.endpoint not in ('users.new_profile',
+                                            'users.authenticate',
+                                            'users.logout', 'static'):
+                    return redirect(url_for('users.new_profile'))
 
     @app.teardown_request
     def teardown_request(exception=None):

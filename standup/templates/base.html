@@ -6,6 +6,9 @@
   <meta name="description" content="Daily standup updates for your projects.">
   <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}" />
   {{ css('common') }}
+  {% for style in styles %}
+    {{ css(style) }}
+  {% endfor %}
   <link rel="alternate" type="application/atom+xml" href="{{ config.SITE_URL + url_for('status.index_feed') }}" title="{{ config.SITE_TITLE }} Feed" />
   {% block atom_feed %}{% endblock atom_feed %}
   <script src="https://login.persona.org/include.js"></script>
@@ -48,12 +51,14 @@
                 </ul>
               </li>
               <li>
-                {% if not session['email'] %}
+                {% if not 'user_id' in session %}
                   <a href="#" id="login">Sign in with Persona</a>
                 {% else %}
-                  <a href="#" id="user-menu"><img src="{{ session['email']|gravatar_url(size=22) }}" alt="{% if current_user %}{{ current_user.username }}{% else %}{{ session['email'] }}{% endif %}"></a>
+                  <a href="#" id="user-menu">
+                    <img src="{{ current_user.email|gravatar_url(size=22) }}" alt="">
+                  </a>
                   <ul>
-                    <li><a href="{{ url_for('status.profile') }}">Profile</a></li>
+                    <li><a href="{{ url_for('users.profile') }}">Profile</a></li>
                     <li><a href="#" id="logout">Sign out</a></li>
                   </ul>
                 {% endif %}
@@ -66,27 +71,20 @@
 
     <div id="main-content" class="container_12 cf">
       <div id="main-notices" class="grid_12">
-        {% block notices %}{% endblock %}
+        {% with notices = get_flashed_messages(with_categories=True) %}
+          {% if notices %}
+            {% for category, notice in notices %}
+              <div class="notice {{ category }}">{{ notice }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        {% block notices %}
+
+        {% endblock %}
       </div>
-
-      {% if session['email'] %}
-        <div id="statusize">
-          <form action="{{ url_for('status.statusize') }}" method="POST">
-            <div class="grid_4 alpha"></div>
-            <div class="grid_7 middle">
-              <textarea name="message" placeholder="What's your status?"></textarea>
-              <input type="hidden" name="redirect_to" value="{{ request.url }}" />
-              <input type="hidden" name="project" value="{{ project.id if project else '' }}" />
-            </div>
-            <div class="grid_1 omega">
-              <img class="gravatar" src="{{ session['email']|gravatar_url(size=60) }}">
-              <input type="submit" class="btn" value="Post"/>
-            </div>
-          </form>
-        </div>
-      {% endif %}
-
+      {% block before_content %}{% endblock %}
       {% block content %}{% endblock %}
+      {% block after_content %}{% endblock %}
     </div>
 
     <footer>

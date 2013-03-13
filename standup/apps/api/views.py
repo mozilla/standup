@@ -1,6 +1,6 @@
 from flask import Blueprint, current_app, request
 from sqlalchemy import desc
-from standup import OrderedDict
+from standup import csrf, OrderedDict
 from standup.apps.api.decorators import api_key_required
 from standup.apps.status.models import Project, Status
 from standup.apps.users.models import User
@@ -56,6 +56,7 @@ def get_statuses():
 
 
 @blueprint.route('/status/', methods=['POST'])
+@csrf.exempt
 @api_key_required
 def create_status():
     """Post a new status.
@@ -132,6 +133,7 @@ def create_status():
 
 
 @blueprint.route('/status/<id>/', methods=['DELETE'])
+@csrf.exempt
 @api_key_required
 def delete_status(id):
     """Delete an existing status
@@ -174,6 +176,7 @@ def delete_status(id):
 
 
 @blueprint.route('/user/<username>/', methods=['POST'])
+@csrf.exempt
 @api_key_required
 def update_user(username):
     """Update settings for an existing user.

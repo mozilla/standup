@@ -51,7 +51,7 @@ def index():
     db = get_session(current_app)
 
     return render_template(
-        'index.html',
+        'status/index.html',
         statuses=paginate(
             db.query(Status).filter_by(reply_to=None).order_by(
                 desc(Status.created)),
@@ -80,7 +80,7 @@ def user(slug):
     if not user:
         return page_not_found('User not found.')
     return render_template(
-        'user.html',
+        'status/user.html',
         user=user,
         statuses=user.recent_statuses(
             request.args.get('page', 1),
@@ -113,7 +113,7 @@ def project(slug):
         return page_not_found('Project not found.')
 
     return render_template(
-        'project.html',
+        'status/project.html',
         project=project,
         projects=db.query(Project).order_by(Project.name).filter(
             Project.statuses.any()),
@@ -148,7 +148,7 @@ def team(slug):
         return page_not_found('Team not found.')
 
     return render_template(
-        'team.html',
+        'status/team.html',
         team=team,
         users=team.users,
         teams=db.query(Team).order_by(Team.name).all(),
@@ -186,7 +186,7 @@ def status(id):
     status = statuses[0]
 
     return render_template(
-        'status.html',
+        'status/status.html',
         user=status.user,
         statuses=paginate(statuses),
         replies=status.replies(request.args.get('page', 1))
@@ -198,14 +198,11 @@ def statusize():
     """Posts a status from the web."""
     db = get_session(current_app)
 
-    email = session.get('email')
-    if not email:
+    user_id = session.get('user_id')
+    if not user_id:
         return forbidden('You must be logged in to statusize!')
 
-    user = db.query(User).filter(User.email == email).first()
-
-    if not user:
-        return forbidden('You must have a user account to statusize!')
+    user = db.query(User).get(user_id)
 
     message = request.form.get('message', '')
 
@@ -229,23 +226,3 @@ def statusize():
     referer = request.headers.get('referer', url_for('status.index'))
     redirect_url = request.form.get('redirect_to', referer)
     return redirect(redirect_url)
-
-
-@blueprint.route('/profile/', methods=['GET'])
-def profile():
-    """Shows the user's profile page."""
-    db = get_session(current_app)
-
-    email = session.get('email')
-    if not email:
-        return forbidden('You must be logged in to see a profile!')
-
-    user = db.query(User).filter(User.email == email).first()
-
-    if not user:
-        return forbidden('You must have a user account to see your profile!')
-
-    return render_template(
-        'profile.html',
-        user=user,
-        statuses=user.recent_statuses())

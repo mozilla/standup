@@ -2,6 +2,9 @@ CSS_BUNDLES = {
     'common': (
         'css/normalize.css',
         'less/style.less',
+    ),
+    'profile': (
+        'less/profile.less',
     )
 }
 

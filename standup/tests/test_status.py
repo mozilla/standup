@@ -2,10 +2,10 @@ from datetime import date, datetime, timedelta
 
 from nose.tools import eq_
 from standup.apps.status.helpers import enddate, paginate, startdate
-from standup.apps.status.models import Project, Status
+from standup.apps.status.models import Status
 from standup.database import get_session
-from standup.tests import (BaseTestCase, create_request, project, status, team,
-                           user)
+from standup.tests import (BaseTestCase, create_request, login, project,
+                           status, team, user)
 
 
 class HelpersTestCase(BaseTestCase):
@@ -213,8 +213,7 @@ class ViewsTestCase(BaseTestCase):
                 status(user=u, project=p, content='foo', content_html='foo',
                        save=True)
 
-        with self.client.session_transaction() as sess:
-            sess['email'] = 'joe@example.com'
+        login(self.client, u)
 
         site_url = self.app.config.get('SITE_URL')
 
@@ -270,8 +269,7 @@ class ViewsTestCase(BaseTestCase):
             team(name='Scooby Gang', slug='scoobies', users=[u], save=True)
             project(name='Kill The Master', slug='master', save=True)
 
-        with self.client.session_transaction() as sess:
-            sess['email'] = 'joe@example.com'
+        login(self.client, u)
 
         site_url = self.app.config.get('SITE_URL')
 
@@ -304,32 +302,20 @@ class StatusizerTestCase(BaseTestCase):
     def test_status(self):
         """Test posting a status."""
         with self.app.app_context():
-            user(email='joe@example.com', save=True)
+            u = user(email='joe@example.com', save=True)
 
-        with self.client.session_transaction() as sess:
-            sess['email'] = 'joe@example.com'
+        login(self.client, u)
 
         rv = self.client.post('/statusize/', data={'message': 'foo'},
                               follow_redirects=True)
         eq_(rv.status_code, 200)
 
-    def test_status_no_user(self):
-        """Test posting a status with a non existant user"""
-        with self.client.session_transaction() as sess:
-            sess['email'] = 'joe@example.com'
-
-        rv = self.client.post('/statusize/',
-                              data={'message': 'foo'},
-                              follow_redirects=True)
-        eq_(rv.status_code, 403)
-
     def test_status_no_message(self):
         """Test posting a status with no message."""
         with self.app.app_context():
-            user(email='joe@example.com', save=True)
+            u = user(email='joe@example.com', save=True)
 
-        with self.client.session_transaction() as sess:
-            sess['email'] = 'joe@example.com'
+        login(self.client, u)
 
         rv = self.client.post('/statusize/', data={'message': ''},
                               follow_redirects=True)
@@ -338,46 +324,13 @@ class StatusizerTestCase(BaseTestCase):
 
     def test_status_with_project(self):
         """Test posting a status with a project."""
-        db = get_session(self.app)
-
         with self.app.app_context():
-            user(email='joe@example.com', save=True)
+            u = user(email='joe@example.com', save=True)
+            p = project(name='blackhole', slug='blackhole', save=True)
+            data = {'message': 'r1cky rocks!', 'project': p.id}
 
-        p = Project(name='blackhole', slug='blackhole')
-        db.add(p)
-        db.commit()
-        pid = p.id
+        login(self.client, u)
 
-        with self.client.session_transaction() as sess:
-            sess['email'] = 'joe@example.com'
-
-        rv = self.client.post('/statusize/',
-                              data={'message': 'r1cky rocks!', 'project': pid},
-                              follow_redirects=True)
+        rv = self.client.post('/statusize/', follow_redirects=True,
+                              data=data)
         eq_(rv.status_code, 200)
-
-
-class ProfileTestCase(BaseTestCase):
-    def test_profile_unauthenticated(self):
-        """Test that you can't see profile page if you're not logged in."""
-        rv = self.client.get('/profile/')
-        eq_(rv.status_code, 403)
-
-    def test_profile_authenticationified(self):
-        """Test that you can see profile page if you are logged in."""
-        with self.app.app_context():
-            user(email='joe@example.com', save=True)
-
-        with self.client.session_transaction() as sess:
-            sess['email'] = 'joe@example.com'
-
-        rv = self.client.get('/profile/')
-        eq_(rv.status_code, 200)
-
-    def test_profile_invalid_user(self):
-        """Test that you can't see a profile page if you are not a user yet"""
-        with self.client.session_transaction() as sess:
-            sess['email'] = 'joe@example.com'
-
-        rv = self.client.get('/profile/')
-        eq_(rv.status_code, 403)

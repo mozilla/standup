@@ -12,7 +12,7 @@ def slugify(text, delim=u'-'):
     """Generates an ASCII-only slug."""
     result = []
     for word in _PUNCT_RE.split(text.lower()):
-        result.extend(unidecode(word).split())
+        result.extend(unidecode(unicode(word)).split())
     return unicode(delim.join(result))
 
 

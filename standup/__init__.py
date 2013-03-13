@@ -3,5 +3,7 @@ try:
 except ImportError:
     from ordereddict import OrderedDict
 
+from standup.main import csrf
 
-__all__ = ['OrderedDict']
+
+__all__ = ['OrderedDict', 'csrf']
