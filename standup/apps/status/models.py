@@ -30,7 +30,8 @@ class Project(Model):
             .order_by(desc(Status.created))
         return paginate(statuses, page, startdate, enddate)
 
-    def export(self):
+    def dictify(self):
+        """Returns an OrderedDict of model attributes"""
         data = OrderedDict()
         data['id'] = self.id
         data['name'] = self.name
@@ -70,7 +71,8 @@ class Status(Model):
         db = get_session(current_app)
         return db.query(Status).filter(Status.reply_to_id == self.id).count()
 
-    def export(self, trim_user=False, trim_project=False):
+    def dictify(self, trim_user=False, trim_project=False):
+        """Returns an OrderedDict of model attributes"""
         if self.reply_to:
             reply_to_user_id = self.reply_to.user.id
             reply_to_username = self.reply_to.user.username
@@ -85,14 +87,14 @@ class Status(Model):
             if trim_user:
                 data['user'] = self.user.id
             else:
-                data['user'] = self.user.export()
+                data['user'] = self.user.dictify()
         else:
             data['user'] = None
         if self.project:
             if trim_project:
                 data['project'] = self.project.id
             else:
-                data['project'] = self.project.export()
+                data['project'] = self.project.dictify()
         else:
             data['project'] = None
         data['content'] = format_update(self.content_html)

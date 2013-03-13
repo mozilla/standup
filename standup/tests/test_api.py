@@ -277,7 +277,6 @@ class APITestCase(BaseTestCase):
                      is_admin=True, save=True)
 
         uid = u.id
-        aid = a.id
         username = u.username
         adminname = a.username
 
@@ -338,6 +337,19 @@ class APITestCase(BaseTestCase):
             '/api/v1/user/%s/' % u.id, data=data,
             content_type='application/json')
         eq_(response.status_code, 403)
+
+    def test_update_user_does_not_exist(self):
+        """Trying to update a user that does not exist should return 400."""
+        with self.app.app_context():
+            u = user(save=True)
+
+        data = json.dumps({
+            'api_key': self.app.config.get('API_KEY'),
+            'user': u.username,
+            'email': 'test@test.com'})
+        response = self.client.post('/api/v1/user/not-a-user/', data=data,
+                                    content_type='application/json')
+        eq_(response.status_code, 400)
 
     def test_get_statuses(self):
         """Test getting statuses from API"""

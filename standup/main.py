@@ -81,6 +81,7 @@ def create_app(settings):
         # Projects, teams and current user
         ctx['projects'] = db.query(Project).order_by(Project.name)
         ctx['teams'] = db.query(Team).order_by(Team.name)
+        ctx['current_user'] = None
         if session and 'user_id' in session:
             user = db.query(User).get(session['user_id'])
             if user:
@@ -109,7 +110,8 @@ def create_app(settings):
             if not user:
                 if request.endpoint not in ('users.new_profile',
                                             'users.authenticate',
-                                            'users.logout', 'static'):
+                                            'users.logout',
+                                            'static'):
                     return redirect(url_for('users.new_profile'))
 
     @app.teardown_request

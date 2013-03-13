@@ -54,10 +54,10 @@ def profile():
 
     user = db.query(User).get(user_id)
 
-    data = MultiDict(user.export())
-
     if request.method == 'POST':
         data = request.form
+    else:
+        data = MultiDict(user.dictify())
 
     form = ProfileForm(data)
 
@@ -76,9 +76,8 @@ def profile():
 @blueprint.route('/profile/new/', methods=['GET', 'POST'])
 def new_profile():
     """Create a new user profile"""
-    if ((not session and not request.method == 'POST')
-        or ('email' not in session and 'email' not in request.form)
-            or 'user_id' in session):
+    if (not (session or request.method == 'POST') or 'user_id' in session
+            or not ('email' in session or 'email' in request.form)):
         return redirect(url_for('status.index'))
 
     data = MultiDict()

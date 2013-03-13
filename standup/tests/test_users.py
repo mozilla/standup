@@ -3,7 +3,7 @@ from mock import patch
 from nose.tools import eq_
 from standup.apps.users.models import User
 from standup.database import get_session
-from standup.tests import BaseTestCase, login, status, team, user
+from standup.tests import authenticate, BaseTestCase, status, team, user
 
 
 class ModelsTestCase(BaseTestCase):
@@ -88,7 +88,7 @@ class ViewsTestCase(BaseTestCase):
         with self.app.app_context():
             u = user(save=True)
 
-        login(self.client, u)
+        authenticate(self.client, u)
 
         response = self.client.post('/logout')
         eq_(response.status_code, 200)
@@ -121,7 +121,7 @@ class ViewsTestCase(BaseTestCase):
         with self.app.app_context():
             u = user(save=True)
 
-        login(self.client, u)
+        authenticate(self.client, u)
 
         response = self.client.get('/profile/new/')
         eq_(response.status_code, 302)
@@ -188,7 +188,7 @@ class ProfileTestCase(BaseTestCase):
         with self.app.app_context():
             u = user(email='joe@example.com', save=True)
 
-        login(self.client, u)
+        authenticate(self.client, u)
 
         response = self.client.get('/profile/')
         eq_(response.status_code, 200)
@@ -198,7 +198,7 @@ class ProfileTestCase(BaseTestCase):
         with self.app.app_context():
             u = user(save=True)
 
-        login(self.client, u)
+        authenticate(self.client, u)
 
         data = {'email': u.email, 'username': 'new-username',
                 'github_handle': 'test-handle', 'name': 'Test User'}

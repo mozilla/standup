@@ -38,7 +38,7 @@ class BaseTestCase(unittest.TestCase):
         db.close()
 
 
-def login(client, user):
+def authenticate(client, user):
     """Sets up session variables for login"""
     with client.session_transaction() as sess:
         sess['email'] = user.email

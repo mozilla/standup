@@ -1,10 +1,9 @@
 from flask import Blueprint, current_app, request
 from sqlalchemy import desc
-from standup.apps.api2.helpers import numerify
 from standup.apps.status.models import Status
 from standup.database import get_session
 from standup.errors import api_error
-from standup.utils import jsonify, truthify
+from standup.utils import jsonify, numerify, truthify
 
 
 blueprint = Blueprint('api_v2', __name__, url_prefix='/api/v2')
@@ -66,7 +65,7 @@ def home_timeline():
 
     data = []
     for status in statuses:
-        data.append(status.export(trim_user=trim_user,
-                                  trim_project=trim_project))
+        data.append(status.dictify(trim_user=trim_user,
+                                   trim_project=trim_project))
 
     return jsonify(data)

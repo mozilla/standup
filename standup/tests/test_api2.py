@@ -1,43 +1,8 @@
-import unittest
-
 import simplejson as json
 from flask import render_template_string
 from nose.tools import eq_
 from standup.apps.api2.decorators import api_key_required
-from standup.apps.api2.helpers import numerify
 from standup.tests import BaseTestCase, project, status, user
-
-
-class HelpersTestCase(unittest.TestCase):
-    def test_numerify(self):
-        """Test the `numerify` helper function"""
-        # Test numeric string
-        eq_(numerify('1'), 1)
-
-        # Test numerifying None with default
-        eq_(numerify(None, 1), 1)
-
-        # Test below limit
-        eq_(numerify('25', min=50), 50)
-
-        # Test within limit
-        eq_(numerify('50', min=25, max=75), 50)
-
-        # Test upper limit
-        eq_(numerify('75', max=50), 50)
-
-        # Throws a type error when a invalid type is provided with no default
-        try:
-            numerify(None)
-        except TypeError:
-            assert True
-
-        # Throws a value error when an invalid value is provided with no
-        # default
-        try:
-            numerify('a')
-        except ValueError:
-            assert True
 
 
 class DecoratorsTestCase(BaseTestCase):
@@ -172,7 +137,7 @@ class TimelinesTestCase(BaseTestCase):
 
         response = self.client.get('/api/v2/statuses/home_timeline.json')
         data = json.loads(response.data)
-        eq_(data[0]['user'], u.export())
+        eq_(data[0]['user'], u.dictify())
 
         response = self.client.get('/api/v2/statuses/home_timeline.json'
                                    '?trim_user=1')
@@ -187,7 +152,7 @@ class TimelinesTestCase(BaseTestCase):
 
         response = self.client.get('/api/v2/statuses/home_timeline.json')
         data = json.loads(response.data)
-        eq_(data[0]['project'], p.export())
+        eq_(data[0]['project'], p.dictify())
 
         response = self.client.get('/api/v2/statuses/home_timeline.json'
                                    '?trim_project=1')

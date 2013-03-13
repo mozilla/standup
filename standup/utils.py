@@ -33,9 +33,21 @@ def jsonify(obj):
     return Response(dump, mimetype='application/json')
 
 
-def truthify(string):
+def truthify(s):
     """Returns a boolean from a string"""
     try:
-        return str(string).lower() in ['true', 't', '1']
+        return str(s).lower() in ['true', 't', '1']
     except (TypeError, ValueError, UnicodeEncodeError):
         return False
+
+
+def numerify(s, default=None, lower=None, upper=None):
+    """Converts a string to an integer"""
+    if s is None:
+        s = default
+    num = int(s)
+    if lower is not None and num < lower:
+        num = lower
+    if upper is not None and num > upper:
+        num = upper
+    return num

@@ -59,7 +59,8 @@ class User(Model):
             .order_by(desc(Status.created))
         return paginate(statuses, page, startdate, enddate)
 
-    def export(self):
+    def dictify(self):
+        """Returns an OrderedDict of model attributes"""
         data = OrderedDict()
         data['id'] = self.id
         data['username'] = self.username

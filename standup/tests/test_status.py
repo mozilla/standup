@@ -4,7 +4,7 @@ from nose.tools import eq_
 from standup.apps.status.helpers import enddate, paginate, startdate
 from standup.apps.status.models import Status
 from standup.database import get_session
-from standup.tests import (BaseTestCase, create_request, login, project,
+from standup.tests import (authenticate, BaseTestCase, create_request, project,
                            status, team, user)
 
 
@@ -213,7 +213,7 @@ class ViewsTestCase(BaseTestCase):
                 status(user=u, project=p, content='foo', content_html='foo',
                        save=True)
 
-        login(self.client, u)
+        authenticate(self.client, u)
 
         site_url = self.app.config.get('SITE_URL')
 
@@ -269,7 +269,7 @@ class ViewsTestCase(BaseTestCase):
             team(name='Scooby Gang', slug='scoobies', users=[u], save=True)
             project(name='Kill The Master', slug='master', save=True)
 
-        login(self.client, u)
+        authenticate(self.client, u)
 
         site_url = self.app.config.get('SITE_URL')
 
@@ -304,7 +304,7 @@ class StatusizerTestCase(BaseTestCase):
         with self.app.app_context():
             u = user(email='joe@example.com', save=True)
 
-        login(self.client, u)
+        authenticate(self.client, u)
 
         rv = self.client.post('/statusize/', data={'message': 'foo'},
                               follow_redirects=True)
@@ -315,7 +315,7 @@ class StatusizerTestCase(BaseTestCase):
         with self.app.app_context():
             u = user(email='joe@example.com', save=True)
 
-        login(self.client, u)
+        authenticate(self.client, u)
 
         rv = self.client.post('/statusize/', data={'message': ''},
                               follow_redirects=True)
@@ -329,7 +329,7 @@ class StatusizerTestCase(BaseTestCase):
             p = project(name='blackhole', slug='blackhole', save=True)
             data = {'message': 'r1cky rocks!', 'project': p.id}
 
-        login(self.client, u)
+        authenticate(self.client, u)
 
         rv = self.client.post('/statusize/', follow_redirects=True,
                               data=data)

@@ -33,7 +33,6 @@ To set up a local dev environment for hacking:
 
 3. Install required dependencies::
 
-    $ pip install -r requirements.txt
     $ pip install -r requirements-dev.txt
 
 4. Configure::
