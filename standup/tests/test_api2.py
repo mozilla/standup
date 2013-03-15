@@ -198,12 +198,10 @@ class UserTimelinesTestCase(BaseTestCase, TimelinesMixin):
         eq_(response.status_code, 404)
 
     def test_timeline_filters_user(self):
-        """Test the timeilne only shows the passed in user."""
+        """Test the timeline only shows the passed in user."""
         with self.app.app_context():
             u = user(save=True)
             status(user=u, project=None, save=True)
-
-        with self.app.app_context():
             u2 = user(username='janedoe', email='jane@doe.com',
                       slug='janedoe', save=True)
             status(user=u2, project=None, save=True)
@@ -212,3 +210,10 @@ class UserTimelinesTestCase(BaseTestCase, TimelinesMixin):
         data = json.loads(response.data)
         eq_(len(data), 1)
         eq_(data[0]['user'], u.dictify())
+
+    def test_timeline_filter_by_user_id(self):
+        with self.app.app_context():
+            u = user(save=True)
+        self.query = {'user_id': u.id}
+        response = self.client.get(self._url())
+        eq_(response.status_code, 200)

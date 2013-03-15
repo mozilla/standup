@@ -12,15 +12,11 @@ from standup.main import create_app
 from werkzeug.test import create_environ
 
 
-testing_app = create_app(test_settings)
-testing_app.config['TESTING'] = True
-
-
 class BaseTestCase(unittest.TestCase):
 
     def setUp(self):
         super(BaseTestCase, self).setUp()
-        self.app = testing_app
+        self.app = create_app(test_settings)
         self.client = self.app.test_client()
         for app in self.app.installed_apps:
             try:
