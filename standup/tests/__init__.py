@@ -17,12 +17,10 @@ testing_app.config['TESTING'] = True
 
 
 class BaseTestCase(unittest.TestCase):
-    def __init__(self, *args, **kwargs):
-        super(BaseTestCase, self).__init__(*args, **kwargs)
-        self.app = testing_app
 
     def setUp(self):
         super(BaseTestCase, self).setUp()
+        self.app = testing_app
         self.client = self.app.test_client()
         for app in self.app.installed_apps:
             try:

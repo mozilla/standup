@@ -4,8 +4,8 @@ from standup.tests import BaseTestCase
 
 
 class ErrorsTestCase(BaseTestCase):
-    def __init__(self, *args, **kwargs):
-        super(ErrorsTestCase, self).__init__(*args, **kwargs)
+    def setUp(self):
+        super(ErrorsTestCase, self).setUp()
 
         @self.app.route('/oh/no/500')
         def oh_no_500():

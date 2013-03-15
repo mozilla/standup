@@ -34,3 +34,7 @@ def page_not_found(message=None):
 def something_broke(message=None):
     message = message or 'Oops! Stood up too fast and feeling woozy.'
     return error(500, message, 'errors/500.html')
+
+
+class ApiError(Exception):
+    pass
