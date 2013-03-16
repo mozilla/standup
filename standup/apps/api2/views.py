@@ -1,7 +1,7 @@
 from flask import Blueprint, current_app, request
 from sqlalchemy import desc
 from sqlalchemy.orm.exc import NoResultFound
-from standup.apps.status.models import Status
+from standup.apps.status.models import Project, Status
 from standup.apps.users.models import User
 from standup.database import get_session
 from standup.errors import ApiError, api_error
@@ -122,6 +122,49 @@ def user_timeline():
 
     try:
         statuses = db.query(Status).filter_by(user=user)
+        statuses = _handle_since(statuses, params)
+        statuses = _handle_max(statuses, params)
+        statuses = _handle_include_replies(statuses, params)
+        statuses = _handle_count(statuses, MAX, params)
+    except ApiError, e:
+        return api_error(400, str(e))
+
+    data = []
+    for status in statuses:
+        data.append(status.dictify(trim_user=params['trim_user'],
+                                   trim_project=params['trim_project']))
+
+    return jsonify(data)
+
+
+@blueprint.route('/statuses/project_timeline.json', methods=['GET'])
+def project_timeline():
+    """Get a collection of the project's recent status updates."""
+    app = current_app
+    db = get_session(app)
+    MAX = app.config.get('API2_TIMELINE_MAX_RESULTS', TIMELINE_MAX_RESULTS)
+
+    try:
+        params = _get_params(request)
+    except ApiError, e:
+        return api_error(400, str(e))
+
+    project_id = request.args.get('project_id')
+    slug = request.args.get('slug')
+
+    try:
+        if slug:
+            project = db.query(Project).filter_by(slug=slug).one()
+        elif project_id:
+            project = db.query(Project).filter_by(id=project_id).one()
+        else:
+            return api_error(400, 'The `project_id` or `slug` parameter must '
+                                  'be provided.')
+    except NoResultFound:
+        return api_error(404, 'Project not found.')
+
+    try:
+        statuses = db.query(Status).filter_by(project=project)
         statuses = _handle_since(statuses, params)
         statuses = _handle_max(statuses, params)
         statuses = _handle_include_replies(statuses, params)

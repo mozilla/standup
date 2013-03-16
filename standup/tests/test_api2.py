@@ -46,7 +46,8 @@ class TimelinesMixin(object):
         """Test the home_timeline endpoint"""
         with self.app.app_context():
             u = user(save=True)
-            status(user=u, project=None, save=True)
+            p = project(save=True)
+            status(user=u, project=p, save=True)
         response = self.client.get(self._url())
         eq_(response.status_code, 200)
         eq_(response.content_type, 'application/json')
@@ -56,8 +57,9 @@ class TimelinesMixin(object):
         self.app.config['API2_TIMELINE_MAX_RESULTS'] = 50
         with self.app.app_context():
             u = user(save=True)
+            p = project(save=True)
             for i in range(60):
-                status(project=None, user=u, save=True)
+                status(project=p, user=u, save=True)
 
         response = self.client.get(self._url())
         data = json.loads(response.data)
@@ -84,8 +86,9 @@ class TimelinesMixin(object):
         """Test the since_id parameter of home_timeline"""
         with self.app.app_context():
             u = user(save=True)
+            p = project(save=True)
             for i in range(30):
-                status(project=None, user=u, save=True)
+                status(project=p, user=u, save=True)
 
         response = self.client.get(self._url(dict(since_id=10, count=20)))
         data = json.loads(response.data)
@@ -110,8 +113,9 @@ class TimelinesMixin(object):
         """Test the max_id parameter of home_timeline"""
         with self.app.app_context():
             u = user(save=True)
+            p = project(save=True)
             for i in range(30):
-                status(project=None, user=u, save=True)
+                status(project=p, user=u, save=True)
 
         response = self.client.get(self._url(dict(max_id=10, count=20)))
         data = json.loads(response.data)
@@ -132,7 +136,8 @@ class TimelinesMixin(object):
         """Test the trim_user parameter of home_timeline"""
         with self.app.app_context():
             u = user(save=True)
-            status(user=u, project=None, save=True)
+            p = project(save=True)
+            status(user=u, project=p, save=True)
 
         response = self.client.get(self._url())
         data = json.loads(response.data)
@@ -160,10 +165,11 @@ class TimelinesMixin(object):
         """Test the include_replies parameter of home_timeline"""
         with self.app.app_context():
             u = user(save=True)
+            p = project(save=True)
             for i in range(10):
-                s = status(project=None, user=u, save=True)
+                s = status(project=p, user=u, save=True)
             for i in range(10):
-                status(project=None, user=u, reply_to=s, save=True)
+                status(project=p, user=u, reply_to=s, save=True)
 
         response = self.client.get(self._url())
         data = json.loads(response.data)
@@ -215,5 +221,44 @@ class UserTimelinesTestCase(BaseTestCase, TimelinesMixin):
         with self.app.app_context():
             u = user(save=True)
         self.query = {'user_id': u.id}
+        response = self.client.get(self._url())
+        eq_(response.status_code, 200)
+
+
+class ProjectTimelinesTestCase(BaseTestCase, TimelinesMixin):
+    def setUp(self):
+        super(ProjectTimelinesTestCase, self).setUp()
+        self.url = '/api/v2/statuses/project_timeline.json'
+        self.query = {'slug': 'test-project'}
+
+    def test_no_project_query(self):
+        self.query = {}
+        response = self.client.get(self._url())
+        eq_(response.status_code, 400)
+
+    def test_project_404(self):
+        self.query = {'slug': 'xxx'}
+        response = self.client.get(self._url())
+        eq_(response.status_code, 404)
+
+    def test_timeline_filters_project(self):
+        """Test the timeline only shows the passed in project."""
+        with self.app.app_context():
+            u = user(save=True)
+            p = project(save=True)
+            status(user=u, project=p, save=True)
+            p2 = project(name='Test Project 2', slug='test-project-2',
+                         save=True)
+            status(user=u, project=p2, save=True)
+
+        response = self.client.get(self._url())
+        data = json.loads(response.data)
+        eq_(len(data), 1)
+        eq_(data[0]['project'], p.dictify())
+
+    def test_timeline_filter_by_project_id(self):
+        with self.app.app_context():
+            p = project(save=True)
+        self.query = {'project_id': p.id}
         response = self.client.get(self._url())
         eq_(response.status_code, 200)
