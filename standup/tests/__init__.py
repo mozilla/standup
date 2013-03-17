@@ -71,13 +71,20 @@ def project(**kwargs):
 @with_save
 def user(**kwargs):
     """Model maker for User"""
+    team_kw = kwargs.pop('team', None)
     defaults = dict(username='jdoe',
                     name='John Doe',
                     email='john@doe.com',
                     slug='jdoe')
     defaults.update(kwargs)
 
-    return User(**defaults)
+    user = User(**defaults)
+
+    if team_kw is not None:
+        t = team(**team_kw)
+        user.teams.append(t)
+
+    return user
 
 
 @with_save

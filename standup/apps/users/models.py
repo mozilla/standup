@@ -30,7 +30,13 @@ class Team(Model):
         """Return all statuses from this team."""
         db = get_session(current_app)
         user_ids = [u.id for u in self.users]
-        return db.query(Status).filter(Status.user_id.in_(user_ids))
+        if user_ids:
+            return db.query(Status).filter(Status.user_id.in_(user_ids))
+        else:
+            # There are no users in this team but SQLAlchemy doesn't like
+            # in_([]) queries so we short circuit with `0=1`. This also allows
+            # other calls to be chained onto the query.
+            return db.query(Status).filter('0=1')
 
 
 class User(Model):

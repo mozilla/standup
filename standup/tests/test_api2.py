@@ -2,7 +2,7 @@ import simplejson as json
 from flask import render_template_string
 from nose.tools import eq_
 from standup.apps.api2.decorators import api_key_required
-from standup.tests import BaseTestCase, project, status, user
+from standup.tests import BaseTestCase, project, status, team, user
 from urllib import urlencode
 
 
@@ -45,7 +45,7 @@ class TimelinesMixin(object):
     def test_timeline(self):
         """Test the home_timeline endpoint"""
         with self.app.app_context():
-            u = user(save=True)
+            u = user(save=True, team={})
             p = project(save=True)
             status(user=u, project=p, save=True)
         response = self.client.get(self._url())
@@ -56,7 +56,7 @@ class TimelinesMixin(object):
         """Test the count parameter of home_timeline"""
         self.app.config['API2_TIMELINE_MAX_RESULTS'] = 50
         with self.app.app_context():
-            u = user(save=True)
+            u = user(save=True, team={})
             p = project(save=True)
             for i in range(60):
                 status(project=p, user=u, save=True)
@@ -85,7 +85,7 @@ class TimelinesMixin(object):
     def test_timeline_since_id(self):
         """Test the since_id parameter of home_timeline"""
         with self.app.app_context():
-            u = user(save=True)
+            u = user(save=True, team={})
             p = project(save=True)
             for i in range(30):
                 status(project=p, user=u, save=True)
@@ -112,7 +112,7 @@ class TimelinesMixin(object):
     def test_timeline_max_id(self):
         """Test the max_id parameter of home_timeline"""
         with self.app.app_context():
-            u = user(save=True)
+            u = user(save=True, team={})
             p = project(save=True)
             for i in range(30):
                 status(project=p, user=u, save=True)
@@ -135,7 +135,7 @@ class TimelinesMixin(object):
     def test_timeline_trim_user(self):
         """Test the trim_user parameter of home_timeline"""
         with self.app.app_context():
-            u = user(save=True)
+            u = user(save=True, team={})
             p = project(save=True)
             status(user=u, project=p, save=True)
 
@@ -150,8 +150,9 @@ class TimelinesMixin(object):
     def test_timeline_trim_project(self):
         """Test the trim_project parameter of home_timeline"""
         with self.app.app_context():
+            u = user(save=True, team={})
             p = project(save=True)
-            status(project=p, save=True)
+            status(user=u, project=p, save=True)
 
         response = self.client.get(self._url())
         data = json.loads(response.data)
@@ -164,7 +165,7 @@ class TimelinesMixin(object):
     def test_timeline_include_replies(self):
         """Test the include_replies parameter of home_timeline"""
         with self.app.app_context():
-            u = user(save=True)
+            u = user(save=True, team={})
             p = project(save=True)
             for i in range(10):
                 s = status(project=p, user=u, save=True)
@@ -260,5 +261,45 @@ class ProjectTimelinesTestCase(BaseTestCase, TimelinesMixin):
         with self.app.app_context():
             p = project(save=True)
         self.query = {'project_id': p.id}
+        response = self.client.get(self._url())
+        eq_(response.status_code, 200)
+
+
+class TeamTimelinesTestCase(BaseTestCase, TimelinesMixin):
+    def setUp(self):
+        super(TeamTimelinesTestCase, self).setUp()
+        self.url = '/api/v2/statuses/team_timeline.json'
+        self.query = {'slug': 'test-team'}
+
+    def test_no_team_query(self):
+        self.query = {}
+        response = self.client.get(self._url())
+        eq_(response.status_code, 400)
+
+    def test_team_404(self):
+        self.query = {'slug': 'xxx'}
+        response = self.client.get(self._url())
+        eq_(response.status_code, 404)
+
+    def test_timeline_filters_team(self):
+        """Test the timeline only shows the passed in team."""
+        with self.app.app_context():
+            u = user(save=True, team={})
+            u2 = user(username='janedoe', email='jane@doe.com',
+                      slug='janedoe', save=True, team={'name': 'XXX',
+                                                       'slug': 'xxx'})
+            p = project(save=True)
+            status(user=u, project=p, save=True)
+            status(user=u2, project=p, save=True)
+
+        response = self.client.get(self._url(dict(team_id=u.teams[0].id)))
+        data = json.loads(response.data)
+        eq_(len(data), 1)
+        eq_(data[0]['user'], u.dictify())
+
+    def test_timeline_filter_by_team_id(self):
+        with self.app.app_context():
+            t = team(save=True)
+        self.query = {'team_id': t.id}
         response = self.client.get(self._url())
         eq_(response.status_code, 200)
