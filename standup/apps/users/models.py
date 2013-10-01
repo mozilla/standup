@@ -1,6 +1,6 @@
 from flask import current_app
 from sqlalchemy import (Boolean, Column, desc, ForeignKey, Integer, String,
-                        Table)
+                        Table, UniqueConstraint)
 from sqlalchemy.orm import backref, relationship
 from standup import OrderedDict
 from standup.apps.status.models import Status
@@ -38,6 +38,13 @@ class Team(Model):
             # other calls to be chained onto the query.
             return db.query(Status).filter('0=1')
 
+    def dictify(self):
+        data = OrderedDict()
+        data['id'] = self.id
+        data['name'] = self.name
+        data['slug'] = self.slug
+        return data
+
 
 class User(Model):
     """A standup participant."""
@@ -52,7 +59,8 @@ class User(Model):
     is_admin = Column(Boolean, default=False)
     team_users = Table('team_users', Model.metadata,
                        Column('team_id', Integer, ForeignKey('team.id')),
-                       Column('user_id', Integer, ForeignKey('user.id')))
+                       Column('user_id', Integer, ForeignKey('user.id')),
+                       UniqueConstraint('team_id', 'user_id'))
     teams = relationship('Team', secondary=team_users,
                          backref=backref('users', lazy='dynamic'))
 

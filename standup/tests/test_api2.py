@@ -2,6 +2,8 @@ import simplejson as json
 from flask import render_template_string
 from nose.tools import eq_
 from standup.apps.api2.decorators import api_key_required
+from standup.apps.users.models import Team
+from standup.database import get_session
 from standup.tests import BaseTestCase, project, status, team, user
 from urllib import urlencode
 
@@ -19,17 +21,18 @@ class DecoratorsTestCase(BaseTestCase):
         """Test the API key required decorator"""
 
         # Test with API key
-        data = json.dumps({
-            'api_key': self.app.config.get('API_KEY')})
-        response = self.client.post('/_tests/_api/_protected', data=data,
-                                    content_type='application/json')
+        data = dict(api_key=self.app.config.get('API_KEY'))
+        response = self.client.post(
+            '/_tests/_api/_protected', data=data,
+            content_type='application/x-www-form-urlencoded')
 
         eq_(response.status_code, 200)
 
         # Test without API key
         data = json.dumps({})
-        response = self.client.post('/_tests/_api/_protected', data=data,
-                                    content_type='application/json')
+        response = self.client.post(
+            '/_tests/_api/_protected', data=data,
+            content_type='application/x-www-form-urlencoded')
 
         eq_(response.status_code, 403)
 
@@ -303,3 +306,330 @@ class TeamTimelinesTestCase(BaseTestCase, TimelinesMixin):
         self.query = {'team_id': t.id}
         response = self.client.get(self._url())
         eq_(response.status_code, 200)
+
+
+class CreateTeamTestCase(BaseTestCase):
+    def setUp(self):
+        super(CreateTeamTestCase, self).setUp()
+        self.url = '/api/v2/teams/create.json'
+        self.data = {'slug': 'test', 'name': 'Test Team',
+                     'api_key': self.app.config.get('API_KEY')}
+
+    def test_create(self):
+        """Test creation of a team."""
+        response = self.client.post(self.url, data=self.data)
+        eq_(response.status_code, 200)
+
+        db = get_session(self.app)
+        team = db.query(Team).filter_by(slug=self.data['slug']).one()
+        eq_(team.slug, self.data['slug'])
+        eq_(team.name, self.data['name'])
+
+    def test_no_api_key(self):
+        """Test request with no API key."""
+        self.data.pop('api_key')
+        response = self.client.post(self.url, data=self.data)
+        eq_(response.status_code, 403)
+
+    def test_no_slug(self):
+        """Test attempted team creation with no slug."""
+        self.data.pop('slug')
+        response = self.client.post(self.url, data=self.data)
+        eq_(response.status_code, 400)
+
+    def test_no_name(self):
+        """Test team creation with no name."""
+        self.data.pop('name')
+        response = self.client.post(self.url, data=self.data)
+        eq_(response.status_code, 200)
+
+        db = get_session(self.app)
+        team = db.query(Team).filter_by(slug=self.data['slug']).one()
+        eq_(team.name, self.data['slug'])
+
+    def test_duplicate(self):
+        """Test attempted team creation with duplicate slug."""
+        response = self.client.post(self.url, data=self.data)
+        eq_(response.status_code, 200)
+
+        response = self.client.post(self.url, data=self.data)
+        eq_(response.status_code, 400)
+
+
+class DestroyTeamTestCase(BaseTestCase):
+    def setUp(self):
+        super(DestroyTeamTestCase, self).setUp()
+        self.url = '/api/v2/teams/destroy.json'
+        self.data = {'slug': 'test', 'api_key': self.app.config.get('API_KEY')}
+        with self.app.app_context():
+            team(slug=self.data['slug'], name='Test Team', save=True)
+
+    def test_destroy(self):
+        """Test removing a team."""
+        response = self.client.post(self.url, data=self.data)
+        eq_(response.status_code, 200)
+
+        db = get_session(self.app)
+        eq_(0, db.query(Team).count())
+
+    def test_no_api_key(self):
+        """Test request with no API key"""
+        self.data.pop('api_key')
+        response = self.client.post(self.url, data=self.data)
+        eq_(response.status_code, 403)
+
+    def test_no_slug(self):
+        """Test attempted team removal with no slug."""
+        self.data.pop('slug')
+        response = self.client.post(self.url, data=self.data)
+        eq_(response.status_code, 400)
+
+    def test_invalid_slug(self):
+        """Test attempted team removal with invalid slug."""
+        self.data['slug'] = 'xxx'
+        response = self.client.post(self.url, data=self.data)
+        eq_(response.status_code, 404)
+
+
+class UpdateTeamTestCase(BaseTestCase):
+    def setUp(self):
+        super(UpdateTeamTestCase, self).setUp()
+        self.url = '/api/v2/teams/update.json'
+        self.data = {'slug': 'test', 'name': 'Updated Team',
+                     'api_key': self.app.config.get('API_KEY')}
+        with self.app.app_context():
+            team(slug=self.data['slug'], name='Test Team', save=True)
+
+    def test_update(self):
+        """Test update team info."""
+        response = self.client.post(self.url, data=self.data)
+        eq_(response.status_code, 200)
+
+        db = get_session(self.app)
+        team = db.query(Team).filter_by(slug=self.data['slug']).one()
+        eq_(team.name, self.data['name'])
+
+    def test_no_api_key(self):
+        """Test request with no API key"""
+        self.data.pop('api_key')
+        response = self.client.post(self.url, data=self.data)
+        eq_(response.status_code, 403)
+
+    def test_no_slug(self):
+        """Test attempted team update with no slug."""
+        self.data.pop('slug')
+        response = self.client.post(self.url, data=self.data)
+        eq_(response.status_code, 400)
+
+    def test_invalid_slug(self):
+        """Test attempted team update with invalid slug."""
+        self.data['slug'] = 'xxx'
+        response = self.client.post(self.url, data=self.data)
+        eq_(response.status_code, 404)
+
+
+class TeamMembersTestCase(BaseTestCase):
+    def setUp(self):
+        super(TeamMembersTestCase, self).setUp()
+
+        self.query = {'slug': 'test'}
+        self.url = '/api/v2/teams/members.json'
+
+        with self.app.app_context():
+            self.team = team(slug=self.query['slug'], name='Test Team',
+                             save=True)
+            self.user = user(save=True)
+
+    def test_no_team_members(self):
+        """Test list members when no members in team."""
+        url = '%s?%s' % (self.url, urlencode(self.query))
+        response = self.client.get(url)
+        eq_(response.status_code, 200)
+        eq_(response.data, json.dumps({'users': []}))
+
+    def test_team_members(self):
+        """Test list members when members are in team."""
+        url = '%s?%s' % (self.url, urlencode(self.query))
+
+        db = get_session(self.app)
+        self.team.users.append(self.user)
+        data = json.dumps({'users': [self.user.dictify()]})
+        db.commit()
+
+        response = self.client.get(url)
+        eq_(response.status_code, 200)
+        eq_(response.data, data)
+
+    def test_no_slug(self):
+        """Test team members list with no slug."""
+        response = self.client.get(self.url)
+        eq_(response.status_code, 400)
+
+    def test_invalid_slug(self):
+        """Test attempted team update with invalid slug."""
+        self.query['slug'] = 'xxx'
+        url = '%s?%s' % (self.url, urlencode(self.query))
+        response = self.client.get(url)
+        eq_(response.status_code, 404)
+
+
+class CreateTeamMemberTestCase(BaseTestCase):
+    def setUp(self):
+        super(CreateTeamMemberTestCase, self).setUp()
+
+        with self.app.app_context():
+            self.user = user(save=True)
+            self.team = team(save=True)
+
+        self.url = '/api/v2/teams/members/create.json'
+        self.data = {'slug': self.team.slug,
+                     'screen_name': self.user.username,
+                     'api_key': self.app.config.get('API_KEY')}
+
+    def test_create_team_member(self):
+        """Test team member addition."""
+        eq_(0, self.team.users.count())
+
+        response = self.client.post(self.url, data=self.data)
+        eq_(response.status_code, 200)
+
+        db = get_session(self.app)
+        team = db.query(Team).filter_by(slug=self.data['slug']).one()
+        eq_(1, team.users.count())
+
+    def test_duplicate_member(self):
+        response = self.client.post(self.url, data=self.data)
+        eq_(response.status_code, 200)
+
+        response = self.client.post(self.url, data=self.data)
+        eq_(response.status_code, 400)
+
+    def test_no_api_key(self):
+        """Test request with no API key"""
+        self.data.pop('api_key')
+        response = self.client.post(self.url, data=self.data)
+        eq_(response.status_code, 403)
+
+    def test_no_slug(self):
+        """Test attempted team member addition with no slug."""
+        self.data.pop('slug')
+        response = self.client.post(self.url, data=self.data)
+        eq_(response.status_code, 400)
+
+    def test_invalid_slug(self):
+        """Test attempted team member addition with invalid slug."""
+        self.data['slug'] = 'xxx'
+        response = self.client.post(self.url, data=self.data)
+        eq_(response.status_code, 404)
+
+    def test_no_screen_name(self):
+        """Test attempted team member addition with no screen_name."""
+        self.data.pop('screen_name')
+        response = self.client.post(self.url, data=self.data)
+        eq_(response.status_code, 400)
+
+    def test_invalid_screen_name(self):
+        """Test attempted team member addition with invalid screen_name."""
+        self.data['screen_name'] = 'xxx'
+        response = self.client.post(self.url, data=self.data)
+        eq_(response.status_code, 404)
+
+
+class DestroyTeamMemberTestCase(BaseTestCase):
+    def setUp(self):
+        super(DestroyTeamMemberTestCase, self).setUp()
+
+        with self.app.app_context():
+            self.user = user(save=True)
+            self.team = team(save=True)
+
+        db = get_session(self.app)
+        self.team.users.append(self.user)
+        db.commit()
+
+        self.url = '/api/v2/teams/members/destroy.json'
+        self.data = {'slug': self.team.slug,
+                     'screen_name': self.user.username,
+                     'api_key': self.app.config.get('API_KEY')}
+
+    def test_destroy_team_member(self):
+        """Test team member deletion."""
+        eq_(1, self.team.users.count())
+
+        response = self.client.post(self.url, data=self.data)
+        eq_(response.status_code, 200)
+
+        db = get_session(self.app)
+        team = db.query(Team).filter_by(slug=self.data['slug']).one()
+        eq_(0, team.users.count())
+
+    def test_no_api_key(self):
+        """Test request with no API key"""
+        self.data.pop('api_key')
+        response = self.client.post(self.url, data=self.data)
+        eq_(response.status_code, 403)
+
+    def test_no_slug(self):
+        """Test attempted team member deletion with no slug."""
+        self.data.pop('slug')
+        response = self.client.post(self.url, data=self.data)
+        eq_(response.status_code, 400)
+
+    def test_invalid_slug(self):
+        """Test attempted team member deletion with invalid slug."""
+        self.data['slug'] = 'xxx'
+        response = self.client.post(self.url, data=self.data)
+        eq_(response.status_code, 404)
+
+    def test_no_screen_name(self):
+        """Test attempted team member deletion with no screen_name."""
+        self.data.pop('screen_name')
+        response = self.client.post(self.url, data=self.data)
+        eq_(response.status_code, 400)
+
+    def test_invalid_screen_name(self):
+        """Test attempted team member deletion with invalid screen_name."""
+        self.data['screen_name'] = 'xxx'
+        response = self.client.post(self.url, data=self.data)
+        eq_(response.status_code, 404)
+
+
+class TimesinceLastUpdateTestCase(BaseTestCase):
+    def setUp(self):
+        super(TimesinceLastUpdateTestCase, self).setUp()
+
+        with self.app.app_context():
+            self.user = user(save=True)
+
+        self.url = '/api/v2/info/timesince_last_update.json'
+        self.query = {'screen_name': self.user.username}
+
+    def test_timesince(self):
+        """Test the timesince last update endpoint."""
+        with self.app.app_context():
+            status(user_id=self.user.id, save=True)
+        url = '%s?%s' % (self.url, urlencode(self.query))
+        response = self.client.get(url)
+        eq_(response.status_code, 200)
+        eq_(response.data, '{"timesince": 0}')
+
+    def test_no_statuses(self):
+        """Test a user with no statuses."""
+        url = '%s?%s' % (self.url, urlencode(self.query))
+        response = self.client.get(url)
+        eq_(response.status_code, 200)
+        eq_(response.data, '{"timesince": null}')
+
+    def test_no_screen_name(self):
+        """Test request with no screen_name."""
+        self.query.pop('screen_name')
+        url = '%s?%s' % (self.url, urlencode(self.query))
+        response = self.client.get(url)
+        eq_(response.status_code, 400)
+
+    def test_invalid_screen_name(self):
+        """Test request with invalid screen_name."""
+        self.query['screen_name'] = 'xxx'
+        url = '%s?%s' % (self.url, urlencode(self.query))
+        response = self.client.get(url)
+        eq_(response.status_code, 404)

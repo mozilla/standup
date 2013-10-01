@@ -37,4 +37,6 @@ def something_broke(message=None):
 
 
 class ApiError(Exception):
-    pass
+    def __init__(self, *args, **kwargs):
+        super(ApiError, self).__init__(*args)
+        self.code = kwargs.pop('code', 400)

@@ -1,10 +1,15 @@
+from datetime import datetime
+
 from flask import Blueprint, current_app, request
 from sqlalchemy import desc
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
+from standup.apps.api2.decorators import api_key_required
 from standup.apps.status.models import Project, Status
 from standup.apps.users.models import Team, User
 from standup.database import get_session
 from standup.errors import ApiError, api_error
+from standup.main import csrf
 from standup.utils import jsonify, numerify, truthify
 
 
@@ -13,7 +18,7 @@ blueprint = Blueprint('api_v2', __name__, url_prefix='/api/v2')
 TIMELINE_MAX_RESULTS = 800
 
 
-def _get_params(request):
+def _get_timeline_params():
     params = {}
     try:
         params['count'] = numerify(request.args.get('count'), default=20)
@@ -26,6 +31,50 @@ def _get_params(request):
     params['include_replies'] = request.args.get('include_replies')
 
     return params
+
+
+def _get_team():
+    db = get_session(current_app)
+
+    data = request.args if request.method == 'GET' else request.form
+
+    team_id = data.get('team_id')
+    slug = data.get('slug')
+
+    try:
+        if slug:
+            team = db.query(Team).filter_by(slug=slug).one()
+        elif team_id:
+            team = db.query(Team).filter_by(id=team_id).one()
+        else:
+            raise ApiError('The `team_id` or `slug` parameter must be '
+                           'provided.')
+    except NoResultFound:
+        raise ApiError('Team not found.', code=404)
+
+    return team
+
+
+def _get_user():
+    db = get_session(current_app)
+
+    data = request.args if request.method == 'GET' else request.form
+
+    user_id = data.get('user_id')
+    screen_name = data.get('screen_name')
+
+    try:
+        if user_id:
+            user = db.query(User).filter_by(id=user_id).one()
+        elif screen_name:
+            user = db.query(User).filter_by(username=screen_name).one()
+        else:
+            raise ApiError('The `user_id` or `screen_name` parameter must be '
+                           'provided.')
+    except NoResultFound:
+        raise ApiError('User not found.', code=404)
+
+    return user
 
 
 def _handle_since(qs, params):
@@ -71,12 +120,12 @@ def _handle_count(qs, max, params):
 @blueprint.route('/statuses/home_timeline.json', methods=['GET'])
 def home_timeline():
     """Get a collection of the most recent status updates."""
-    app = current_app
-    db = get_session(app)
-    MAX = app.config.get('API2_TIMELINE_MAX_RESULTS', TIMELINE_MAX_RESULTS)
+    db = get_session(current_app)
+    MAX = current_app.config.get('API2_TIMELINE_MAX_RESULTS',
+                                 TIMELINE_MAX_RESULTS)
 
     try:
-        params = _get_params(request)
+        params = _get_timeline_params()
 
         statuses = db.query(Status)
         statuses = _handle_since(statuses, params)
@@ -84,7 +133,7 @@ def home_timeline():
         statuses = _handle_include_replies(statuses, params)
         statuses = _handle_count(statuses, MAX, params)
     except ApiError, e:
-        return api_error(400, str(e))
+        return api_error(e.code, str(e))
 
     data = []
     for status in statuses:
@@ -97,28 +146,19 @@ def home_timeline():
 @blueprint.route('/statuses/user_timeline.json', methods=['GET'])
 def user_timeline():
     """Get a collection of the user's recent status updates."""
-    app = current_app
-    db = get_session(app)
-    MAX = app.config.get('API2_TIMELINE_MAX_RESULTS', TIMELINE_MAX_RESULTS)
+    db = get_session(current_app)
+    MAX = current_app.config.get('API2_TIMELINE_MAX_RESULTS',
+                                 TIMELINE_MAX_RESULTS)
 
     try:
-        params = _get_params(request)
+        params = _get_timeline_params()
     except ApiError, e:
-        return api_error(400, str(e))
-
-    user_id = request.args.get('user_id')
-    screen_name = request.args.get('screen_name')
+        return api_error(e.code, str(e))
 
     try:
-        if user_id:
-            user = db.query(User).filter_by(id=user_id).one()
-        elif screen_name:
-            user = db.query(User).filter_by(username=screen_name).one()
-        else:
-            return api_error(400, 'The `user_id` or `screen_name` parameter '
-                                  'must be provided.')
-    except NoResultFound:
-        return api_error(404, 'User not found.')
+        user = _get_user()
+    except ApiError, e:
+        return api_error(e.code, str(e))
 
     try:
         statuses = db.query(Status).filter_by(user=user)
@@ -127,7 +167,7 @@ def user_timeline():
         statuses = _handle_include_replies(statuses, params)
         statuses = _handle_count(statuses, MAX, params)
     except ApiError, e:
-        return api_error(400, str(e))
+        return api_error(e.code, str(e))
 
     data = []
     for status in statuses:
@@ -140,14 +180,14 @@ def user_timeline():
 @blueprint.route('/statuses/project_timeline.json', methods=['GET'])
 def project_timeline():
     """Get a collection of the project's recent status updates."""
-    app = current_app
-    db = get_session(app)
-    MAX = app.config.get('API2_TIMELINE_MAX_RESULTS', TIMELINE_MAX_RESULTS)
+    db = get_session(current_app)
+    MAX = current_app.config.get('API2_TIMELINE_MAX_RESULTS',
+                                 TIMELINE_MAX_RESULTS)
 
     try:
-        params = _get_params(request)
+        params = _get_timeline_params()
     except ApiError, e:
-        return api_error(400, str(e))
+        return api_error(e.code, str(e))
 
     project_id = request.args.get('project_id')
     slug = request.args.get('slug')
@@ -170,7 +210,7 @@ def project_timeline():
         statuses = _handle_include_replies(statuses, params)
         statuses = _handle_count(statuses, MAX, params)
     except ApiError, e:
-        return api_error(400, str(e))
+        return api_error(e.code, str(e))
 
     data = []
     for status in statuses:
@@ -183,28 +223,18 @@ def project_timeline():
 @blueprint.route('/statuses/team_timeline.json', methods=['GET'])
 def team_timeline():
     """Get a collection of the team's recent status updates."""
-    app = current_app
-    db = get_session(app)
-    MAX = app.config.get('API2_TIMELINE_MAX_RESULTS', TIMELINE_MAX_RESULTS)
+    MAX = current_app.config.get('API2_TIMELINE_MAX_RESULTS',
+                                 TIMELINE_MAX_RESULTS)
 
     try:
-        params = _get_params(request)
+        params = _get_timeline_params()
     except ApiError, e:
-        return api_error(400, str(e))
-
-    team_id = request.args.get('team_id')
-    slug = request.args.get('slug')
+        return api_error(e.code, str(e))
 
     try:
-        if slug:
-            team = db.query(Team).filter_by(slug=slug).one()
-        elif team_id:
-            team = db.query(Team).filter_by(id=team_id).one()
-        else:
-            return api_error(400, 'The `team_id` or `slug` parameter must '
-                                  'be provided.')
-    except NoResultFound:
-        return api_error(404, 'Team not found.')
+        team = _get_team()
+    except ApiError, e:
+        return api_error(e.code, str(e))
 
     try:
         statuses = team.statuses().order_by(desc(Status.created))
@@ -213,7 +243,7 @@ def team_timeline():
         statuses = _handle_include_replies(statuses, params)
         statuses = _handle_count(statuses, MAX, params)
     except ApiError, e:
-        return api_error(400, str(e))
+        return api_error(e.code, str(e))
 
     data = []
     for status in statuses:
@@ -221,3 +251,145 @@ def team_timeline():
                                    trim_project=params['trim_project']))
 
     return jsonify(data)
+
+
+@csrf.exempt
+@blueprint.route('/teams/create.json', methods=['POST'])
+@api_key_required
+def create_team():
+    """Creates a new team."""
+    db = get_session(current_app)
+    team = Team()
+
+    team.slug = request.form.get('slug')
+
+    if not team.slug:
+        return api_error(400, 'No slug provided.')
+
+    team.name = request.form.get('name', team.slug)
+
+    db.add(team)
+
+    try:
+        db.commit()
+    except IntegrityError:
+        return api_error(400, 'Slug is already in use.')
+
+    return jsonify(team.dictify())
+
+
+@csrf.exempt
+@blueprint.route('/teams/destroy.json', methods=['POST'])
+@api_key_required
+def destroy_team():
+    """Removes a team."""
+    db = get_session(current_app)
+
+    try:
+        team = _get_team()
+    except ApiError, e:
+        return api_error(e.code, str(e))
+
+    data = team.dictify()
+
+    db.delete(team)
+    db.commit()
+
+    return jsonify(data)
+
+
+@csrf.exempt
+@blueprint.route('/teams/update.json', methods=['POST'])
+@api_key_required
+def update_team():
+    """Update a team's info."""
+    db = get_session(current_app)
+
+    try:
+        team = _get_team()
+    except ApiError, e:
+        return api_error(e.code, str(e))
+
+    team.name = request.form.get('name', team.slug)
+    db.commit()
+
+    return jsonify(team.dictify())
+
+
+@blueprint.route('/teams/members.json', methods=['GET'])
+def team_members():
+    """Get a list of members of the team."""
+    try:
+        team = _get_team()
+    except ApiError, e:
+        return api_error(e.code, str(e))
+
+    members = []
+    for user in team.users.all():
+        members.append(user.dictify())
+
+    return jsonify({'users': members})
+
+
+@csrf.exempt
+@blueprint.route('/teams/members/create.json', methods=['POST'])
+@api_key_required
+def create_team_member():
+    """Add a user to the team."""
+    db = get_session(current_app)
+
+    try:
+        team = _get_team()
+        user = _get_user()
+    except ApiError, e:
+        return api_error(e.code, str(e))
+
+    team.users.append(user)
+
+    try:
+        db.commit()
+    except IntegrityError:
+        return api_error(400, 'User is already in that team.')
+
+    return jsonify(team.dictify())
+
+
+@csrf.exempt
+@blueprint.route('/teams/members/destroy.json', methods=['POST'])
+@api_key_required
+def destroy_team_member():
+    """Remove a user from the team."""
+    db = get_session(current_app)
+
+    try:
+        team = _get_team()
+        user = _get_user()
+    except ApiError, e:
+        return api_error(e.code, str(e))
+
+    team.users.remove(user)
+    db.commit()
+
+    return jsonify(team.dictify())
+
+
+@blueprint.route('/info/timesince_last_update.json', methods=['GET'])
+def timesince_last_update():
+    """Get the time since the users last update in seconds"""
+    db = get_session(current_app)
+
+    try:
+        user = _get_user()
+    except ApiError, e:
+        return api_error(e.code, str(e))
+
+    try:
+        status = db.query(Status).filter_by(user=user)
+        status = status.order_by(desc(Status.created)).one()
+    except NoResultFound:
+        return jsonify({'timesince': None})
+
+    td = datetime.utcnow() - status.created
+    ts = (td.microseconds + (td.seconds + td.days * 24 * 3600) * 10**6) / 10**6
+
+    return jsonify({'timesince': int(ts)})
