@@ -50,6 +50,20 @@
                   {% endfor %}
                 </ul>
               </li>
+              {% if weeks %}
+              <li>
+              <a href="{{ url_for('status.weekly') }}">Weekly</a>
+              <ul>
+                {% for week in weeks %}
+                <li>
+                  <a href="{{ url_for('status.weekly', week=week.start_date.date()|dateformat('%Y-%m-%d')) }}">
+                   {{week.start_date.date()|dateformat('%b %d')}} to {{ week.end_date.date()|dateformat('%b %d %Y') }}
+                  </a>
+                </li>
+                {% endfor %}
+              </ul>
+              </li>
+              {% endif %}
               <li>
                 {% if not 'user_id' in session %}
                   <a href="#" id="login">Sign in with Persona</a>

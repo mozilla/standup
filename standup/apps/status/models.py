@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from flask import current_app
 from sqlalchemy import (asc, Column, DateTime, desc, ForeignKey, Integer,
@@ -6,9 +6,30 @@ from sqlalchemy import (asc, Column, DateTime, desc, ForeignKey, Integer,
 from sqlalchemy.orm import backref, relationship
 from standup import OrderedDict
 from standup.apps.status.helpers import paginate
+from standup.apps.status.helpers import week_start as h_week_start
+from standup.apps.status.helpers import week_end as h_week_end
 from standup.database import get_session
 from standup.database.classes import Model
 from standup.filters import format_update
+from sqlalchemy.ext.compiler import compiles
+from sqlalchemy.sql.expression import ColumnClause
+
+
+# Extract Year+WeekOfYear from a given date column.
+class WeekColumnClause(ColumnClause):
+    pass
+
+@compiles(WeekColumnClause, 'sqlite')
+def compile_week_column(element, compiler, **kw):
+    return "strftime('%%Y%%W', %s)" % element.name
+
+@compiles(WeekColumnClause, 'postgresql')
+def compile_week_column(element, compiler, **kw):
+    return "to_char(%s, 'YYYYWW')" % element.name
+
+@compiles(WeekColumnClause, 'mysql')
+def compile_week_column(element, compiler, **kw):
+    return "DATE_FORMAT(%s, '%%Y%%V')" % element.name
 
 
 class Project(Model):
@@ -71,7 +92,19 @@ class Status(Model):
         db = get_session(current_app)
         return db.query(Status).filter(Status.reply_to_id == self.id).count()
 
-    def dictify(self, trim_user=False, trim_project=False):
+    @property
+    def week_start(self):
+        if self.created:
+            return h_week_start(self.created)
+        return None
+
+    @property
+    def week_end(self):
+        if self.created:
+            return h_week_end(self.created)
+        return None
+
+    def dictify(self, trim_user=False, trim_project=False, include_week=False):
         """Returns an OrderedDict of model attributes"""
         if self.reply_to:
             reply_to_user_id = self.reply_to.user.id
@@ -102,5 +135,8 @@ class Status(Model):
         data['reply_to_user_id'] = reply_to_user_id
         data['reply_to_username'] = reply_to_username
         data['reply_count'] = self.reply_count
+        if include_week:
+            data['week_start'] = self.week_start.strftime("%Y-%m-%d")
+            data['week_end'] = self.week_end.strftime("%Y-%m-%d")
 
         return data

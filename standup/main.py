@@ -5,6 +5,7 @@ from flask import Flask, redirect, request, session, url_for
 from flask.ext.funnel import Funnel
 from flask.ext.markdown import Markdown
 from flask.ext.seasurf import SeaSurf
+from standup.apps.status.helpers import get_weeks
 from standup.apps.status.models import Project
 from standup.apps.users.models import Team, User
 from standup.database import get_session
@@ -81,6 +82,7 @@ def create_app(settings):
         # Projects, teams and current user
         ctx['projects'] = db.query(Project).order_by(Project.name)
         ctx['teams'] = db.query(Team).order_by(Team.name)
+        ctx['weeks'] = get_weeks()
         ctx['current_user'] = None
         if session and 'user_id' in session:
             user = db.query(User).get(session['user_id'])

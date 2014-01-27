@@ -7,7 +7,7 @@ from werkzeug.contrib.atom import AtomFeed
 
 from sqlalchemy import desc
 from standup.apps.status.helpers import enddate, paginate, startdate
-from standup.apps.status.models import Project, Status
+from standup.apps.status.models import Project, Status, WeekColumnClause
 from standup.apps.users.models import Team, User
 from standup.database import get_session
 from standup.errors import forbidden, page_not_found
@@ -59,6 +59,24 @@ def index():
             startdate(request),
             enddate(request)),)
 
+@blueprint.route('/weekly')
+def weekly():
+    """The weekly status page."""
+    db = get_session(current_app)
+
+    #select id, user_id, created, strftime('%Y%W', created), date(created, 'weekday 1'), content from status order by 4, 2, 3;
+    return render_template(
+        'status/weekly.html',
+        week=request.args.get('week', None),
+        statuses=paginate(
+            db.query(Status).filter_by(reply_to=None).order_by(
+                desc(WeekColumnClause("created")),
+                Status.user_id,
+                desc(Status.created)),
+            request.args.get('page', 1),
+            startdate(request),
+            enddate(request),
+            per_page=100),)
 
 @blueprint.route('/statuses.xml')
 def index_feed():

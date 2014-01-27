@@ -31,7 +31,10 @@ def gravatar_url(email, size=None):
 
     qs = {}
 
-    if app.debug or not 'SITE_URL' in app.config:
+    # gravatar default URLs must be publicly accessible, so 'localhost' ones
+    # are a no-go
+    if app.debug or not 'SITE_URL' in app.config or \
+                       'localhost' in app.config.get('SITE_URL'):
         qs['d'] = 'mm'
     else:
         qs['d'] = app.config.get('SITE_URL') + url_for(

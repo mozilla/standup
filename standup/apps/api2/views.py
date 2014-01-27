@@ -5,7 +5,7 @@ from sqlalchemy import desc
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 from standup.apps.api2.decorators import api_key_required
-from standup.apps.status.models import Project, Status
+from standup.apps.status.models import Project, Status, WeekColumnClause
 from standup.apps.users.models import Team, User
 from standup.database import get_session
 from standup.errors import ApiError, api_error
@@ -29,6 +29,7 @@ def _get_timeline_params():
     params['trim_user'] = truthify(request.args.get('trim_user'))
     params['trim_project'] = truthify(request.args.get('trim_project'))
     params['include_replies'] = request.args.get('include_replies')
+    params['weekly'] = truthify(request.args.get('weekly'))
 
     return params
 
@@ -116,6 +117,21 @@ def _handle_count(qs, max, params):
     else:
         return qs.order_by(desc(Status.created)).limit(params['count'])
 
+def _handle_weekly(qs, params):
+    if params['weekly']:
+        return qs.order_by(
+                desc(WeekColumnClause("created")),
+                Status.user_id,
+                desc(Status.created))
+    return qs
+
+def _get_data(statuses, params):
+    data = []
+    for status in statuses:
+        data.append(status.dictify(trim_user=params['trim_user'],
+                                   trim_project=params['trim_project'],
+                                   include_week=params['weekly']))
+    return data
 
 @blueprint.route('/statuses/home_timeline.json', methods=['GET'])
 def home_timeline():
@@ -128,6 +144,7 @@ def home_timeline():
         params = _get_timeline_params()
 
         statuses = db.query(Status)
+        statuses = _handle_weekly(statuses, params)
         statuses = _handle_since(statuses, params)
         statuses = _handle_max(statuses, params)
         statuses = _handle_include_replies(statuses, params)
@@ -135,11 +152,7 @@ def home_timeline():
     except ApiError, e:
         return api_error(e.code, str(e))
 
-    data = []
-    for status in statuses:
-        data.append(status.dictify(trim_user=params['trim_user'],
-                                   trim_project=params['trim_project']))
-
+    data = _get_data(statuses, params)
     return jsonify(data)
 
 
@@ -162,6 +175,7 @@ def user_timeline():
 
     try:
         statuses = db.query(Status).filter_by(user=user)
+        statuses = _handle_weekly(statuses, params)
         statuses = _handle_since(statuses, params)
         statuses = _handle_max(statuses, params)
         statuses = _handle_include_replies(statuses, params)
@@ -169,11 +183,7 @@ def user_timeline():
     except ApiError, e:
         return api_error(e.code, str(e))
 
-    data = []
-    for status in statuses:
-        data.append(status.dictify(trim_user=params['trim_user'],
-                                   trim_project=params['trim_project']))
-
+    data = _get_data(statuses, params)
     return jsonify(data)
 
 
@@ -205,6 +215,7 @@ def project_timeline():
 
     try:
         statuses = db.query(Status).filter_by(project=project)
+        statuses = _handle_weekly(statuses, params)
         statuses = _handle_since(statuses, params)
         statuses = _handle_max(statuses, params)
         statuses = _handle_include_replies(statuses, params)
@@ -212,11 +223,7 @@ def project_timeline():
     except ApiError, e:
         return api_error(e.code, str(e))
 
-    data = []
-    for status in statuses:
-        data.append(status.dictify(trim_user=params['trim_user'],
-                                   trim_project=params['trim_project']))
-
+    data = _get_data(statuses, params)
     return jsonify(data)
 
 
@@ -238,6 +245,7 @@ def team_timeline():
 
     try:
         statuses = team.statuses().order_by(desc(Status.created))
+        statuses = _handle_weekly(statuses, params)
         statuses = _handle_since(statuses, params)
         statuses = _handle_max(statuses, params)
         statuses = _handle_include_replies(statuses, params)
@@ -245,11 +253,7 @@ def team_timeline():
     except ApiError, e:
         return api_error(e.code, str(e))
 
-    data = []
-    for status in statuses:
-        data.append(status.dictify(trim_user=params['trim_user'],
-                                   trim_project=params['trim_project']))
-
+    data = _get_data(statuses, params)
     return jsonify(data)
 
 

@@ -1,7 +1,8 @@
 from datetime import date, datetime, timedelta
 
 from nose.tools import eq_
-from standup.apps.status.helpers import enddate, paginate, startdate
+from standup.apps.status.helpers import (enddate, paginate, startdate,
+                                         week_start, week_end)
 from standup.apps.status.models import Status
 from standup.database import get_session
 from standup.tests import (authenticate, BaseTestCase, create_request, project,
@@ -87,6 +88,14 @@ class HelpersTestCase(BaseTestCase):
 
         page = paginate(s, page=1, enddate=datetime(2012, 6, 28))
         eq_(page.pages, 3)
+
+    def test_weeks(self):
+        """Test the week start/end helper functions."""
+        d = datetime(2014, 1, 29)
+        start = week_start(d)
+        eq_(start, datetime(2014, 1, 27))
+        end = week_end(d)
+        eq_(end, datetime(2014, 2, 2))
 
 
 class ModelsTestCase(BaseTestCase):
