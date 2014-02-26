@@ -94,7 +94,7 @@ body {
 
 #grid {
   .output () {
-    (~".container_@{gridColumns}") {
+    .container_@{gridColumns} {
       margin-left: auto;
       margin-right: auto;
       width: (@gridColumnWidth + @gridGutterWidth) * @gridColumns;
@@ -104,7 +104,7 @@ body {
     }
 
     .grids (@index) when (@index > 0) {
-      (~".grid_@{index}") { .grid(@index); }
+      .grid_@{index} { .grid(@index); }
       .grids(@index - 1);
     }
     .grids (0) {}
@@ -114,10 +114,10 @@ body {
     }
 
     .fix (@index) when (@index > 0) {
-      (~".prefix_@{index}") { .prefix(@index); }
-      (~".suffix_@{index}") { .suffix(@index); }
-      (~".push_@{index}") { .push(@index); }
-      (~".pull_@{index}") { .pull(@index); }
+      .prefix_@{index} { .prefix(@index); }
+      .suffix_@{index} { .suffix(@index); }
+      .push_@{index} { .push(@index); }
+      .pull_@{index} { .pull(@index); }
       .fix(@index - 1);
     }
     .fix (0) {}
