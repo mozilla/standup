@@ -11,6 +11,7 @@ from standup.database import get_session
 from standup.errors import ApiError, api_error
 from standup.main import csrf
 from standup.utils import jsonify, numerify, truthify
+from standup.apps.status.helpers import week_start, week_end, isday, get_day
 
 
 blueprint = Blueprint('api_v2', __name__, url_prefix='/api/v2')
@@ -30,6 +31,13 @@ def _get_timeline_params():
     params['trim_project'] = truthify(request.args.get('trim_project'))
     params['include_replies'] = request.args.get('include_replies')
     params['weekly'] = truthify(request.args.get('weekly'))
+    week = request.args.get('week')
+    if week:
+        if not isday(week):
+            raise ApiError('Error in `week` parameter: must be YYYY-MM-DD form.')
+        weekday = get_day(week)
+        params['week_start'] = week_start(weekday)
+        params['week_end'] = week_end(weekday)
 
     return params
 
@@ -118,6 +126,9 @@ def _handle_count(qs, max, params):
         return qs.order_by(desc(Status.created)).limit(params['count'])
 
 def _handle_weekly(qs, params):
+    if params.get('week_start') and params.get('week_end'):
+        qs = qs.filter(Status.created >= params['week_start'],
+                       Status.created <= params['week_end'])
     if params['weekly']:
         return qs.order_by(
                 desc(WeekColumnClause("created")),
