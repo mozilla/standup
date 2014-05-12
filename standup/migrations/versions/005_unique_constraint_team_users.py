@@ -1,9 +1,23 @@
 from migrate.changeset.constraint import UniqueConstraint
-from sqlalchemy import Column, ForeignKey, Integer, MetaData, Table
+from sqlalchemy import Column, ForeignKey, Integer, MetaData, Table, String, Boolean
 
 
 meta = MetaData()
 
+team = Table('team', meta,
+             Column('id', Integer, primary_key=True),
+             Column('name', String(100)),
+             Column('slug', String(100), unique=True))
+
+user = Table('user', meta,
+             Column('id', Integer, primary_key=True),
+             Column('username', String(100), unique=True),
+             Column('name', String(100)),
+             Column('slug', String(100), unique=True),
+             Column('email', String(100), unique=True),
+             Column('github_handle', String(100), unique=True),
+             Column('is_admin', Boolean, default=False),
+             Column('team_id', Integer, ForeignKey('team.id')))
 
 team_users = Table('team_users', meta,
                    Column('team_id', Integer, ForeignKey('team.id')),
