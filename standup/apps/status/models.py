@@ -20,15 +20,15 @@ class WeekColumnClause(ColumnClause):
     pass
 
 @compiles(WeekColumnClause, 'sqlite')
-def compile_week_column(element, compiler, **kw):
+def compile_week_column_sqlite(element, compiler, **kw):
     return "strftime('%%Y%%W', %s)" % element.name
 
 @compiles(WeekColumnClause, 'postgresql')
-def compile_week_column(element, compiler, **kw):
+def compile_week_column_postgresql(element, compiler, **kw):
     return "to_char(%s, 'YYYYWW')" % element.name
 
 @compiles(WeekColumnClause, 'mysql')
-def compile_week_column(element, compiler, **kw):
+def compile_week_column_mysql(element, compiler, **kw):
     return "DATE_FORMAT(%s, '%%Y%%V')" % element.name
 
 

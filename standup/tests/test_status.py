@@ -4,9 +4,13 @@ from nose.tools import eq_
 from standup.apps.status.helpers import (enddate, paginate, startdate,
                                          week_start, week_end)
 from standup.apps.status.models import Status
+from standup.apps.status.models import (compile_week_column_sqlite,
+                                        compile_week_column_postgresql,
+                                        compile_week_column_mysql)
 from standup.database import get_session
 from standup.tests import (authenticate, BaseTestCase, create_request, project,
                            status, team, user)
+from standup.apps.status.helpers import get_day
 
 
 class HelpersTestCase(BaseTestCase):
@@ -21,6 +25,9 @@ class HelpersTestCase(BaseTestCase):
         req = create_request(query_string={'day': '2012-05-24'})
         eq_(startdate(req), datetime(2012, 5, 24))
 
+        req = create_request(query_string={'week': '2012-05-24'})
+        eq_(startdate(req), datetime(2012, 5, 21))
+
         req = create_request(query_string={'day': 'today'})
         eq_(startdate(req), None)
 
@@ -31,6 +38,9 @@ class HelpersTestCase(BaseTestCase):
         """Test the enddate helper function"""
         req = create_request(query_string={'day': '2012-05-24'})
         eq_(enddate(req), datetime(2012, 5, 25))
+
+        req = create_request(query_string={'week': '2012-05-24'})
+        eq_(enddate(req), datetime(2012, 5, 27))
 
         req = create_request(query_string={'day': 'today'})
         eq_(enddate(req), None)
@@ -158,6 +168,74 @@ class ModelsTestCase(BaseTestCase):
         page = p.recent_statuses()
         eq_(page.pages, 4)
 
+    def test_week_column_clause(self):
+        """Test that the WeekColumnClause generates the right thing."""
+        # Dummy object to have a "name" attribute
+        e = lambda: None
+        e.name = "test"
+        c = None
+        eq_(compile_week_column_sqlite(e, c), "strftime('%Y%W', test)")
+        eq_(compile_week_column_postgresql(e, c), "to_char(test, 'YYYYWW')")
+        eq_(compile_week_column_mysql(e, c), "DATE_FORMAT(test, '%Y%V')")
+
+    def test_status_week_start(self):
+        """Test the week_start function of the Status model."""
+        d = datetime(2014, 5, 8, 17, 17, 51, 0)
+        with self.app.app_context():
+            u = user(username='testuser', save=True)
+            s = status(content='my status update', created=d, user=u, save=True)
+        d_actual = s.week_start.strftime("%Y-%m-%d")
+        eq_(d_actual, "2014-05-05")
+
+    def test_status_week_end(self):
+        """Test the week_end function of the Status model."""
+        d = datetime(2014, 5, 8, 17, 17, 51, 0)
+        with self.app.app_context():
+            u = user(username='testuser', save=True)
+            s = status(content='my status update', created=d, user=u, save=True)
+        d_actual = s.week_end.strftime("%Y-%m-%d")
+        eq_(d_actual, "2014-05-11") # Happy Mother's Day!
+
+    def test_status_weeks_at_year_end(self):
+        """Test the week_{start|end} function around the end of the year."""
+        d = datetime(2014, 1, 1, 12, 13, 45, 0)
+        with self.app.app_context():
+            u = user(username='testuser', save=True)
+            s = status(content='my status update', created=d, user=u, save=True)
+        eq_(s.week_start.strftime("%Y-%m-%d"), "2013-12-30")
+        eq_(s.week_end.strftime("%Y-%m-%d"), "2014-01-05")
+
+    def test_status_weeks_at_year_start(self):
+        """Test the week_{start|end} function around the start of the year."""
+        d = datetime(2013, 12, 31, 12, 13, 45, 0)
+        with self.app.app_context():
+            u = user(username='testuser', save=True)
+            s = status(content='my status update', created=d, user=u, save=True)
+        eq_(s.week_start.strftime("%Y-%m-%d"), "2013-12-30")
+        eq_(s.week_end.strftime("%Y-%m-%d"), "2014-01-05")
+
+    def test_status_week_no_created(self):
+        """Test the week_{start|end} functions with no 'created' date."""
+        with self.app.app_context():
+            s = status(content='my status update', save=True)
+        # monkey patch s:
+        s.created = None
+        eq_(s.week_start, None)
+        eq_(s.week_end, None)
+
+    def test_status_dictify_include_week(self):
+        """Test the `include_week` param of `dictify`."""
+        d = datetime(2014, 5, 8, 17, 17, 51, 0)
+        with self.app.app_context():
+            s = status(content='my status update', created=d, save=True)
+            d1 = s.dictify(include_week=False)
+            eq_(d1.get("week_start", None), None)
+            eq_(d1.get("week_end", None), None)
+
+            d2 = s.dictify(include_week=True)
+            eq_(d2.get("week_start", None), "2014-05-05")
+            eq_(d2.get("week_end", None), "2014-05-11")
+
 
 class ViewsTestCase(BaseTestCase):
     def test_index_view(self):
@@ -210,6 +288,16 @@ class ViewsTestCase(BaseTestCase):
 
         response = self.client.get('/status/9999')
         eq_(response.status_code, 404)
+
+    def test_weekly_view(self):
+        """Make sure the weekly view works like it's supposed to."""
+        with self.app.app_context():
+            s = status(content='this works!', content_html='this works!',
+                       save=True)
+
+        response = self.client.get('/weekly')
+        eq_(response.status_code, 200)
+        assert 'this works!' in response.data
 
     def test_feeds(self):
         """Test that the site-wise Atom feed appears and functions properly."""
