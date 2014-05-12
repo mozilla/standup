@@ -6,3 +6,4 @@ TESTING = True
 # and it causes our tests to run super fast!
 DATABASE_URL = 'sqlite://'
 CSRF_DISABLE = True
+SERVER_NAME = 'localhost'

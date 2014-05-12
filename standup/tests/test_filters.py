@@ -1,3 +1,4 @@
+from flask import Flask
 from nose.tools import eq_
 from standup.filters import format_update, gravatar_url, TAG_TMPL
 from standup.tests import BaseTestCase
@@ -19,26 +20,33 @@ class FilterTestCase(BaseTestCase):
 
     def test_gravatar_url(self):
         """Test that the gravatar url is generated correctly"""
-        with self.app.test_request_context('/'):
-            self.app.debug = True
-            url = gravatar_url('test@test.com')
-            eq_(url, 'http://www.gravatar.com/avatar/'
-                     'b642b4217b34b1e8d3bd915fc65c4452?d=mm')
+        # Note: We make a fake Flask app for this.
+        app = Flask(__name__)
 
-            url = gravatar_url('test@test.com', 200)
-            eq_(url, 'http://www.gravatar.com/avatar/'
-                     'b642b4217b34b1e8d3bd915fc65c4452?s=200&d=mm')
+        with app.test_request_context('/'):
+            app.debug = True
+            url = gravatar_url('test@example.com')
+            eq_(url,
+                'http://www.gravatar.com/avatar/'
+                '55502f40dc8b7c769880b10874abc9d0?d=mm')
 
-            self.app.debug = False
+            url = gravatar_url('test@example.com', 200)
+            eq_(url,
+                'http://www.gravatar.com/avatar/'
+                '55502f40dc8b7c769880b10874abc9d0?s=200&d=mm')
 
-            url = gravatar_url('test@test.com')
-            eq_(url, 'http://www.gravatar.com/avatar/'
-                     'b642b4217b34b1e8d3bd915fc65c4452?d=mm')
+            app.debug = False
 
-            self.app.config['SITE_URL'] = 'http://www.site.com'
+            url = gravatar_url('test@example.com')
+            eq_(url,
+                'http://www.gravatar.com/avatar/'
+                '55502f40dc8b7c769880b10874abc9d0?d=mm')
 
-            url = gravatar_url('test@test.com')
-            eq_(url, 'http://www.gravatar.com/avatar/'
-                'b642b4217b34b1e8d3bd915fc65c4452'
+            app.config['SITE_URL'] = 'http://www.site.com'
+
+            url = gravatar_url('test@example.com')
+            eq_(url,
+                'http://www.gravatar.com/avatar/'
+                '55502f40dc8b7c769880b10874abc9d0'
                 '?d=http%3A%2F%2Fwww.site.com%2Fstatic%2Fimg%2F'
                 'default-avatar.png')

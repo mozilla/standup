@@ -74,9 +74,15 @@ def user(**kwargs):
     team_kw = kwargs.pop('team', None)
     defaults = dict(username='jdoe',
                     name='John Doe',
-                    email='john@doe.com',
-                    slug='jdoe')
+                    email='john@doe.com')
     defaults.update(kwargs)
+
+    if 'slug' not in defaults:
+        # This is silly, but it's probably "good enough"
+        defaults['slug'] = ''.join(
+            [c for c in defaults['username'].lower()
+             if c.isalnum()]
+        )
 
     user = User(**defaults)
 

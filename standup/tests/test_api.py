@@ -48,7 +48,7 @@ class APITestCase(BaseTestCase):
         content = ("#merge pull #1 and pR 2 to fix bug #3 and BUg 4 by "
                    "@jezdez for @r1cky but not willkg@mozilla.com")
         with self.app.app_context():
-            user(username='r1cky', save=True)
+            user(username='r1cky', slug='r1cky', save=True)
             user(username='jezdez', slug='jezdez',
                  email='jezdez@mozilla.com',
                  github_handle='jezdez',
