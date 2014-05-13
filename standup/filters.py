@@ -5,6 +5,8 @@ from urllib import urlencode
 from bleach import clean
 from flask import current_app, url_for
 
+from standup.database import get_session
+
 
 TAG_TMPL = '{0} <span class="tag tag-{1}">{2}</span>'
 
@@ -48,8 +50,11 @@ def gravatar_url(email, size=None):
 
 
 def format_update(update, project=None):
+    from standup.apps.users.models import User  # damn those circular imports
+
     BUG_RE = re.compile(r'(bug) #?(\d+)', flags=re.I)
     PULL_RE = re.compile(r'(pull|pr) #?(\d+)', flags=re.I)
+    USER_RE = re.compile(r'(?<=^|(?<=[^\w\-\.]))@([\w-]+)', flags=re.I)
 
     # Remove icky stuff.
     formatted = clean(update, tags=[])
@@ -58,6 +63,20 @@ def format_update(update, project=None):
     formatted = BUG_RE.sub(
         r'<a href="http://bugzilla.mozilla.org/show_bug.cgi?id=\2">\1 \2</a>',
         formatted)
+
+    checked = set()
+    db = get_session(current_app)
+    for slug in USER_RE.findall(formatted):
+        if slug in checked:
+            continue
+        user = db.query(User).filter_by(slug=slug).first()
+        if user:
+            url = url_for('status.user', slug=slug)
+            at_slug = '@%s' % slug
+            formatted = formatted.replace(at_slug,
+                                          '<a href="%s">%s</a>' %
+                                          (url, at_slug))
+        checked.add(slug)
 
     # Linkify "pull #n" and "pull n" text.
     if project and project.repo_url:

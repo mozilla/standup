@@ -45,19 +45,26 @@ class APITestCase(BaseTestCase):
         eq_(response.status_code, 400)
 
     def test_format_update(self):
-        db = get_session(self.app)
-
-        p = Project(name='mdndev', slug='mdndev',
-                    repo_url='https://github.com/mozilla/kuma')
-        db.add(p)
-        db.commit()
-        content = "#merge pull #1 and pR 2 to fix bug #3 and BUg 4"
-        formatted_update = format_update(content, project=p)
+        content = ("#merge pull #1 and pR 2 to fix bug #3 and BUg 4 by "
+                   "@jezdez for @r1cky but not willkg@mozilla.com")
+        with self.app.app_context():
+            user(username='r1cky', slug='r1cky', save=True)
+            user(username='jezdez', slug='jezdez',
+                 email='jezdez@mozilla.com',
+                 github_handle='jezdez',
+                 save=True)
+            p = project(name='mdndev', slug='mdndev',
+                        repo_url='https://github.com/mozilla/kuma')
+            formatted_update = format_update(content, project=p)
         ok_('tag-merge' in formatted_update)
         ok_('pull/1' in formatted_update)
         ok_('pull/2' in formatted_update)
         ok_('show_bug.cgi?id=3' in formatted_update)
         ok_('show_bug.cgi?id=4' in formatted_update)
+        ok_('/user/jezdez' in formatted_update)
+        ok_('/user/r1cky' in formatted_update)
+        ok_('/user/willkg' not in formatted_update)
+        ok_('/user/mozilla.com' not in formatted_update)
 
     def test_create_status_validation(self):
         """Verify validation of required fields when creating a status"""
