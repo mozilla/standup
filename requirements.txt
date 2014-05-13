@@ -1,6 +1,6 @@
 bleach==1.4
 Flask==0.10.1
-Flask-Funnel==0.1.10
+Flask-Funnel==0.1.7
 Flask-Script==2.0.3
 Flask-SeaSurf==0.1.22
 Flask-Markdown==0.3
