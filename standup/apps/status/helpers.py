@@ -24,7 +24,7 @@ def startdate(request):
     elif isday(day):
         return get_day(day)
     elif isday(week):
-        return get_day(week)
+        return week_start(get_day(week))
     return None
 
 
@@ -34,7 +34,7 @@ def enddate(request):
     if isday(day):
         return get_day(day) + timedelta(days=1)
     elif isday(week):
-        return get_day(week) + timedelta(days=7)
+        return week_end(get_day(week))
     return None
 
 
