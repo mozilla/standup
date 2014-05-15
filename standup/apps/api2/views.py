@@ -4,7 +4,7 @@ from flask import Blueprint, current_app, request
 from sqlalchemy import desc
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
-from standup.apps.api2.decorators import api_key_required
+from standup.apps.api2.decorators import api_key_required, crossdomain
 from standup.apps.status.models import Project, Status, WeekColumnClause
 from standup.apps.users.models import Team, User
 from standup.database import get_session
@@ -145,6 +145,7 @@ def _get_data(statuses, params):
     return data
 
 @blueprint.route('/statuses/home_timeline.json', methods=['GET'])
+@crossdomain(origin='*')
 def home_timeline():
     """Get a collection of the most recent status updates."""
     db = get_session(current_app)
@@ -168,6 +169,7 @@ def home_timeline():
 
 
 @blueprint.route('/statuses/user_timeline.json', methods=['GET'])
+@crossdomain(origin='*')
 def user_timeline():
     """Get a collection of the user's recent status updates."""
     db = get_session(current_app)
@@ -199,6 +201,7 @@ def user_timeline():
 
 
 @blueprint.route('/statuses/project_timeline.json', methods=['GET'])
+@crossdomain(origin='*')
 def project_timeline():
     """Get a collection of the project's recent status updates."""
     db = get_session(current_app)
@@ -239,6 +242,7 @@ def project_timeline():
 
 
 @blueprint.route('/statuses/team_timeline.json', methods=['GET'])
+@crossdomain(origin='*')
 def team_timeline():
     """Get a collection of the team's recent status updates."""
     MAX = current_app.config.get('API2_TIMELINE_MAX_RESULTS',
@@ -270,6 +274,7 @@ def team_timeline():
 
 @csrf.exempt
 @blueprint.route('/teams/create.json', methods=['POST'])
+@crossdomain(origin='*')
 @api_key_required
 def create_team():
     """Creates a new team."""
@@ -295,6 +300,7 @@ def create_team():
 
 @csrf.exempt
 @blueprint.route('/teams/destroy.json', methods=['POST'])
+@crossdomain(origin='*')
 @api_key_required
 def destroy_team():
     """Removes a team."""
@@ -315,6 +321,7 @@ def destroy_team():
 
 @csrf.exempt
 @blueprint.route('/teams/update.json', methods=['POST'])
+@crossdomain(origin='*')
 @api_key_required
 def update_team():
     """Update a team's info."""
@@ -332,6 +339,7 @@ def update_team():
 
 
 @blueprint.route('/teams/members.json', methods=['GET'])
+@crossdomain(origin='*')
 def team_members():
     """Get a list of members of the team."""
     try:
@@ -348,6 +356,7 @@ def team_members():
 
 @csrf.exempt
 @blueprint.route('/teams/members/create.json', methods=['POST'])
+@crossdomain(origin='*')
 @api_key_required
 def create_team_member():
     """Add a user to the team."""
@@ -371,6 +380,7 @@ def create_team_member():
 
 @csrf.exempt
 @blueprint.route('/teams/members/destroy.json', methods=['POST'])
+@crossdomain(origin='*')
 @api_key_required
 def destroy_team_member():
     """Remove a user from the team."""
@@ -389,6 +399,7 @@ def destroy_team_member():
 
 
 @blueprint.route('/info/timesince_last_update.json', methods=['GET'])
+@crossdomain(origin='*')
 def timesince_last_update():
     """Get the time since the users last update in seconds"""
     db = get_session(current_app)
