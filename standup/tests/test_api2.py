@@ -1,7 +1,7 @@
 import simplejson as json
 from flask import render_template_string
-from nose.tools import eq_
-from standup.apps.api2.decorators import api_key_required
+from nose.tools import eq_, ok_
+from standup.apps.api2.decorators import api_key_required, crossdomain
 from standup.apps.users.models import Team
 from standup.database import get_session
 from standup.tests import BaseTestCase, project, status, team, user
@@ -12,10 +12,54 @@ class DecoratorsTestCase(BaseTestCase):
     def setUp(self):
         super(DecoratorsTestCase, self).setUp()
 
+        # API Key test endpoints:
         @self.app.route('/_tests/_api/_protected', methods=['POST'])
         @api_key_required
         def protected():
             return render_template_string('Success!')
+
+        # Crossdomain test endpoints:
+        @self.app.route('/_tests/_api/_cd_none')
+        def no_crossdomain():
+            return render_template_string('Success!')
+
+        @self.app.route('/_tests/_api/_cd_defaultmethods')
+        @crossdomain(origin='*')
+        def defaultmethods():
+            return render_template_string('Success!')
+
+        @self.app.route('/_tests/_api/_cd_defaultmethods2', methods=self.get_some_methods())
+        @crossdomain(origin='*')
+        def defaultmethods2():
+            return render_template_string('Success!')
+
+        @self.app.route('/_tests/_api/_cd_getonly', methods=['GET', 'POST'])
+        @crossdomain(origin='*', methods=["GET"])
+        def getonly():
+            return render_template_string('Success!')
+
+        @self.app.route('/_tests/_api/_cd_oneorigin')
+        @crossdomain(origin='standup.example.com')
+        def oneorigin():
+            return render_template_string('Success!')
+
+        @self.app.route('/_tests/_api/_cd_multiorigin')
+        @crossdomain(origin=['standup.example.com', 'api.example.com'])
+        def multiorigin():
+            return render_template_string('Success!')
+
+        @self.app.route('/_tests/_api/_cd_headers')
+        @crossdomain(origin="*", headers=["A", "b"])
+        def crossdomain_headers():
+            return render_template_string('Success!')
+
+        @self.app.route('/_tests/_api/_cd_no_attach_to_all', methods=['GET', 'OPTIONS'])
+        @crossdomain(origin='*', attach_to_all=False)
+        def no_attach_to_all():
+            return render_template_string('Success!')
+
+    def get_some_methods(self):
+        return ['HEAD', 'GET','POST','DELETE', 'OPTIONS']
 
     def test_api_key_required(self):
         """Test the API key required decorator"""
@@ -35,6 +79,81 @@ class DecoratorsTestCase(BaseTestCase):
             content_type='application/x-www-form-urlencoded')
 
         eq_(response.status_code, 403)
+
+    def test_crossdomain(self):
+        """Test crossdomain decorator"""
+        # Test without crossdomain
+        response = self.client.get('/_tests/_api/_cd_none')
+        eq_(response.status_code, 200)
+        eq_(response.headers.get('Access-Control-Allow-Origin'), None)
+        eq_(response.headers.get('Access-Control-Allow-Methods'), None)
+
+        # Test with default methods
+        response = self.client.get('/_tests/_api/_cd_defaultmethods')
+        eq_(response.status_code, 200)
+        eq_(response.headers.get('Access-Control-Allow-Origin'), '*')
+        # default app-allowed methods:
+        eq_(response.headers.get('Access-Control-Allow-Methods'), 'HEAD, GET')
+
+        # Check an endpoint that allows more methods
+        response = self.client.get('/_tests/_api/_cd_defaultmethods2')
+        eq_(response.status_code, 200)
+        eq_(response.headers.get('Access-Control-Allow-Origin'), '*')
+        allowed_ac_methods = response.headers.get('Access-Control-Allow-Methods').split(", ")
+        expected_ac_methods = self.get_some_methods()
+        # They're not listed in order, so we have to check each one.
+        eq_(len(expected_ac_methods), len(allowed_ac_methods))
+        for m in expected_ac_methods:
+            ok_(m in allowed_ac_methods)
+
+        # Test with GET only
+        response = self.client.get('/_tests/_api/_cd_getonly')
+        eq_(response.status_code, 200)
+        eq_(response.headers.get('Access-Control-Allow-Origin'), '*')
+        eq_(response.headers.get('Access-Control-Allow-Methods'), "GET")
+
+        response = self.client.post('/_tests/_api/_cd_getonly', data='{}',
+            content_type='application/x-www-form-urlencoded')
+        eq_(response.status_code, 200)
+        eq_(response.headers.get('Access-Control-Allow-Origin'), '*')
+        eq_(response.headers.get('Access-Control-Allow-Methods'), "GET")
+
+        # Test default origin
+        #   Leaving 'origin' as the default (None) raises a TypeError, but
+        #   why would you do that? Adding @crossdomain implies you want to
+        #   allow one or more origins.
+
+        # Test with single-string origin
+        response = self.client.get('/_tests/_api/_cd_oneorigin')
+        eq_(response.status_code, 200)
+        eq_(response.headers.get('Access-Control-Allow-Origin'),
+                'standup.example.com')
+
+        # Test with a list of origins
+        response = self.client.get('/_tests/_api/_cd_multiorigin')
+        eq_(response.status_code, 200)
+        eq_(response.headers.get('Access-Control-Allow-Origin'),
+                'standup.example.com, api.example.com')
+
+        # Test OPTIONS request
+        response = self.client.options('/_tests/_api/_cd_defaultmethods2')
+        eq_(response.status_code, 200)
+        eq_(response.headers.get('Access-Control-Allow-Origin'), '*')
+
+        # Test normal request without 'attach_to_all'
+        # OPTIONS request should have the header:
+        response = self.client.options('/_tests/_api/_cd_no_attach_to_all')
+        eq_(response.status_code, 200)
+        eq_(response.headers.get('Access-Control-Allow-Origin'), '*')
+        # GET request should not:
+        response = self.client.get('/_tests/_api/_cd_no_attach_to_all')
+        eq_(response.status_code, 200)
+        eq_(response.headers.get('Access-Control-Allow-Origin'), None)
+
+        # Test with extra headers
+        response = self.client.get('/_tests/_api/_cd_headers')
+        eq_(response.status_code, 200)
+        eq_(response.headers.get('Access-Control-Allow-Headers'), 'A, B')
 
 
 class TimelinesMixin(object):
