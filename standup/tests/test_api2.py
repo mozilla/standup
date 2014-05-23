@@ -1,9 +1,11 @@
 import simplejson as json
+from datetime import datetime
 from flask import render_template_string
 from nose.tools import eq_, ok_
 from standup.apps.api2.decorators import api_key_required, crossdomain
 from standup.apps.users.models import Team
 from standup.database import get_session
+from standup.errors import ApiError
 from standup.tests import BaseTestCase, project, status, team, user
 from urllib import urlencode
 
@@ -301,6 +303,27 @@ class TimelinesMixin(object):
         response = self.client.get(self._url(dict(include_replies=1)))
         data = json.loads(response.data)
         eq_(len(data), 20)
+
+    def test_timeline_week(self):
+        """Test the week parameter of home_timeline"""
+        year = 2014
+        month = 5
+        day = 23
+        date_str = "%04d-%02d-%02d" % (year, month, day)
+        with self.app.app_context():
+            u = user(save=True, team={})
+            p = project(save=True)
+            d = datetime(year, month, day)
+            s = status(user=u, project=p, save=True, created=d)
+
+        # A badly formatted date should raise ApiError (returning 400)
+        response = self.client.get(self._url(dict(week="May 23, 2014")))
+        eq_(response.status_code, 400)
+
+        response = self.client.get(self._url(dict(week=date_str)))
+        eq_(response.status_code, 200)
+        data = json.loads(response.data)
+        ok_(data[0]['created'].startswith(date_str))
 
 
 class HomeTimelinesTestCase(BaseTestCase, TimelinesMixin):
