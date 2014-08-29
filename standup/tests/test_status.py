@@ -40,7 +40,7 @@ class HelpersTestCase(BaseTestCase):
         eq_(enddate(req), datetime(2012, 5, 25))
 
         req = create_request(query_string={'week': '2012-05-24'})
-        eq_(enddate(req), datetime(2012, 5, 27))
+        eq_(enddate(req), datetime(2012, 5, 27, 23, 59, 59))
 
         req = create_request(query_string={'day': 'today'})
         eq_(enddate(req), None)
@@ -102,10 +102,8 @@ class HelpersTestCase(BaseTestCase):
     def test_weeks(self):
         """Test the week start/end helper functions."""
         d = datetime(2014, 1, 29)
-        start = week_start(d)
-        eq_(start, datetime(2014, 1, 27))
-        end = week_end(d)
-        eq_(end, datetime(2014, 2, 2))
+        eq_(week_start(d), datetime(2014, 1, 27, 0, 0, 0))
+        eq_(week_end(d), datetime(2014, 2, 2, 23, 59, 59))
 
 
 class ModelsTestCase(BaseTestCase):

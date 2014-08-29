@@ -308,12 +308,14 @@ class TimelinesMixin(object):
         """Test the week parameter of home_timeline"""
         year = 2014
         month = 5
-        day = 23
+        # May 18th, 2014 is a Sunday so it tests the week_end edge
+        # case.
+        day = 18
         date_str = "%04d-%02d-%02d" % (year, month, day)
         with self.app.app_context():
             u = user(save=True, team={})
             p = project(save=True)
-            d = datetime(year, month, day)
+            d = datetime(year, month, day, 12, 0)
             s = status(user=u, project=p, save=True, created=d)
 
         # A badly formatted date should raise ApiError (returning 400)

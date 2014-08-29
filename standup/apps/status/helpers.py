@@ -59,9 +59,11 @@ def get_weeks(num_weeks=10):
 
 def week_start(d):
     """Weeks start on the Monday on or before the given date"""
-    return d - timedelta(d.isoweekday() - 1)
+    d = d - timedelta(d.isoweekday() - 1)
+    return datetime(d.year, d.month, d.day, 0, 0, 0)
 
 
 def week_end(d):
     """Weeks start on the Sunday on or after the given date"""
-    return d + timedelta(7 - d.isoweekday())
+    d = d + timedelta(7 - d.isoweekday())
+    return datetime(d.year, d.month, d.day, 23, 59, 59)
