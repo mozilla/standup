@@ -28,7 +28,7 @@ To set up a local dev environment for hacking:
 1. Create and activate a new virtual environment.
 2. Clone the repo::
 
-    $ git clone git://github.com/rlr/standup.git
+    $ git clone git://github.com/mozilla/standup.git
     $ cd standup
 
 3. Install required dependencies::
