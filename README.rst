@@ -2,6 +2,15 @@
  README
 ========
 
+Status
+======
+
+May 24th, 2016: This project is no longer maintained. If you're interested
+in taking over the project, write up an issue.
+
+Summary
+=======
+
 .. image:: https://travis-ci.org/rlr/standup.png
    :target: https://travis-ci.org/rlr/standup
 
