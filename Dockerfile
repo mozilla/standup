@@ -27,9 +27,10 @@ RUN ./bin/pipstrap.py
 # First copy requirements.txt and peep so we can take advantage of
 # docker caching.
 COPY requirements.txt /app/requirements.txt
+COPY requirements-dev.txt /app/requirements-dev.txt
 RUN pip install --require-hashes --no-cache-dir -r requirements-dev.txt
 
 COPY . /app
-RUN DEBUG=False SECRET_KEY=foo ALLOWED_HOSTS=localhost, DATABASE_URL=postgres://foo ./manage.py collectstatic --noinput -c
+# RUN DEBUG=False SECRET_KEY=foo ALLOWED_HOSTS=localhost, DATABASE_URL=postgres://foo ./manage.py collectstatic --noinput -c
 RUN chown webdev.webdev -R .
 USER webdev
