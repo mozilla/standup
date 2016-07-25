@@ -2,12 +2,6 @@
  README
 ========
 
-Status
-======
-
-May 24th, 2016: This project is no longer maintained. If you're interested
-in taking over the project, write up an issue.
-
 Summary
 =======
 
@@ -29,83 +23,41 @@ We developed it with the following priorities:
    through and work to unblock people.
 
 
+Years passed. It was cool then it kind of sucked. So we rewrote it in
+Django.
+
 Hacking
 =======
 
 To set up a local dev environment for hacking:
 
-1. Create and activate a new virtual environment.
-2. Clone the repo::
+1. Clone the repo::
 
-    $ git clone git://github.com/mozilla/standup.git
-    $ cd standup
+     $ git clone git://github.com/mozilla/standup.git
+     $ cd standup
 
-3. Install required dependencies::
+2. Configure.
 
-    $ pip install -r requirements-dev.txt
+3. Run::
 
-4. Configure::
+     $ docker-compose up
 
-    $ cp ./standup/local_settings.py-dist ./standup/local_settings.py
-    $ vim ./standup/local_settings.py
 
-5. Create the database using::
-
-    $ ./manage.py db_create
-
-6. Run the app::
-
-    $ ./manage.py runserver
-
+Then connect to it at http://localhost:8000/ .
 
 Oh, but wait--what can you do with it? Well, for testing purposes, you
-can use the included ``scripts/standup-cmd`` which is a command-line
+can use the included ``bin/standup-cmd`` which is a command-line
 tool you can use to create statuses.
 
 Example::
 
-    $ ./scripts/standup-cmd localhost:5000 ou812 willkg sumo "hi."
+  $ ./bin/standup-cmd localhost:8000 ou812 willkg sumo "hi."
 
-(This assumes your ``API_KEY`` is set to ou812.)
-
-Also, you can use the ``./manage.py`` script to add teams::
-
-    $ ./manage.py add_team "Team Awesome"
-    $ ./manage.py add_team -s "awesome" "Team Awesome"
-
-and projects::
-
-    $ ./manage.py add_project "DEATH MARCH"
-    $ ./manage.py add_project -s "death_march" "DEATH MARCH"
-    $ ./manage.py add_project -r "http://github.com/rlr/standups" "DEATH MARCH"
-    $ ./manage.py add_project -c "0000ff" "DEATH MARCH"
-
-And see stats for your instance::
-
-    $ ./manage.py stats
-
-
-Migrations
-==========
-
-To upgrade the database use::
-
-  $ ./manage.py db_upgrade
-
-You may optionally pass a version that you wish to upgrade to::
-
-  $ ./manage.py db_upgrade 8
-
-If you wish to downgrade, you must specify what version to downgrade to::
-
-  $ ./manage.py db_downgrade 4
-
-Finally you can check the current version of the database by using::
-
-  $ ./manage.py db_version
 
 Configuration
 =============
+
+FIXME: This is all wrong
 
 There's a ``standup/local_settings.py-dist`` template which you can copy
 to ``standup/local_settings.py`` to start you off.
@@ -163,17 +115,8 @@ These are things you can set in the environment when you launch standup:
 Testing
 =======
 
-We use nose for testing. To run the tests, do::
+We use pytest for testing. To run the tests, do::
 
-    $ nosetests
+  $ make test
 
 Remember to run tests before submitting pull requests!
-
-Also, we are trying to keep 100% test coverage, so make sure to check the coverage report
-as well. You can do that by running tests like this::
-
-    $ nosetests --with-coverage --cover-package=standup --cover-inclusive -v
-
-Or if you like, use our fab script::
-
-    $ fab test
