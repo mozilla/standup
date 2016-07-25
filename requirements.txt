@@ -1,16 +1,6 @@
-bleach==1.4
-Flask==0.10.1
-Flask-Funnel==0.1.7
-Flask-Script==2.0.3
-Flask-SeaSurf==0.1.22
-Flask-Markdown==0.3
-gunicorn==18.0
-Jinja2==2.7.2
-ordereddict==1.1
-psycopg2==2.5.2
-simplejson==3.4.1
-SQLAlchemy==0.9.4
-sqlalchemy-migrate==0.9.1
-Unidecode==0.04.16
-WTForms==1.0.5
--e git://github.com/mozilla/PyBrowserID.git@7281da84cd9e3ca3b4f5f3073d9096d5dad32f39#egg=PyBrowserID-dev
+Django>=1.8,<1.9
+bleach
+gunicorn
+Jinja2
+django-jinja
+Unidecode

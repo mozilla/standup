@@ -1,8 +1,0 @@
-scripts/
-tests/
-.coveragerc
-.travis.yml
-CONTRIBUTORS
-LICENSE
-README.rst
-test_settings.py

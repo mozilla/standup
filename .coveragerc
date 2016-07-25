@@ -1,6 +1,0 @@
-[run]
-
-omit =
-    */migrations/*
-    */*settings.py
-    */standup/__init__.py

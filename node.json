@@ -1,7 +1,0 @@
-{
-  "name": "standup",
-  "version": "0.0.0",
-  "dependencies": {
-    "less": "1.4.1"
-  }
-}

@@ -1,3 +1,0 @@
-SITE_URL = 'http://localhost:5000'
-SESSION_SECRET = '1234'
-LESS_PREPROCESS = True
