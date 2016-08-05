@@ -1,6 +1,6 @@
-========
- README
-========
+======
+README
+======
 
 Summary
 =======
@@ -23,8 +23,9 @@ We developed it with the following priorities:
    through and work to unblock people.
 
 
-Years passed. It was cool then it kind of sucked. So we rewrote it in
-Django.
+Years passed. It was cool, then time passed and it bitrotted and in that
+time we discovered we had various needs. So we rewrote it in Django.
+
 
 Hacking
 =======
