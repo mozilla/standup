@@ -1,3 +1,4 @@
+# base
 Django==1.8.14 --hash=sha256:1716747f7e0fbee6e2c1c0bcdb74307139d441a79eb4dcc97d206c615e1ded15
 bleach==1.4.3 --hash=sha256:1293061adb5a9eebb7b260516e691785ac08cc1646c8976aeda7db9dbb1c6f4b
 gunicorn==19.6.0 --hash=sha256:723234ea1fa8dff370ab69830ba8bc37469a7cba13fd66055faeef24085e6530
@@ -5,6 +6,8 @@ Jinja2==2.8 --hash=sha256:1cc03ef32b64be19e0a5b54578dd790906a34943fe9102cfdae0d4
 django-jinja==2.2.0 --hash=sha256:61e54b7aee2cb72f66f245a7539383034fdd8c87ae55f54ff55ab58bcccc750e
 Unidecode==0.4.19 --hash=sha256:51477646a9169469e37e791b13ae65fcc75b7f7f570d0d3e514d077805c02e1e
 MarkupSafe==0.23 --hash=sha256:a4ec1aff59b95a14b45eb2e23761a0179e98319da5a7eb76b56ea8cdc7b871c3
+
+# database
 psycopg2==2.6.2 --hash=sha256:70490e12ed9c5c818ecd85d185d363335cc8a8cbf7212e3c185431c79ff8c05c
 
 # static files
