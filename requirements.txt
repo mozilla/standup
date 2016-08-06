@@ -5,3 +5,11 @@ Jinja2==2.8 --hash=sha256:1cc03ef32b64be19e0a5b54578dd790906a34943fe9102cfdae0d4
 django-jinja==2.2.0 --hash=sha256:61e54b7aee2cb72f66f245a7539383034fdd8c87ae55f54ff55ab58bcccc750e
 Unidecode==0.4.19 --hash=sha256:51477646a9169469e37e791b13ae65fcc75b7f7f570d0d3e514d077805c02e1e
 MarkupSafe==0.23 --hash=sha256:a4ec1aff59b95a14b45eb2e23761a0179e98319da5a7eb76b56ea8cdc7b871c3
+psycopg2==2.6.2 --hash=sha256:70490e12ed9c5c818ecd85d185d363335cc8a8cbf7212e3c185431c79ff8c05c
+
+# static files
+whitenoise==3.2 --hash=sha256:13e5d6673c7c0805c73037b7745e027141a8e39c5b6ba669b631c8fb3d05b06e
+
+# configuration
+everett==0.1.0 --hash=sha256:0a1a9d231bb9ef4c168b66f6fdf1e8baac3cd926b3fcf7cb6f6468739d701204
+dj-database-url==0.4.1 --hash=sha256:7f4c78d2a090df8dfaf56d5d3ff7bbee17360436e4879558317e2314424864cd
