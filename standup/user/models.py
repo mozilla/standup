@@ -46,7 +46,8 @@ class StandupUser(models.Model):
         data['username'] = self.user.username
         data['name'] = self.user.name
         data['slug'] = self.slug
-        data['email'] = self.user.email
+        # FIXME: Should we be providing email addresses publicly via the api?
+        # data['email'] = self.user.email
         data['github_handle'] = self.github_handle
         data['is_staff'] = self.user.is_staff
         return data
