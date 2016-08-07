@@ -1,3 +1,7 @@
 from django.contrib import admin
 
-# Register your models here.
+from standup.user.models import StandupUser, Team
+
+
+admin.site.register(StandupUser)
+admin.site.register(Team)

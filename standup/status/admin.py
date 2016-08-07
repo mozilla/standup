@@ -1,3 +1,6 @@
 from django.contrib import admin
 
-# Register your models here.
+from standup.status.models import Project
+
+
+admin.site.register(Project)
