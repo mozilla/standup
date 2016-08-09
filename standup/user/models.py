@@ -25,9 +25,10 @@ class Team(models.Model):
 
 class StandupUser(models.Model):
     """A standup participant--tied to Django's User model."""
+    # Note: User provides "username", "name", "is_superuser", "is_staff" and
+    # "email"
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
-    # User provides "username", "name", "is_superuser", "is_staff" and "email"
     slug = models.SlugField(unique=True)
     github_handle = models.CharField(max_length=100, unique=True)
     teams = models.ManyToManyField(Team)

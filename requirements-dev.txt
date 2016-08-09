@@ -2,6 +2,11 @@
 
 pytest==2.9.2 --hash=sha256:ccc23b4aab3ef3e19e731de9baca73f3b1a7e610d9ec65b28c36a5a3305f0349
 mock==2.0.0 --hash=sha256:5ce3c71c5545b472da17b72268978914d0252980348636840bd34a00b5cc96c1
+factory_boy==2.7.0 --hash=sha256:36c949d5c7adefb02d25323b7a5a97dc698e58ef84c4654845ecb2e34bee9a23
+# Note: fake_factory gets changed to faker sometime after September 15th, 2016. That probably
+# means we need to update fake_factory and factory_boy packages.
+fake_factory==0.5.10 --hash=sha256:a3491f0a745a8bdd8199d1ffa04aeee3e38146a4cc3e7789ae785d159a9f69c4
+python-dateutil==2.5.3 --hash=sha256:598499a75be2e5e18a66f12c00dd47a069de24794effeda4228bfc760f44f527
 Sphinx==1.4.5 --hash=sha256:a1901af3d437473662daca2ee8f03c232d84af08a0b119d6bc55020661b12ab8
 pbr==1.10.0 --hash=sha256:f5cf7265a80636ecff66806d13494cbf9d77a3758a65fd8b4d4d4bee81b0c375
 py==1.4.31 --hash=sha256:4a3e4f3000c123835ac39cab5ccc510642153bc47bc1f13e2bbb53039540ae69
