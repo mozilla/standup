@@ -1,25 +1,18 @@
 <!doctype html>
-<html class="no-js">
+<html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
   <title>{% block title %}{% endblock %}</title>
   <meta name="description" content="Daily standup updates for your projects.">
-  <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}" />
-  {{ css('common') }}
-  {% for style in styles %}
-    {{ css(style) }}
-  {% endfor %}
-  <link rel="alternate" type="application/atom+xml" href="{{ config.SITE_URL + url_for('status.index_feed') }}" title="{{ config.SITE_TITLE }} Feed" />
+  <link rel="icon" type="image/png" href="{{ url('static', filename='img/favicon.png') }}" />
+  <link rel="alternate" type="application/atom+xml" href="{{ settings.SITE_URL + url('status.index_feed') }}" title="{{ settings.SITE_TITLE }} Feed" />
   {% block atom_feed %}{% endblock atom_feed %}
-  <script src="https://login.persona.org/include.js"></script>
-  <script src="{{ url_for('static', filename='js/vendor/modernizr-2.6.1.js') }}"></script>
 </head>
 <body>
-  <div class="page">
   <header>
     <div class="container_12">
       <div class="grid_2">
-        <a class="logo" href="{{ url_for('status.index') }}">{{ config.SITE_TITLE }}</a>
+        <a class="logo" href="{{ url('status.index') }}">{{ settings.SITE_TITLE }}</a>
       </div>
       <div class="grid_10">
         <nav>
@@ -30,7 +23,7 @@
                 <ul>
                   {% for team in teams %}
                   <li>
-                    <a {% if team == selected %}class="selected"{% endif %} href="{{ url_for('status.team', slug=team.slug) }}">
+                    <a {% if team == selected %}class="selected"{% endif %} href="{{ url('status.team', slug=team.slug) }}">
                     {{ team.name }}
                     </a>
                   </li>
@@ -43,7 +36,7 @@
               <ul>
                 {% for project in projects %}
                 <li>
-                    <a {% if project == selected %}class="selected"{% endif %} href="{{ url_for('status.project', slug=project.slug) }}">
+                    <a {% if project == selected %}class="selected"{% endif %} href="{{ url('status.project', slug=project.slug) }}">
                     {{ project.name }}
                     </a>
                   </li>
@@ -52,11 +45,11 @@
               </li>
               {% if weeks %}
               <li>
-              <a href="{{ url_for('status.weekly') }}">Weekly</a>
+              <a href="{{ url('status.weekly') }}">Weekly</a>
               <ul>
                 {% for week in weeks %}
                 <li>
-                  <a href="{{ url_for('status.weekly', week=week.start_date.date()|dateformat('%Y-%m-%d')) }}">
+                  <a href="{{ url('status.weekly', week=week.start_date.date()|dateformat('%Y-%m-%d')) }}">
                    {{week.start_date.date()|dateformat('%b %d')}} to {{ week.end_date.date()|dateformat('%b %d %Y') }}
                   </a>
                 </li>
@@ -72,7 +65,7 @@
                     <img src="{{ current_user.email|gravatar_url(size=22) }}" alt="">
                   </a>
                   <ul>
-                    <li><a href="{{ url_for('users.profile') }}">Profile</a></li>
+                    <li><a href="{{ url('users.profile') }}">Profile</a></li>
                     <li><a href="#" id="logout">Sign out</a></li>
                   </ul>
                 {% endif %}
@@ -104,7 +97,7 @@
     <footer>
       <div class="container_12 cf">
         <div class="grid_1">
-          <img src="{{ url_for('static', filename='img/logo-grey.png') }}" alt="">
+          <img src="{{ url('static', filename='img/logo-grey.png') }}" alt="">
         </div>
         <div class="grid_5">
           Standup is a neat little app that helps to organize and publish
@@ -113,7 +106,7 @@
         <div class="grid_6">
           <nav>
             <ul>
-              <li><a href="{{ url_for('landings.help') }}">Help &amp; FAQ</a></li>
+              <li><a href="{{ url('landings.help') }}">Help &amp; FAQ</a></li>
               <li><a href="https://github.com/mozilla/standup/issues">Report a bug</a></li>
               <li><a href="https://github.com/mozilla/standup">Contribute</a></li>
             </ul>
@@ -122,10 +115,5 @@
       </div>
     </footer>
   </div>
-
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  <script>window.jQuery || document.write('<script src="{{ url_for('static', filename='js/vendor/jquery-1.9.1.min.js') }}"><\/script>')</script>
-
-  {{ js('common') }}
 </body>
 </html>

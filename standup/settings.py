@@ -25,7 +25,7 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = True
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', parser=ListOf(str))
-
+SITE_TITLE = config('SITE_TITLE', default='standup')
 
 # Application definition
 
@@ -38,6 +38,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
 
     'django_jinja',
+    'django_jinja_markdown',
 
     'standup.user',
     'standup.status',
@@ -61,6 +62,7 @@ _CONTEXT_PROCESSORS = [
     'django.template.context_processors.request',
     'django.contrib.auth.context_processors.auth',
     'django.contrib.messages.context_processors.messages',
+    'standup.status.context_processors.status',
 ]
 
 TEMPLATES = [
@@ -79,12 +81,15 @@ TEMPLATES = [
             'undefined': 'jinja2.StrictUndefined',
             'extensions': [
                 'jinja2.ext.do',
+                'jinja2.ext.i18n',
                 'jinja2.ext.loopcontrols',
                 'jinja2.ext.with_',
                 'jinja2.ext.autoescape',
                 'django_jinja.builtins.extensions.CsrfExtension',
-                'django_jinja.builtins.extensions.StaticFilesExtension',
                 'django_jinja.builtins.extensions.DjangoFiltersExtension',
+                'django_jinja.builtins.extensions.StaticFilesExtension',
+                'django_jinja.builtins.extensions.UrlsExtension',
+                'django_jinja_markdown.extensions.MarkdownExtension',
             ],
         }
     },
