@@ -5,11 +5,9 @@ README
 Summary
 =======
 
-.. image:: https://travis-ci.org/rlr/standup.png
-   :target: https://travis-ci.org/rlr/standup
-
 standup is an app that logs daily status updates.
-It is currently in super early active development, check back later.
+It is in perpetual Beta which is to say that it probably has bugs and you
+shouldn't bet a million dollars on it.
 
 We developed it with the following priorities:
 
@@ -24,7 +22,8 @@ We developed it with the following priorities:
 
 
 Years passed. It was cool, then time passed and it bitrotted and in that
-time we discovered we had various needs. So we rewrote it in Django.
+time we discovered we had various needs and Persona was dying. So a small
+elite group of us rewrote it in Django.
 
 
 Hacking
@@ -41,7 +40,7 @@ To set up a local dev environment for hacking:
 
 3. Run::
 
-     $ docker-compose up
+     $ make run
 
 
 Then connect to it at http://localhost:8000/ .
