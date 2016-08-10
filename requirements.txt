@@ -10,6 +10,9 @@ Unidecode==0.4.19 --hash=sha256:51477646a9169469e37e791b13ae65fcc75b7f7f570d0d3e
 MarkupSafe==0.23 --hash=sha256:a4ec1aff59b95a14b45eb2e23761a0179e98319da5a7eb76b56ea8cdc7b871c3
 django-jinja-markdown==1.0.1 --hash=sha256:233dcde5d6895416f5613e4ca030e88f18a163e4b676e7aa815d191754f53085
 Markdown==2.6.6 --hash=sha256:022239550fb4a84bcc3b3b42dff9a41efc56d773ef17c4f28016dd8f265c82d0
+six==1.10.0 --hash=sha256:0ff78c403d9bccf5a425a6d31a12aa6b47f1c21ca4dc2573a7e2f32a97335eb1
+# 7 9s because bleach doesn't support anything after that, yet.
+html5lib==0.9999999 --hash=sha256:2612a191a8d5842bfa057e41ba50bbb9dcb722419d2408c78cff4758d0754868
 
 # database
 psycopg2==2.6.2 --hash=sha256:70490e12ed9c5c818ecd85d185d363335cc8a8cbf7212e3c185431c79ff8c05c
