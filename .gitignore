@@ -7,3 +7,4 @@
 local_settings.py
 .docker-build
 db.sqlite3
+staticfiles

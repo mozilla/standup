@@ -4,7 +4,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
   <title>{% block title %}{% endblock %}</title>
   <meta name="description" content="Daily standup updates for your projects.">
-  <link rel="icon" type="image/png" href="{{ url('static', filename='img/favicon.png') }}" />
+  <link rel="icon" type="image/png" href="{{ static('img/favicon.png') }}" />
   <link rel="alternate" type="application/atom+xml" href="{{ settings.SITE_URL + url('status.index_feed') }}" title="{{ settings.SITE_TITLE }} Feed" />
   {% block atom_feed %}{% endblock atom_feed %}
 </head>
@@ -97,7 +97,7 @@
     <footer>
       <div class="container_12 cf">
         <div class="grid_1">
-          <img src="{{ url('static', filename='img/logo-grey.png') }}" alt="">
+          <img src="{{ static('img/logo-grey.png') }}" alt="">
         </div>
         <div class="grid_5">
           Standup is a neat little app that helps to organize and publish

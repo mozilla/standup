@@ -50,6 +50,7 @@ lint:
 	${DOCKERCOMPOSE} run web flake8 --statistics collector
 
 test:
+	${DOCKERCOMPOSE} run web ./manage.py collectstatic --noinput -c
 	${DOCKERCOMPOSE} run web ./manage.py test
 
 docs:
