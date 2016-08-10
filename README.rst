@@ -5,6 +5,12 @@ README
 Summary
 =======
 
+**STATUS: August 10th, 2016**
+
+    This branch is a django rewrite of the original app. It's pretty
+    far from complete.
+
+
 standup is an app that logs daily status updates.
 It is in perpetual Beta which is to say that it probably has bugs and you
 shouldn't bet a million dollars on it.
@@ -57,59 +63,8 @@ Example::
 Configuration
 =============
 
-FIXME: This is all wrong
-
-There's a ``standup/local_settings.py-dist`` template which you can copy
-to ``standup/local_settings.py`` to start you off.
-
-These are things you can set in ``standup/local_settings.py``:
-
-    SITE_URL
-        The url for your site.
-
-        For example, if you're running on your local machine, it would be::
-
-            SITE_URL = 'http://127.0.0.1:5000'
-
-        You have to set this in production, but a default (the above) is
-        supplied for ease-of-development.
-
-    SESSION_SECRET
-        Secret string used for creating session variables. This can be
-        any string.
-
-        For example::
-
-            SESSION_SECRET = '1234'
-
-        You have to set this in production, but a default (the above) is
-        supplied for ease-of-development.
-
-    API_KEY
-        The key used for using the API. You use this for the standup-irc
-        bot as well as the standup-cli.
-
-        Defaults to something ridiculous.
-
-    API2_TIMELINES_MAX_RESULTS
-        Sets the maximum number of results that can be requested from the
-        timeline endpoints of the API (v2).
-
-        Defaults to 800.
-
-    DEBUG
-        Either ``True`` or ``False``. Determines whether it prints lots of
-        stuff to the console and whether errors get a debugging-friendly
-        error page.
-
-        Defaults to ``False``.
-
-These are things you can set in the environment when you launch standup:
-
-    DATABASE_URL
-        The uri to use for the database.
-
-        Defaults to ``sqlite:///standup_app.db``.
+See ``standup/settings.py`` for settings you can define in the
+environment.
 
 
 Testing
