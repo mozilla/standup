@@ -76,3 +76,25 @@ We use pytest for testing. To run the tests, do::
   $ make test
 
 Remember to run tests before submitting pull requests!
+
+
+To run on Heroku
+================
+
+1. Create a heroku app::
+
+     heroku apps:create myapp
+
+2. Push the code::
+
+     git push heroku master
+
+3. Set up required environment variables::
+
+     heroku config:set SECRET_KEY=<KEYHERE>
+     heroku config:set ALLOWED_HOSTS=<HEROKU_HOST_HERE>
+
+   You can see other variables you can set in the environment in
+   ``standup/settings.py``.
+
+4. You should be all set!
