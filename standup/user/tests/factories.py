@@ -33,4 +33,4 @@ class StandupUserFactory(factory.django.DjangoModelFactory):
     user = factory.SubFactory(UserFactory)
     slug = factory.LazyAttribute(lambda obj: slugify(obj.user.username))
     github_handle = factory.LazyAttribute(lambda obj: obj.user.username)
-    teams = []
+    # FIXME: teams

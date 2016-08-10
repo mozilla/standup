@@ -6,6 +6,7 @@ import bleach
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.templatetags.static import static
 
 from standup.user.models import StandupUser
 
@@ -19,7 +20,7 @@ def dateformat(date, fmt='%Y-%m-%d'):
 
 
 def gravatar_url(email, size=None):
-    m = hashlib.md5(email.lower())
+    m = hashlib.md5(email.encode('utf-8').lower())
     hash = m.hexdigest()
     url = 'http://www.gravatar.com/avatar/' + hash
 
@@ -27,12 +28,11 @@ def gravatar_url(email, size=None):
 
     # gravatar default URLs must be publicly accessible, so 'localhost' ones
     # are a no-go
-    site_url = settings.get('SITE_URL', '')
+    site_url = getattr(settings, 'SITE_URL', '')
     if settings.DEBUG or 'localhost' in site_url.lower():
         qs['d'] = 'mm'
     else:
-        qs['d'] = site_url + reverse(
-            'static', filename='img/default-avatar.png')
+        qs['d'] = site_url + static('img/default-avatar.png')
 
     if size:
         qs['s'] = size

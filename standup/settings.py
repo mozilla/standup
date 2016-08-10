@@ -37,6 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
 
     'django_jinja',
+    'django_jinja.contrib._humanize',
     'django_jinja_markdown',
 
     'standup.user',

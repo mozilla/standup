@@ -1,0 +1,97 @@
+{% macro end_of_statuses(url, statuses, page, week=None) %}
+  {# Shows the pagination bits #}
+  {% if statuses.has_previous() or statuses.has_next() %}
+    {% set url_base = url + '?' %}
+  {% endif %}
+  <div>
+    {% if statuses.has_previous() %}
+      <a href="{{ url_base }}page={{ page - 1 }}">Newer &raquo;</a>
+    {% endif %}
+    {% if statuses.has_next() %}
+      <a href="{{ url_base }}page={{ page + 1 }}">&laquo; Older</a>
+    {% endif %}
+  </div>
+{% endmacro %}
+
+{% macro begin_user_statuses(status) %}
+  <div>
+    <div>
+      <h4><a href="FIXME">{{ status.user.name }}</a></h4>
+      <a href="FIXME">@{{ status.user.username }}</a>
+    </div>
+    <div>
+      <a href="FIXME">
+        <img src="{% if status.user.email %}{{ status.user.email|gravatar_url(size=60) }}{% else %}{{ 'None'|gravatar_url(size=60) }}{% endif %}">
+      </a>
+    </div>
+    <div>
+      <ul>
+{% endmacro %}
+
+{% macro end_user_statuses(status) %}
+      </ul>
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro display_one_status(status, include_day=False) %}
+  <li class="cf">
+    <div>{{ status.content_html|format_update(status.project)|safe|urlize(trim_url_limit=32)|markdown }}</div>
+    <div>
+      <a href="FIXME">
+        <div datetime="{{ status.created|dateformat('%Y-%m-%dT%H:%M:%SZ') }}">
+          {% if include_day %}
+            {{ status.created|dateformat('%a %-I:%M %p') }}
+          {% else %}
+            {{ status.created|dateformat('%-I:%M %p') }}
+          {% endif %}
+        </div>
+      </a>
+
+      {# <a href="FIXME" class="comment-count">{{ status.replies()|length }}</a> #}
+
+      {% if status.project %}
+      <a class="project-name"
+         style="{% if status.project.color %}background-color: #{{ status.project.color }}; color: #{{ status.project.color }};{% endif %}"
+         href="FIXME">
+        {{ status.project.name }}
+      </a>
+      {% endif %}
+    </div>
+  </li>
+{% endmacro %}
+
+{% macro status_updates(statuses, url='/') %}
+  {# Takes a Paginator.page of statuses and displays them #}
+  {% if not statuses|length %}
+    <div>No status updates available.</div>
+  {% else %}
+    {% set last_user = None %}
+    {% set last_date = None %}
+
+    {% for status in statuses %}
+      {% if (status.user.username != last_user or last_date != status.created.date()) and not loop.first %}
+        {{ end_user_statuses(status) }}
+      {% endif %}
+
+      {% if last_date != status.created.date() %}
+        {% set last_date = status.created.date() %}
+        {% set last_user = None %}
+        <div>
+          <h3>
+            <a href="?day={{ status.created.date()|dateformat('%Y-%m-%d') }}">
+              {{ status.created|naturalday }}
+            </a>
+          </h3>
+        </div>
+      {% endif %}
+
+      {% if status.user.username != last_user %}
+        {% set last_user = status.user.username %}
+        {{ begin_user_statuses(status) }}
+      {% endif %}
+      {{ display_one_status(status) }}
+    {% endfor %}
+    {{ end_of_statuses(url, statuses, page) }}
+  {% endif %}
+{% endmacro %}

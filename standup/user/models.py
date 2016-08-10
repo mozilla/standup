@@ -40,12 +40,24 @@ class StandupUser(models.Model):
     def __repr__(self):
         return '<User: [%s] %s>' % (self.user.username, self.user.name)
 
+    @property
+    def name(self):
+        return self.user.get_full_name()
+
+    @property
+    def username(self):
+        return self.user.username
+
+    @property
+    def email(self):
+        return self.user.email
+
     def dictify(self):
         """Returns an OrderedDict of model attributes"""
         data = OrderedDict()
         data['id'] = self.id
-        data['username'] = self.user.username
-        data['name'] = self.user.name
+        data['username'] = self.username
+        data['name'] = self.name
         data['slug'] = self.slug
         # FIXME: Should we be providing email addresses publicly via the api?
         # data['email'] = self.user.email

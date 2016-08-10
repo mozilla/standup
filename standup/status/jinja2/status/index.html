@@ -1,5 +1,4 @@
 {% from 'includes/macros.html' import status_updates %}
-{% from 'includes/macros.html' import statusize with context %}
 
 {% extends "base.html" %}
 
@@ -7,14 +6,8 @@
   {{ settings.SITE_TITLE }}
 {% endblock %}
 
-{% block before_content %}
-  {% if 'user_id' in session %}
-    {{ statusize() }}
-  {% endif %}
-{% endblock %}
-
 {% block content %}
   <div class="grid_12">
-    {{ status_updates(statuses, page) }}
+    {{ status_updates(statuses) }}
   </div>
 {% endblock %}

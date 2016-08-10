@@ -5,115 +5,41 @@
   <title>{% block title %}{% endblock %}</title>
   <meta name="description" content="Daily standup updates for your projects.">
   <link rel="icon" type="image/png" href="{{ static('img/favicon.png') }}" />
-  <link rel="alternate" type="application/atom+xml" href="{{ settings.SITE_URL + url('status.index_feed') }}" title="{{ settings.SITE_TITLE }} Feed" />
-  {% block atom_feed %}{% endblock atom_feed %}
 </head>
 <body>
   <header>
-    <div class="container_12">
-      <div class="grid_2">
-        <a class="logo" href="{{ url('status.index') }}">{{ settings.SITE_TITLE }}</a>
-      </div>
-      <div class="grid_10">
-        <nav>
-          <ul>
-            {% if teams %}
-              <li>
-                <a href="#">Teams</a>
-                <ul>
-                  {% for team in teams %}
-                  <li>
-                    <a {% if team == selected %}class="selected"{% endif %} href="{{ url('status.team', slug=team.slug) }}">
-                    {{ team.name }}
-                    </a>
-                  </li>
-                  {% endfor %}
-                </ul>
-              </li>
-            {% endif %}
-            <li>
-              <a href="#">Projects</a>
-              <ul>
-                {% for project in projects %}
-                <li>
-                    <a {% if project == selected %}class="selected"{% endif %} href="{{ url('status.project', slug=project.slug) }}">
-                    {{ project.name }}
-                    </a>
-                  </li>
-                  {% endfor %}
-                </ul>
-              </li>
-              {% if weeks %}
-              <li>
-              <a href="{{ url('status.weekly') }}">Weekly</a>
-              <ul>
-                {% for week in weeks %}
-                <li>
-                  <a href="{{ url('status.weekly', week=week.start_date.date()|dateformat('%Y-%m-%d')) }}">
-                   {{week.start_date.date()|dateformat('%b %d')}} to {{ week.end_date.date()|dateformat('%b %d %Y') }}
-                  </a>
-                </li>
-                {% endfor %}
-              </ul>
-              </li>
-              {% endif %}
-              <li>
-                {% if not 'user_id' in session %}
-                  <a href="#" id="login">Sign in with Persona</a>
-                {% else %}
-                  <a href="#" id="user-menu">
-                    <img src="{{ current_user.email|gravatar_url(size=22) }}" alt="">
-                  </a>
-                  <ul>
-                    <li><a href="{{ url('users.profile') }}">Profile</a></li>
-                    <li><a href="#" id="logout">Sign out</a></li>
-                  </ul>
-                {% endif %}
-              </li>
-            </ul>
-          </nav>
-        </div>
-      </div>
-    </header>
+    <a class="logo" href="{{ url('home-view') }}">{{ settings.SITE_TITLE }}</a>
+    <nav>
+      <ul>
+        <li>TEAMS</li>
+        <li>PROJECTS</li>
+        <li>WEEKLY</li>
+        <li>SIGN-IN</li>
+      </ul>
+    </nav>
+  </header>
 
-    <div id="main-content" class="container_12 cf">
-      <div id="main-notices" class="grid_12">
-        {% with notices = get_flashed_messages(with_categories=True) %}
-          {% if notices %}
-            {% for category, notice in notices %}
-              <div class="notice {{ category }}">{{ notice }}</div>
-            {% endfor %}
-          {% endif %}
-        {% endwith %}
-        {% block notices %}
-
-        {% endblock %}
-      </div>
-      {% block before_content %}{% endblock %}
-      {% block content %}{% endblock %}
-      {% block after_content %}{% endblock %}
-    </div>
-
-    <footer>
-      <div class="container_12 cf">
-        <div class="grid_1">
-          <img src="{{ static('img/logo-grey.png') }}" alt="">
-        </div>
-        <div class="grid_5">
-          Standup is a neat little app that helps to organize and publish
-          asynchronous status updates.
-        </div>
-        <div class="grid_6">
-          <nav>
-            <ul>
-              <li><a href="{{ url('landings.help') }}">Help &amp; FAQ</a></li>
-              <li><a href="https://github.com/mozilla/standup/issues">Report a bug</a></li>
-              <li><a href="https://github.com/mozilla/standup">Contribute</a></li>
-            </ul>
-          </nav>
-        </div>
-      </div>
-    </footer>
+  <div id="main-content">
+    {% block before_content %}{% endblock %}
+    {% block content %}{% endblock %}
+    {% block after_content %}{% endblock %}
   </div>
+
+  <footer>
+    <img src="{{ static('img/logo-grey.png') }}" alt="">
+    <div>
+      Standup is a neat little app that helps to organize and publish
+      asynchronous status updates.
+    </div>
+    <div>
+      <nav>
+        <ul>
+          <li><a href="FIXME">Help &amp; FAQ</a></li>
+          <li><a href="https://github.com/mozilla/standup/issues">Report a bug</a></li>
+          <li><a href="https://github.com/mozilla/standup">Contribute</a></li>
+        </ul>
+      </nav>
+    </div>
+  </footer>
 </body>
 </html>
