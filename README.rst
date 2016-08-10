@@ -2,14 +2,15 @@
 README
 ======
 
+STATUS: August 10th, 2016
+=========================
+
+This branch is a django rewrite of the original app. It's pretty
+far from complete.
+
+
 Summary
 =======
-
-**STATUS: August 10th, 2016**
-
-    This branch is a django rewrite of the original app. It's pretty
-    far from complete.
-
 
 standup is an app that logs daily status updates.
 It is in perpetual Beta which is to say that it probably has bugs and you
