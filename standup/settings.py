@@ -1,18 +1,26 @@
 import os
+from pathlib import Path
 
-from everett.manager import ConfigManager, ConfigOSEnv, ListOf
+from everett.manager import ConfigManager, ConfigEnvFileEnv, ConfigOSEnv, ListOf
 import dj_database_url
+
+
+ROOT_PATH = Path(__file__).resolve().parents[1]
+
+
+def path(*paths):
+    return str(ROOT_PATH.joinpath(*paths))
 
 
 config = ConfigManager([
     # Pull configuration from the OS--no ini files.
     ConfigOSEnv(),
+    ConfigEnvFileEnv(path('.env')),
 ])
 
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# Build paths inside the project like this: path(...)
+BASE_DIR = str(ROOT_PATH)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
@@ -23,7 +31,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', parser=ListOf(str))
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', parser=ListOf(str), default='localhost')
 SITE_TITLE = config('SITE_TITLE', default='standup')
 
 # Application definition
@@ -113,7 +121,9 @@ WSGI_APPLICATION = 'standup.wsgi.application'
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
 DATABASES = {
-    'default': config('DATABASE_URL', parser=dj_database_url.parse)
+    'default': config('DATABASE_URL',
+                      parser=dj_database_url.parse,
+                      default='sqlite:///db.sqlite3')
 }
 
 
@@ -134,6 +144,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = path('staticfiles')
 STATIC_URL = '/static/'
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
