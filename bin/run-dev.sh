@@ -1,4 +1,5 @@
-#!/bin/sh
+#!/bin/bash -ex
 
+urlwait
 ./bin/run-common.sh
-./manage.py runserver 0.0.0.0:8000
+exec python3 manage.py runserver 0.0.0.0:8000

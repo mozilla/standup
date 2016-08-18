@@ -1,0 +1,32 @@
+FROM quay.io/mozmar/base
+
+# Set Python-related environment variables to reduce annoying-ness
+ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PIP_DISABLE_PIP_VERSION_CHECK 1
+ENV LANG C.UTF-8
+
+# Project settings
+ENV DJANGO_SETTINGS_MODULE standup.settings
+
+EXPOSE 8000
+CMD ["./bin/run-supervisor.sh", "prod"]
+WORKDIR /app
+RUN update-alternatives --install /bin/sh sh /bin/bash 10
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+                    build-essential python3-{dev,pip,setuptools} \
+                    gettext libpq-dev supervisor && \
+    rm -rf /var/lib/apt/lists/*
+
+# First copy requirements.txt so we can take advantage of
+# docker caching.
+COPY requirements.txt /app/requirements.txt
+RUN pip3 install --require-hashes --no-cache-dir -r requirements.txt
+
+COPY . /app
+RUN DEBUG=False SECRET_KEY=foo ALLOWED_HOSTS=localhost DATABASE_URL=sqlite:// ./manage.py collectstatic --noinput
+
+RUN adduser --uid 1000 --disabled-password --gecos '' --no-create-home webdev
+RUN chown webdev.webdev -R .

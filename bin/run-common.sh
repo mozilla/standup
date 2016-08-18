@@ -1,7 +1,5 @@
-#!/bin/bash
+#!/bin/bash -ex
 
 # Migrate the db
-./manage.py migrate
-
-# Collect any static files
-./manage.py collectstatic --noinput -c
+python3 manage.py migrate --noinput
+python3 manage.py collectstatic --noinput -c
