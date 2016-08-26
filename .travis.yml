@@ -1,8 +1,17 @@
+sudo: no
 language: python
-python:
- - "2.6"
- - "2.7"
-install:
- - pip install -r requirements-dev.txt --use-mirrors
-script:
- - nosetests --with-coverage --cover-package=standup --cover-inclusive -v
+python: "3.5"
+
+env:
+  global:
+    - PIP_DOWNLOAD_CACHE="pip_cache"
+
+cache:
+  directories:
+    - pip_cache
+
+install: pip install -r requirements-dev.txt --use-mirrors
+
+before_script: python manage.py collectstatic --noinput -c
+
+script: python manage.py test
