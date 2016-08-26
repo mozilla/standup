@@ -2,10 +2,10 @@
 README
 ======
 
-STATUS: August 10th, 2016
+STATUS: August 26th, 2016
 =========================
 
-This branch is a django rewrite of the original app. It's pretty
+This is currently undergoing a django rewrite of the original app. It's pretty
 far from complete.
 
 
