@@ -5,6 +5,7 @@ python: "3.5"
 env:
   global:
     - PIP_DOWNLOAD_CACHE="pip_cache"
+    - SECRET_KEY="foo"
 
 cache:
   directories:
