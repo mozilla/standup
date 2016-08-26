@@ -10,7 +10,7 @@ cache:
   directories:
     - pip_cache
 
-install: pip install -r requirements-dev.txt --use-mirrors
+install: pip install -r requirements-dev.txt
 
 before_script: python manage.py collectstatic --noinput -c
 
