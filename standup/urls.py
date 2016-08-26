@@ -17,7 +17,9 @@ from django.contrib import admin
 
 
 urlpatterns = [
+    url(r'^api/', include('standup.api.urls')),
+    url(r'^admin/', include(admin.site.urls)),
+
     url(r'', include('standup.status.urls')),
 
-    url(r'^admin/', include(admin.site.urls)),
 ]

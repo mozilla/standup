@@ -49,6 +49,7 @@ INSTALLED_APPS = (
     'django_jinja_markdown',
 
     'standup.user',
+    'standup.api',
     'standup.status',
 )
 

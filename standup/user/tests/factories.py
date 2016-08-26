@@ -1,12 +1,11 @@
 import factory
 
-from django.contrib.auth import models as django_auth_models
 from django.template.defaultfilters import slugify
 
 
 class UserFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = django_auth_models.User
+        model = 'auth.User'
 
     username = factory.Faker('user_name')
     first_name = factory.Faker('first_name')
