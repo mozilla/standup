@@ -18,11 +18,11 @@ help:
 	make build
 
 build:
-	${DOCKERCOMPOSE} build
+	${DOCKERCOMPOSE} -f docker-compose.build.yml build
 	touch .docker-build
 
 run: .docker-build
-	${DOCKERCOMPOSE} up
+	${DOCKERCOMPOSE} up web
 
 clean:
 	# python related things
@@ -46,14 +46,13 @@ clean:
 	-rm .docker-build
 	-rm .docker-build-prod
 
-lint:
+lint: .docker-build
 	${DOCKERCOMPOSE} run web flake8 --statistics collector
 
-test:
-	${DOCKERCOMPOSE} run web ./manage.py collectstatic --noinput -c
-	${DOCKERCOMPOSE} run web py.test
+test: .docker-build
+	${DOCKERCOMPOSE} run test
 
-docs:
+docs: .docker-build
 	${DOCKERCOMPOSE} run web $(MAKE) -C docs/ clean
 	${DOCKERCOMPOSE} run web $(MAKE) -C docs/ html
 
