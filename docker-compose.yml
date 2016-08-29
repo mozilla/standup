@@ -34,6 +34,8 @@ services:
 
   test:
     image: local/standup_dev
+    volumes:
+      - .:/app
     links:
       - db
     environment:
