@@ -32,7 +32,7 @@ class Status(models.Model):
 
     created = models.DateTimeField(default=now)
     user = models.ForeignKey('user.StandupUser', related_name='statuses')
-    project = models.ForeignKey('Project', related_name='statuses')
+    project = models.ForeignKey('Project', related_name='statuses', null=True)
     content = models.TextField()
     content_html = models.TextField()
     reply_to = models.ForeignKey(
