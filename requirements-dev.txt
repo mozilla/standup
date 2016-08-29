@@ -1,6 +1,11 @@
 -r requirements.txt
 
-pytest==2.9.2 --hash=sha256:ccc23b4aab3ef3e19e731de9baca73f3b1a7e610d9ec65b28c36a5a3305f0349
+pytest==3.0.1 \
+    --hash=sha256:ba6ae459222c3ee650d9e7a3f8cbf69c23c20ed6977496e9081f3b8da19107d0 \
+    --hash=sha256:e82bc0596ee96b2287c08705cfcb6898db1fe4b5c87db3b6823f1fdd77fb3ff1
+pytest-django==3.0.0 \
+    --hash=sha256:7898731205fa245926c800273dcffcd9b25e0b660a363ecb6cc2901ffe4aa1cc \
+    --hash=sha256:5952283b0e6e0f9d8cb46803636e3940e1c77da8a529f03a8a4320f52d9bf560
 mock==2.0.0 --hash=sha256:5ce3c71c5545b472da17b72268978914d0252980348636840bd34a00b5cc96c1
 factory_boy==2.7.0 --hash=sha256:36c949d5c7adefb02d25323b7a5a97dc698e58ef84c4654845ecb2e34bee9a23
 # Note: fake_factory gets changed to faker sometime after September 15th, 2016. That probably

@@ -51,7 +51,7 @@ lint:
 
 test:
 	${DOCKERCOMPOSE} run web ./manage.py collectstatic --noinput -c
-	${DOCKERCOMPOSE} run web ./manage.py test
+	${DOCKERCOMPOSE} run web py.test
 
 docs:
 	${DOCKERCOMPOSE} run web $(MAKE) -C docs/ clean
