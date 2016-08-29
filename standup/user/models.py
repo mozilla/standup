@@ -38,7 +38,7 @@ class StandupUser(models.Model):
         pass
 
     def __repr__(self):
-        return '<User: [%s] %s>' % (self.user.username, self.user.name)
+        return '<StandupUser: [{}]>'.format(self.user.username)
 
     @property
     def name(self):
