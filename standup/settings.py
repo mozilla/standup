@@ -1,4 +1,5 @@
 import os
+import sys
 from pathlib import Path
 
 from everett.manager import ConfigManager, ConfigEnvFileEnv, ConfigOSEnv, ListOf
@@ -152,3 +153,7 @@ SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default='false', parser=bool
 STATIC_ROOT = path('staticfiles')
 STATIC_URL = '/static/'
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+
+if sys.argv[0].endswith('py.test'):
+    # won't barf if staticfiles are missing
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
