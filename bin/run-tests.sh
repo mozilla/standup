@@ -1,5 +1,5 @@
 #!/bin/bash -ex
 
-urlwait
+#urlwait
 ./bin/run-common.sh
-py.test standup
+py.test

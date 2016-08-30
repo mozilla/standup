@@ -13,7 +13,6 @@ def path(*paths):
 
 
 config = ConfigManager([
-    # Pull configuration from the OS--no ini files.
     ConfigOSEnv(),
     ConfigEnvFileEnv(path('.env')),
 ])
@@ -29,7 +28,7 @@ BASE_DIR = str(ROOT_PATH)
 SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default='false', parser=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', parser=ListOf(str), default='localhost')
 SITE_TITLE = config('SITE_TITLE', default='standup')
@@ -62,7 +61,6 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
-
     'whitenoise.middleware.WhiteNoiseMiddleware',
 )
 
@@ -140,6 +138,12 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+SECURE_BROWSER_XSS_FILTER = config('SECURE_BROWSER_XSS_FILTER', default='true', parser=bool)
+# this should be 31536000 in prod (1 year)
+SECURE_HSTS_SECONDS = config('SECURE_HSTS_SECONDS', default='0', parser=int)
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default='false', parser=bool)
 
 
 # Static files (CSS, JavaScript, Images)

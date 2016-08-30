@@ -4,6 +4,7 @@ services:
   db:
     image: postgres:9.4
 
+  # run the site with the django dev-server
   web:
     image: local/standup_dev
     ports:
@@ -15,9 +16,10 @@ services:
     environment:
       - DATABASE_URL=postgres://postgres@db/postgres
       - DEBUG=True
-      - ALLOWED_HOSTS=localhost,127.0.0.1,
-      - SECRET_KEY=59114b6a-2858-4caf-8878-482a24ee9542
+      - ALLOWED_HOSTS=localhost,127.0.0.1
+      - SECRET_KEY=itsasekrit
 
+  # run the site in a prod-like environment
   prod:
     image: local/standup_base
     ports:
@@ -29,18 +31,17 @@ services:
     environment:
       - DATABASE_URL=postgres://postgres@db/postgres
       - DEBUG=False
-      - ALLOWED_HOSTS=localhost,127.0.0.1,
-      - SECRET_KEY=59114b6a-2858-4caf-8878-482a24ee9542
+      - ALLOWED_HOSTS=localhost,127.0.0.1
+      - SECRET_KEY=itsasekrit
 
+  # run the tests
   test:
     image: local/standup_dev
     volumes:
       - .:/app
-    links:
-      - db
     environment:
-      - DATABASE_URL=postgres://postgres@db/postgres
-      - ALLOWED_HOSTS=localhost,127.0.0.1,
-      - SECRET_KEY=59114b6a-2858-4caf-8878-482a24ee9542
+      - DATABASE_URL=sqlite://
+      - ALLOWED_HOSTS=localhost,127.0.0.1
+      - SECRET_KEY=itsasekrit
     command:
       ./bin/run-tests.sh

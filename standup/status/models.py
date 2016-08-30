@@ -12,7 +12,13 @@ class Project(models.Model):
     name = models.CharField(max_length=100, unique=True)
     slug = models.CharField(max_length=100, unique=True)
     color = models.CharField(max_length=6)
-    repo_url = models.URLField()
+    repo_url = models.URLField(max_length=100)
+
+    class Meta:
+        db_table = 'project'
+
+    def __str__(self):
+        return self.name
 
     def __repr__(self):
         return '<Project: [%s] %s>' % (self.slug, self.name)
@@ -38,6 +44,12 @@ class Status(models.Model):
     reply_to = models.ForeignKey(
         'self', blank=True, null=True, default=None,
         on_delete=models.SET_DEFAULT)
+
+    class Meta:
+        db_table = 'status'
+
+    def __str__(self):
+        return 'Status from %s' % self.user.username
 
     def __repr__(self):
         return '<Status: %s: %s>' % (self.user.username, self.content)
