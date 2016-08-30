@@ -10,7 +10,13 @@ class Team(models.Model):
         max_length=100,
         help_text='Name of the team'
     )
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(unique=True, max_length=100)
+
+    class Meta:
+        db_table = 'team'
+
+    def __str__(self):
+        return self.name
 
     def __repr__(self):
         return '<Team: [%s]>' % (self.name,)
@@ -23,19 +29,38 @@ class Team(models.Model):
         return data
 
 
+class LegacyUser(models.Model):
+    """A model for the old users in the Flask-based instance.
+
+    For use with the initial data migration. After the new standup
+    is in production this can be deleted.
+    """
+    username = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
+    slug = models.CharField(max_length=100)
+    email = models.CharField(max_length=100, blank=True)
+    github_handle = models.CharField(max_length=100, blank=True)
+    is_admin = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'user'
+
+
 class StandupUser(models.Model):
     """A standup participant--tied to Django's User model."""
     # Note: User provides "username", "name", "is_superuser", "is_staff" and
     # "email"
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
 
     slug = models.SlugField(unique=True)
     github_handle = models.CharField(max_length=100, unique=True)
     teams = models.ManyToManyField(Team)
 
     class Meta:
-        # FIXME: can we order by self.user.username ?
-        pass
+        ordering = ('user__username',)
+
+    def __str__(self):
+        return self.user.get_full_name()
 
     def __repr__(self):
         return '<StandupUser: [{}]>'.format(self.user.username)

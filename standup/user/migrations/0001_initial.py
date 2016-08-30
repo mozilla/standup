@@ -7,35 +7,33 @@ from django.conf import settings
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='StandupUser',
+            name='LegacyUser',
             fields=[
-                ('id', models.AutoField(serialize=False, verbose_name='ID', auto_created=True, primary_key=True)),
-                ('slug', models.SlugField(unique=True)),
-                ('github_handle', models.CharField(unique=True, max_length=100)),
+                ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True, serialize=False)),
+                ('username', models.CharField(max_length=100)),
+                ('name', models.CharField(max_length=100)),
+                ('slug', models.CharField(max_length=100)),
+                ('email', models.CharField(blank=True, max_length=100)),
+                ('github_handle', models.CharField(blank=True, max_length=100)),
+                ('is_admin', models.BooleanField(default=False)),
             ],
+            options={
+                'db_table': 'user',
+            },
         ),
         migrations.CreateModel(
             name='Team',
             fields=[
-                ('id', models.AutoField(serialize=False, verbose_name='ID', auto_created=True, primary_key=True)),
+                ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True, serialize=False)),
                 ('name', models.CharField(help_text='Name of the team', max_length=100)),
-                ('slug', models.SlugField(unique=True)),
+                ('slug', models.SlugField(unique=True, max_length=100)),
             ],
-        ),
-        migrations.AddField(
-            model_name='standupuser',
-            name='teams',
-            field=models.ManyToManyField(to='user.Team'),
-        ),
-        migrations.AddField(
-            model_name='standupuser',
-            name='user',
-            field=models.OneToOneField(to=settings.AUTH_USER_MODEL),
+            options={
+                'db_table': 'team',
+            },
         ),
     ]

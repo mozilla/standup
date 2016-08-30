@@ -27,5 +27,5 @@ RUN pip3 install --require-hashes --no-cache-dir -r requirements.txt
 
 COPY . /app
 
-RUN adduser --uid 1000 --disabled-password --gecos '' --no-create-home webdev
-RUN chown webdev.webdev -R .
+# process static files
+RUN bin/phb-manage.sh collectstatic --noinput

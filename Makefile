@@ -14,11 +14,19 @@ help:
 	@echo "test-coverage - run tests and generate coverage report in cover/"
 	@echo "docs          - generate Sphinx HTML documentation, including API docs"
 
+.docker-build-base:
+	make build-base
+
 .docker-build:
 	make build
 
-build:
-	${DOCKERCOMPOSE} -f docker-compose.build.yml build
+build-base:
+	${DOCKERCOMPOSE} -f docker-compose.build.yml build --pull base
+	rm -f .docker-build
+	touch .docker-build-base
+
+build: .docker-build-base
+	${DOCKERCOMPOSE} -f docker-compose.build.yml build web
 	touch .docker-build
 
 run: .docker-build
@@ -56,4 +64,4 @@ docs: .docker-build
 	${DOCKERCOMPOSE} run web $(MAKE) -C docs/ clean
 	${DOCKERCOMPOSE} run web $(MAKE) -C docs/ html
 
-.PHONY: default clean build docs lint run test test-coverage
+.PHONY: default clean build-base build docs lint run test test-coverage
