@@ -4,5 +4,5 @@ from . import views
 
 
 urlpatterns = [
-    url(r'^$', views.home_view, name='home-view'),
+    url(r'^v1/status/', views.StatusPost.as_view(), name='api-status-post')
 ]
