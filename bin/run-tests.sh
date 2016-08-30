@@ -1,4 +1,5 @@
 #!/bin/bash -ex
 
-./bin/run-common.sh
-py.test
+export DATABASE_URL=sqlite:// SECRET_KEY=itsasekrit
+
+py.test $@
