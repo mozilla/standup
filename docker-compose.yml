@@ -45,3 +45,13 @@ services:
       - SECRET_KEY=itsasekrit
     command:
       ./bin/run-tests.sh
+
+  # run the tests against the files in the image, not local
+  test-image:
+    image: local/standup_dev
+    environment:
+      - DATABASE_URL=sqlite://
+      - ALLOWED_HOSTS=localhost,127.0.0.1
+      - SECRET_KEY=itsasekrit
+    command:
+      ./bin/run-tests.sh

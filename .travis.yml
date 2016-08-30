@@ -1,18 +1,13 @@
-sudo: no
-language: python
-python: "3.5"
-
+services: docker
 env:
   global:
-    - PIP_DOWNLOAD_CACHE="pip_cache"
-    - SECRET_KEY="foo"
-
-cache:
-  directories:
-    - pip_cache
-
-install: pip install -r requirements-dev.txt
-
-before_script: python manage.py collectstatic --noinput
-
-script: py.test
+    - DOCKER_REGISTRY=registry.heroku.com
+    - HEROKU_PROD_APP=standups
+    - HEROKU_STAGE_APP=standupstage
+    - HEROKU_PROC_TYPE=web
+before_install:
+  - docker -v
+  - docker-compose -v
+install: make build
+script: make test-image
+after_success: bin/deploy.sh

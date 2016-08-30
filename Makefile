@@ -2,6 +2,7 @@ DOCKERCOMPOSE = $(shell which docker-compose)
 
 default:
 	@echo "You need to specify a subcommand."
+	make help
 	@exit 1
 
 help:
@@ -10,8 +11,10 @@ help:
 	@echo ""
 	@echo "clean         - remove all build, test, coverage and Python artifacts"
 	@echo "lint          - check style with flake8"
-	@echo "test          - run tests"
+	@echo "test          - run tests against local files"
+	@echo "test-image    - run tests against files in docker image"
 	@echo "test-coverage - run tests and generate coverage report in cover/"
+	@echo "build-base    - (re)build base docker container"
 	@echo "docs          - generate Sphinx HTML documentation, including API docs"
 
 .docker-build-base:
@@ -59,6 +62,9 @@ lint: .docker-build
 
 test: .docker-build
 	${DOCKERCOMPOSE} run test
+
+test-image: .docker-build
+	${DOCKERCOMPOSE} run test-image
 
 docs: .docker-build
 	${DOCKERCOMPOSE} run web $(MAKE) -C docs/ clean
