@@ -1,0 +1,24 @@
+{% from 'includes/macros.html' import status_updates %}
+{% from 'includes/macros.html' import statusize with context %}
+
+{% extends "base.html" %}
+
+{% block title %}
+  Project: {{ project.name }} | {{ settings.SITE_TITLE }}
+{% endblock %}
+
+{% block before_content %}
+  {% if 'user_id' in session %}
+    {{ statusize() }}
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  <div class="grid_12">
+    {{ status_updates(statuses, url=url('status.project', slug=project.slug)) }}
+  </div>
+{% endblock %}
+
+{% block atom_feed %}
+  <link rel="alternate" type="application/atom+xml" href="{{ settings.SITE_URL + url('status.project_feed', slug=project.slug) }}" title="{{ settings.SITE_TITLE }} Feed for {{ project.name }}" />
+{% endblock atom_feed %}

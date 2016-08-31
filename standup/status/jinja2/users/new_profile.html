@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% set styles = ('profile',) %}
+
+{% block content %}
+  <div class="grid_12 banner">
+    <h1>Welcome to Standup!</h1>
+    <p>
+      Before you can start kicking it with your peeps on Standup, you must
+      create a profile.
+    </p>
+  </div>
+  <div class="grid_6 prefix_3 suffix_3">
+    <form action="{{ request.path }}" method="post">
+      {{ csrf()|safe }}
+      {% for field in form %}
+        {% if not field.type == 'HiddenField' or field.name == 'email' %}
+          {% for error in field.errors %}
+            <span class="error">{{ error }}</span>
+          {% endfor %}
+          {{ field.label }}
+        {% endif %}
+        {% if field.name == 'email' %}
+          <div class="fake-input disabled">{{ field.data }}</div>
+        {% endif %}
+        {{ field }}
+      {% endfor %}
+      <button type="submit" class="btn">Create new profile</button>
+    </form>
+  </div>
+{% endblock %}

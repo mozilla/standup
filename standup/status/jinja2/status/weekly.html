@@ -1,4 +1,4 @@
-{% from 'includes/macros.html' import status_updates %}
+{% from 'includes/macros.html' import weekly_updates %}
 {% from 'includes/macros.html' import statusize with context %}
 
 {% extends "base.html" %}
@@ -15,6 +15,6 @@
 
 {% block content %}
   <div class="grid_12">
-    {{ status_updates(statuses) }}
+    {{ weekly_updates(statuses, week) }}
   </div>
 {% endblock %}

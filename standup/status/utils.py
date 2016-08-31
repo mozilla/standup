@@ -19,28 +19,6 @@ def dateformat(date, fmt='%Y-%m-%d'):
     return date.strftime(fmt).replace('{S}', str(date.day) + suffix(date.day))
 
 
-def gravatar_url(email, size=None):
-    m = hashlib.md5(email.encode('utf-8').lower())
-    hash = m.hexdigest()
-    url = 'http://www.gravatar.com/avatar/' + hash
-
-    qs = {}
-
-    # gravatar default URLs must be publicly accessible, so 'localhost' ones
-    # are a no-go
-    site_url = getattr(settings, 'SITE_URL', '')
-    if settings.DEBUG or 'localhost' in site_url.lower():
-        qs['d'] = 'mm'
-    else:
-        qs['d'] = site_url + static('img/default-avatar.png')
-
-    if size:
-        qs['s'] = size
-
-    url += '?' + urlencode(qs)
-    return url
-
-
 TAG_TMPL = '{0} <span class="tag tag-{1}">{2}</span>'
 BUG_RE = re.compile(r'(bug) #?(\d+)', flags=re.I)
 PULL_RE = re.compile(r'(pull|pr) #?(\d+)', flags=re.I)

@@ -20,3 +20,11 @@ def home_view(request):
     return render(request, 'status/index.html', {
         'statuses': statuses,
     })
+
+
+def team_view(request, slug):
+    return 'team'
+
+
+def status_view(request, pk):
+    return 'team'

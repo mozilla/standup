@@ -1,0 +1,25 @@
+{
+  "name": "standup",
+  "version": "1.0.0",
+  "description": "Standup is a neat little app that helps to organize and publish asynchronous status updates",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mozilla/standup.git"
+  },
+  "keywords": [
+    "django",
+    "agile",
+    "standup"
+  ],
+  "author": "Will Kahn-Greene",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/mozilla/standup/issues"
+  },
+  "homepage": "https://github.com/mozilla/standup#readme",
+  "dependencies": {
+    "less": "2.7.1",
+    "yuglify": "0.1.4"
+  }
+}

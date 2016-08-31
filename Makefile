@@ -25,7 +25,7 @@ help:
 
 build-base:
 	${DOCKERCOMPOSE} -f docker-compose.build.yml build --pull base
-	rm -f .docker-build
+	-rm -f .docker-build
 	touch .docker-build-base
 
 build: .docker-build-base
@@ -48,14 +48,12 @@ clean:
 
 	# test related things
 	-rm -f .coverage
-	${DOCKERCOMPOSE} run web rm -rf cover
 
 	# docs files
 	-rm -rf docs/_build/
 
 	# state files
-	-rm .docker-build
-	-rm .docker-build-prod
+	-rm -f .docker-build*
 
 lint: .docker-build
 	${DOCKERCOMPOSE} run web flake8 --statistics collector

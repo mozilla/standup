@@ -4,7 +4,7 @@
 {% extends "base.html" %}
 
 {% block title %}
-  {{ settings.SITE_TITLE }}
+  Team: {{ team.name }} | {{ settings.SITE_TITLE }}
 {% endblock %}
 
 {% block before_content %}
@@ -15,6 +15,10 @@
 
 {% block content %}
   <div class="grid_12">
-    {{ status_updates(statuses) }}
+    {{ status_updates(statuses, url=url('status.team', slug=team.slug)) }}
   </div>
 {% endblock %}
+
+{% block atom_feed %}
+  <link rel="alternate" type="application/atom+xml" href="{{ url('status.team_feed', slug=team.slug) }}" title="{{ settings.SITE_TITLE }} Feed for {{ team.name }} team" />
+{% endblock atom_feed %}

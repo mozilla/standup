@@ -1,31 +1,37 @@
-{% macro end_of_statuses(url, statuses, page, week=None) %}
-  {# Shows the pagination bits #}
-  {% if statuses.has_previous() or statuses.has_next() %}
-    {% set url_base = url + '?' %}
+{% macro comments(statuses, url='/') %}
+  {% if statuses.items %}
+    <ul class="comments cf">
+      {% for status in statuses.items %}
+        <li class="cf">
+          {{ status.content }}
+          <div class="meta">
+            <a href="{{ url('status.user', slug=status.user.slug) }}">
+              {% if status.user.email %}{{ gravatar(status.user.email, 22) }}{% else %}{{ gravatar('None', 60) }}{% endif %}
+            </a>
+            <a href="{{ url('status.user', slug=status.user.slug) }}">{{ status.user.name }} (@{{ status.user.username }})</a>
+            {{ status.created|dateformat('%A, {S} %B %Y at %-I:%M %p') }}
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <div class="notice">There are no comments.</div>
   {% endif %}
-  <div>
-    {% if statuses.has_previous() %}
-      <a href="{{ url_base }}page={{ page - 1 }}">Newer &raquo;</a>
-    {% endif %}
-    {% if statuses.has_next() %}
-      <a href="{{ url_base }}page={{ page + 1 }}">&laquo; Older</a>
-    {% endif %}
-  </div>
 {% endmacro %}
 
 {% macro begin_user_statuses(status) %}
-  <div>
-    <div>
-      <h4><a href="FIXME">{{ status.user.name }}</a></h4>
-      <a href="FIXME">@{{ status.user.username }}</a>
+  <div class="status-block cf">
+    <div class="user-meta grid_3 alpha">
+      <h4><a href="{{ url('status.user', slug=status.user.slug) }}">{{ status.user.name }}</a></h4>
+      <a href="{{ url('status.user', slug=status.user.slug) }}">@{{ status.user.username }}</a>
     </div>
-    <div>
-      <a href="FIXME">
-        <img src="{% if status.user.email %}{{ status.user.email|gravatar_url(size=60) }}{% else %}{{ 'None'|gravatar_url(size=60) }}{% endif %}">
+    <div class="grid_1">
+      <a href="{{ url('status.user', slug=status.user.slug) }}">
+        {% if status.user.email %}{{ gravatar(status.user.email, 60) }}{% else %}{{ gravatar('None', 60) }}{% endif %}
       </a>
     </div>
-    <div>
-      <ul>
+    <div class="grid_8 omega">
+      <ul class="bubble">
 {% endmacro %}
 
 {% macro end_user_statuses(status) %}
@@ -36,9 +42,9 @@
 
 {% macro display_one_status(status, include_day=False) %}
   <li class="cf">
-    <div>{{ status.content_html|format_update(status.project)|safe|urlize(trim_url_limit=32)|markdown }}</div>
-    <div>
-      <a href="FIXME">
+    <div class="update">{{ status.content_html|format_update(status.project)|safe|urlize(trim_url_limit=32)|markdown }}</div>
+    <div class="update-meta">
+      <a class="post-time" href="{{ url('status.status', pk=status.id) }}">
         <div datetime="{{ status.created|dateformat('%Y-%m-%dT%H:%M:%SZ') }}">
           {% if include_day %}
             {{ status.created|dateformat('%a %-I:%M %p') }}
@@ -48,50 +54,120 @@
         </div>
       </a>
 
-      {# <a href="FIXME" class="comment-count">{{ status.replies()|length }}</a> #}
+      <a href="{{ url('status.status', pk=status.id) }}" class="comment-count">{{ status.replies().items|length }}</a>
 
       {% if status.project %}
-      <a class="project-name"
-         style="{% if status.project.color %}background-color: #{{ status.project.color }}; color: #{{ status.project.color }};{% endif %}"
-         href="FIXME">
-        {{ status.project.name }}
-      </a>
+        <a class="project-name"
+           style="{% if status.project.color %}background-color: #{{ status.project.color }}; color: #{{ status.project.color }};{% endif %}"
+           href="{{ url('status.project', slug=status.project.slug) }}">
+          {{ status.project.name }}
+        </a>
       {% endif %}
     </div>
   </li>
 {% endmacro %}
 
-{% macro status_updates(statuses, url='/') %}
-  {# Takes a Paginator.page of statuses and displays them #}
-  {% if not statuses|length %}
-    <div>No status updates available.</div>
-  {% else %}
-    {% set last_user = None %}
-    {% set last_date = None %}
-
-    {% for status in statuses %}
-      {% if (status.user.username != last_user or last_date != status.created.date()) and not loop.first %}
-        {{ end_user_statuses(status) }}
-      {% endif %}
-
-      {% if last_date != status.created.date() %}
-        {% set last_date = status.created.date() %}
-        {% set last_user = None %}
-        <div>
-          <h3>
-            <a href="?day={{ status.created.date()|dateformat('%Y-%m-%d') }}">
-              {{ status.created|naturalday }}
-            </a>
-          </h3>
-        </div>
-      {% endif %}
-
-      {% if status.user.username != last_user %}
-        {% set last_user = status.user.username %}
-        {{ begin_user_statuses(status) }}
-      {% endif %}
-      {{ display_one_status(status) }}
-    {% endfor %}
-    {{ end_of_statuses(url, statuses, page) }}
+{% macro end_of_statuses(url, statuses, week=None) %}
+  {% if not statuses %}
+    <div class="notice">No status updates available.</div>
   {% endif %}
+  {% if statuses.has_previous() or statuses.has_next() %}
+    {% if week %}
+      {% set url_base = url + '?week=' + week + '&' %}
+    {% else %}
+      {% set url_base = url + '?' %}
+    {% endif %}
+    <div class="grid_8 prefix_4 pagination cf">
+      {% if statuses.has_previous() %}
+        <a class="btn big prev" href="?page={{ statuses.previous_page_number() }}">Newer &raquo;</a>
+      {% endif %}
+      {% if statuses.has_next() %}
+        <a class="btn big next" href="?page={{ statuses.next_page_number() }}">&laquo; Older</a>
+      {% endif %}
+    </div>
+  {% endif %}
+{% endmacro %}
+
+{% macro status_updates(statuses, url='/') %}
+  {% for status in statuses %}
+    {% if (status.user.username != last_user or last_date != status.created.date()) and not loop.first %}
+      {{ end_user_statuses(status) }}
+    {% endif %}
+
+    {% if last_date != status.created.date() %}
+      {% set last_date = status.created.date() %}
+      {% set last_user = None %}
+      <div class="grid_8 alpha omega prefix_4">
+        <h3>
+          <a href="?day={{ status.created.date()|dateformat('%Y-%m-%d') }}">
+            {% if status.created.date() == today%}
+              Today
+            {% elif status.created.date() == yesterday %}
+              Yesterday
+            {% else %}
+              {{ status.created.date()|dateformat('%A, {S} %B %Y') }}
+            {% endif %}
+          </a>
+        </h3>
+      </div>
+    {% endif %}
+
+    {% if status.user.username != last_user %}
+      {% set last_user = status.user.username %}
+      {{ begin_user_statuses(status) }}
+    {% endif %}
+    {{ display_one_status(status) }}
+    {% if loop.last %}
+      {{ end_user_statuses(status) }}
+    {% endif %}
+  {% endfor %}
+  {{ end_of_statuses(url, statuses) }}
+{% endmacro %}
+
+{% macro weekly_updates(statuses, week=None, url='/weekly') %}
+  {% for status in statuses.items %}
+    {% if (status.user.username != last_user or last_date != status.week_start.date()) and not loop.first %}
+      {{ end_user_statuses(status) }}
+    {% endif %}
+
+    {% if last_date != status.week_start.date() %}
+      {% set last_date = status.week_start.date() %}
+      {% set last_user = None %}
+      <div class="grid_8 alpha omega prefix_4">
+        <h3>
+          <a href="?week={{ status.week_start.date()|dateformat('%Y-%m-%d') }}">
+              Week of {{ status.week_start.date()|dateformat('%A, {S} %B %Y') }} to {{ status.week_end.date()|dateformat('%A, {S} %B %Y') }}
+          </a>
+        </h3>
+      </div>
+    {% endif %}
+
+    {% if status.user.username != last_user %}
+      {% set last_user = status.user.username %}
+      {{ begin_user_statuses(status) }}
+    {% endif %}
+    {{ display_one_status(status, True) }}
+    {% if loop.last %}
+      {{ end_user_statuses(status) }}
+    {% endif %}
+  {% endfor %}
+  {{ end_of_statuses(url, statuses, week) }}
+{% endmacro %}
+
+{% macro statusize() %}
+  <div id="statusize">
+    <form action="{{ url('status.statusize') }}" method="POST">
+      {{ csrf()|safe }}
+      <div class="grid_4 alpha"></div>
+      <div class="grid_7 middle">
+        <textarea name="message" placeholder="What's your status?"></textarea>
+        <input type="hidden" name="redirect_to" value="{{ request.url }}" />
+        <input type="hidden" name="project" value="{{ project.id if project else '' }}" />
+      </div>
+      <div class="grid_1 omega">
+        {{ gravatar(current_user, 60) }}
+        <input type="submit" class="btn" value="Post"/>
+      </div>
+    </form>
+  </div>
 {% endmacro %}

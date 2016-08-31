@@ -9,3 +9,4 @@ local_settings.py
 db.sqlite3
 *.dump
 .cache
+node_modules
