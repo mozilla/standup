@@ -4,31 +4,6 @@ from django.contrib.auth.models import User
 from django.db import models
 
 
-class Team(models.Model):
-    """A team of users in the organization."""
-    name = models.CharField(
-        max_length=100,
-        help_text='Name of the team'
-    )
-    slug = models.SlugField(unique=True, max_length=100)
-
-    class Meta:
-        db_table = 'team'
-
-    def __str__(self):
-        return self.name
-
-    def __repr__(self):
-        return '<Team: [%s]>' % (self.name,)
-
-    def dictify(self):
-        data = OrderedDict()
-        data['id'] = self.id
-        data['name'] = self.name
-        data['slug'] = self.slug
-        return data
-
-
 class LegacyUser(models.Model):
     """A model for the old users in the Flask-based instance.
 
@@ -54,7 +29,6 @@ class StandupUser(models.Model):
 
     slug = models.SlugField(unique=True)
     github_handle = models.CharField(max_length=100, unique=True)
-    teams = models.ManyToManyField(Team)
 
     class Meta:
         ordering = ('user__username',)

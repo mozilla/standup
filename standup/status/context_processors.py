@@ -1,7 +1,6 @@
 from django.conf import settings
 
-from standup.user.models import Team
-from .models import Project
+from .models import Project, Team
 from .utils import get_weeks
 
 

@@ -18,13 +18,6 @@ class UserFactory(factory.django.DjangoModelFactory):
     is_superuser = False
 
 
-class TeamFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = 'user.Team'
-    name = factory.Faker('name')
-    slug = factory.LazyAttribute(lambda obj: slugify(obj))
-
-
 class StandupUserFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = 'user.StandupUser'

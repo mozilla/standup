@@ -16,6 +16,7 @@ class Project(models.Model):
 
     class Meta:
         db_table = 'project'
+        ordering = ('name',)
 
     def __str__(self):
         return self.name
@@ -47,6 +48,7 @@ class Status(models.Model):
 
     class Meta:
         db_table = 'status'
+        ordering = ('-created',)
 
     def __str__(self):
         return 'Status from %s' % self.user.username
@@ -104,3 +106,46 @@ class Status(models.Model):
         # data['week_end'] = self.week_end.strftime("%Y-%m-%d")
 
         return data
+
+
+class Team(models.Model):
+    """A team of users in the organization."""
+    name = models.CharField(
+        max_length=100,
+        help_text='Name of the team'
+    )
+    slug = models.SlugField(unique=True, max_length=100)
+    users = models.ManyToManyField('user.StandupUser',
+                                   related_name='teams',
+                                   through='TeamUser')
+
+    class Meta:
+        db_table = 'team'
+        ordering = ('name',)
+
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return '<Team: [%s]>' % (self.name,)
+
+    def statuses(self):
+        user_ids = self.users.values_list('id', flat=True)
+        print(user_ids)
+        return Status.objects.filter(user__pk__in=user_ids)
+
+    def dictify(self):
+        data = OrderedDict()
+        data['id'] = self.id
+        data['name'] = self.name
+        data['slug'] = self.slug
+        return data
+
+
+class TeamUser(models.Model):
+    team = models.ForeignKey(Team)
+    user = models.ForeignKey('user.StandupUser')
+
+    class Meta:
+        db_table = 'team_users'
+        unique_together = (('team', 'user'),)

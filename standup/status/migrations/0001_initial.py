@@ -41,4 +41,27 @@ class Migration(migrations.Migration):
                 'db_table': 'status',
             },
         ),
+        migrations.CreateModel(
+            name='Team',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True, serialize=False)),
+                ('name', models.CharField(help_text='Name of the team', max_length=100)),
+                ('slug', models.SlugField(unique=True, max_length=100)),
+            ],
+            options={
+                'db_table': 'team',
+            },
+        ),
+        migrations.CreateModel(
+            name='TeamUser',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True, serialize=False)),
+                ('team', models.ForeignKey(to='status.Team')),
+                ('user', models.ForeignKey(to='user.StandupUser')),
+            ],
+            options={
+                'db_table': 'team_users',
+                'unique_together': (('team', 'user'),),
+            },
+        ),
     ]

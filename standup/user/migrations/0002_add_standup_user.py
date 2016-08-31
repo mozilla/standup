@@ -26,11 +26,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='standupuser',
-            name='teams',
-            field=models.ManyToManyField(to='user.Team'),
-        ),
-        migrations.AddField(
-            model_name='standupuser',
             name='user',
             field=models.OneToOneField(related_name='profile', to=settings.AUTH_USER_MODEL),
         ),

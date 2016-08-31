@@ -35,6 +35,9 @@ build: .docker-build-base
 run: .docker-build
 	${DOCKERCOMPOSE} up web
 
+shell: .docker-build
+	${DOCKERCOMPOSE} run web python3 manage.py shell
+
 clean:
 	# python related things
 	-rm -rf build/
@@ -68,4 +71,4 @@ docs: .docker-build
 	${DOCKERCOMPOSE} run web $(MAKE) -C docs/ clean
 	${DOCKERCOMPOSE} run web $(MAKE) -C docs/ html
 
-.PHONY: default clean build-base build docs lint run test test-coverage
+.PHONY: default clean build-base build docs lint run shell test test-coverage

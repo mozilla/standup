@@ -1,15 +1,12 @@
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.shortcuts import render
+from django.views.generic import DetailView
+from django.views.generic import TemplateView
 
-from standup.status.models import Status
+from standup.status.models import Status, Team
 
 
-def home_view(request):
-    """Render the front page"""
-    status_list = Status.objects.filter(reply_to=None).order_by('-created')
-    paginator = Paginator(status_list, 20)
-
-    page = request.GET.get('page')
+def paginate_statuses(qs, page, per_page=20):
+    paginator = Paginator(qs, per_page)
     try:
         statuses = paginator.page(page)
     except PageNotAnInteger:
@@ -17,9 +14,30 @@ def home_view(request):
     except EmptyPage:
         statuses = paginator.page(paginator.num_pages)
 
-    return render(request, 'status/index.html', {
-        'statuses': statuses,
-    })
+    return statuses
+
+
+class HomeView(TemplateView):
+    template_name = 'status/index.html'
+
+    def get_context_data(self, **kwargs):
+        cxt = super().get_context_data(**kwargs)
+        status_list = Status.objects.filter(reply_to=None)
+        cxt['statuses'] = paginate_statuses(status_list, self.request.GET.get('page'))
+        return cxt
+
+
+class TeamView(DetailView):
+    template_name = 'status/team.html'
+    model = Team
+    context_object_name = 'team'
+
+    def get_context_data(self, **kwargs):
+        cxt = super().get_context_data(**kwargs)
+        statuses = paginate_statuses(self.object.statuses(),
+                                     self.request.GET.get('page'))
+        cxt['statuses'] = statuses
+        return cxt
 
 
 def team_view(request, slug):

@@ -31,3 +31,10 @@ class StatusFactory(factory.django.DjangoModelFactory):
     content = factory.Faker('sentence')
     # FIXME: content_html
     reply_to = None
+
+
+class TeamFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = 'status.Team'
+    name = factory.Faker('name')
+    slug = factory.LazyAttribute(lambda obj: slugify(obj))

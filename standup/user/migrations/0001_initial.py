@@ -25,15 +25,4 @@ class Migration(migrations.Migration):
                 'db_table': 'user',
             },
         ),
-        migrations.CreateModel(
-            name='Team',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True, serialize=False)),
-                ('name', models.CharField(help_text='Name of the team', max_length=100)),
-                ('slug', models.SlugField(unique=True, max_length=100)),
-            ],
-            options={
-                'db_table': 'team',
-            },
-        ),
     ]
