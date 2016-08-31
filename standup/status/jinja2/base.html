@@ -35,11 +35,12 @@
                 </ul>
               </li>
             {% endif %}
-            <li>
-              <a href="#">Projects</a>
-              <ul>
-                {% for project in projects %}
-                <li>
+            {% if projects %}
+              <li>
+                <a href="#">Projects</a>
+                <ul>
+                  {% for project in projects %}
+                  <li>
                     <a {% if project == selected %}class="selected"{% endif %} href="{{ url('status.project', slug=project.slug) }}">
                     {{ project.name }}
                     </a>
@@ -47,20 +48,21 @@
                   {% endfor %}
                 </ul>
               </li>
-              {% if weeks %}
+            {% endif %}
+            {% if weeks %}
               <li>
-              <a href="{{ url('status.weekly') }}">Weekly</a>
-              <ul>
-                {% for week in weeks %}
-                <li>
-                  <a href="{{ url('status.weekly', week=week.start_date.date()|dateformat('%Y-%m-%d')) }}">
-                   {{week.start_date.date()|dateformat('%b %d')}} to {{ week.end_date.date()|dateformat('%b %d %Y') }}
-                  </a>
-                </li>
-                {% endfor %}
-              </ul>
+                <a href="{{ url('status.weekly') }}">Weekly</a>
+                <ul>
+                  {% for week in weeks %}
+                  <li>
+                    <a href="{{ url('status.weekly', week=week.start_date.date()|dateformat('%Y-%m-%d')) }}">
+                     {{week.start_date.date()|dateformat('%b %d')}} to {{ week.end_date.date()|dateformat('%b %d %Y') }}
+                    </a>
+                  </li>
+                  {% endfor %}
+                </ul>
               </li>
-              {% endif %}
+            {% endif %}
               <li>
                 {% if not 'user_id' in session %}
                   <a href="#" id="login">Sign in with Persona</a>

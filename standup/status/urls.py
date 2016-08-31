@@ -14,7 +14,7 @@ urlpatterns = [
     url(r'^project/(?P<slug>.+)/$', views.team_view, name='status.project'),
     url(r'^user/(?P<slug>.+)/$', views.team_view, name='status.user'),
     url(r'^status/(?P<pk>.+)/$', views.status_view, name='status.status'),
-    url(r'^weekly/$', views.home_view, name='status.weekly'),
+    url(r'^weekly/(?P<week>.+)?/?$', views.weekly_view, name='status.weekly'),
     url(r'^profile/$', views.home_view, name='users.profile'),
     url(r'^help/$', views.home_view, name='landings.help'),
 ]

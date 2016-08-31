@@ -28,3 +28,7 @@ def team_view(request, slug):
 
 def status_view(request, pk):
     return 'team'
+
+
+def weekly_view(request, week=None):
+    pass

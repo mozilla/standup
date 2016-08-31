@@ -1,14 +1,67 @@
-import hashlib
 import re
-from urllib.parse import urlencode
+from datetime import date, datetime, timedelta
 
 import bleach
 
-from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.templatetags.static import static
 
 from standup.user.models import StandupUser
+
+
+def startdate(request):
+    dates = request.GET.get('dates')
+    day = request.GET.get('day')
+    week = request.GET.get('week')
+    if dates == '7d':
+        return date.today() - timedelta(days=7)
+    elif dates == 'today':
+        return date.today()
+    elif isday(day):
+        return get_day(day)
+    elif isday(week):
+        return week_start(get_day(week))
+    return None
+
+
+def enddate(request):
+    day = request.GET.get('day')
+    week = request.GET.get('week')
+    if isday(day):
+        return get_day(day) + timedelta(days=1)
+    elif isday(week):
+        return week_end(get_day(week))
+    return None
+
+
+def isday(day):
+    return day and re.match('^\d{4}-\d{2}-\d{2}$', day)
+
+
+def get_day(day):
+    return datetime.strptime(day, '%Y-%m-%d')
+
+
+def get_weeks(num_weeks=10):
+    weeks = []
+    current = datetime.now()
+    for i in range(num_weeks):
+        weeks.append({"start_date": week_start(current),
+                      "end_date": week_end(current),
+                      "weeks_ago": i})
+        current = current - timedelta(7)
+    return weeks
+
+
+def week_start(d):
+    """Weeks start on the Monday on or before the given date"""
+    d = d - timedelta(d.isoweekday() - 1)
+    return datetime(d.year, d.month, d.day, 0, 0, 0)
+
+
+def week_end(d):
+    """Weeks start on the Sunday on or after the given date"""
+    d = d + timedelta(7 - d.isoweekday())
+    return datetime(d.year, d.month, d.day, 23, 59, 59)
 
 
 def dateformat(date, fmt='%Y-%m-%d'):
