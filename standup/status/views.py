@@ -2,7 +2,7 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.views.generic import DetailView
 from django.views.generic import TemplateView
 
-from standup.status.models import Status, Team
+from standup.status.models import Status, Team, Project
 
 
 def paginate_statuses(qs, page, per_page=20):
@@ -35,6 +35,19 @@ class TeamView(DetailView):
     def get_context_data(self, **kwargs):
         cxt = super().get_context_data(**kwargs)
         statuses = paginate_statuses(self.object.statuses(),
+                                     self.request.GET.get('page'))
+        cxt['statuses'] = statuses
+        return cxt
+
+
+class ProjectView(DetailView):
+    template_name = 'status/project.html'
+    model = Project
+    context_object_name = 'project'
+
+    def get_context_data(self, **kwargs):
+        cxt = super().get_context_data(**kwargs)
+        statuses = paginate_statuses(self.object.statuses.filter(reply_to=None),
                                      self.request.GET.get('page'))
         cxt['statuses'] = statuses
         return cxt

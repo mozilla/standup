@@ -20,5 +20,5 @@
 {% endblock %}
 
 {% block atom_feed %}
-  <link rel="alternate" type="application/atom+xml" href="{{ settings.SITE_URL + url('status.project_feed', slug=project.slug) }}" title="{{ settings.SITE_TITLE }} Feed for {{ project.name }}" />
+  <link rel="alternate" type="application/atom+xml" href="{{ url('status.project_feed', slug=project.slug) }}" title="{{ settings.SITE_TITLE }} Feed for {{ project.name }}" />
 {% endblock atom_feed %}

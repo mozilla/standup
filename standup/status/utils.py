@@ -92,9 +92,10 @@ def format_update(update, project=None):
     for slug in USER_RE.findall(formatted):
         if slug in checked:
             continue
+        slug = slug.lstrip('@')
         user = StandupUser.objects.filter(slug=slug).first()
         if user:
-            url = reverse('status.user', slug=slug)
+            url = reverse('status.user', kwargs={'slug': slug})
             at_slug = '@%s' % slug
             formatted = formatted.replace(at_slug,
                                           '<a href="%s">%s</a>' %

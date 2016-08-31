@@ -131,8 +131,7 @@ class Team(models.Model):
 
     def statuses(self):
         user_ids = self.users.values_list('id', flat=True)
-        print(user_ids)
-        return Status.objects.filter(user__pk__in=user_ids)
+        return Status.objects.filter(user__pk__in=user_ids, reply_to=None)
 
     def dictify(self):
         data = OrderedDict()
