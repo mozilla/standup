@@ -29,3 +29,5 @@ deploy:
     on:
       tags: true
       repo: mozilla/standup
+notifications:
+  irc: "irc.mozilla.org#standup"
