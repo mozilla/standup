@@ -6,6 +6,7 @@ from .utils import get_weeks
 
 def status(request):
     return {
+        'request': request,
         'settings': settings,
         'teams': Team.objects.all(),
         'projects': Project.objects.all(),

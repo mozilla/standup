@@ -67,22 +67,17 @@
   </li>
 {% endmacro %}
 
-{% macro end_of_statuses(url, statuses, week=None) %}
+{% macro end_of_statuses(url, statuses) %}
   {% if not statuses %}
     <div class="notice">No status updates available.</div>
   {% endif %}
   {% if statuses.has_previous() or statuses.has_next() %}
-    {% if week %}
-      {% set url_base = url + '?week=' + week + '&' %}
-    {% else %}
-      {% set url_base = url + '?' %}
-    {% endif %}
     <div class="grid_8 prefix_4 pagination cf">
       {% if statuses.has_previous() %}
-        <a class="btn big prev" href="?page={{ statuses.previous_page_number() }}">Newer &raquo;</a>
+        <a class="btn big prev" href="?{{ merge_query(request, page=statuses.previous_page_number()) }}">Newer &raquo;</a>
       {% endif %}
       {% if statuses.has_next() %}
-        <a class="btn big next" href="?page={{ statuses.next_page_number() }}">&laquo; Older</a>
+        <a class="btn big next" href="?{{ merge_query(request, page=statuses.next_page_number()) }}">&laquo; Older</a>
       {% endif %}
     </div>
   {% endif %}
@@ -124,8 +119,8 @@
   {{ end_of_statuses(url, statuses) }}
 {% endmacro %}
 
-{% macro weekly_updates(statuses, week=None, url='/weekly') %}
-  {% for status in statuses.items %}
+{% macro weekly_updates(statuses, url='/weekly') %}
+  {% for status in statuses %}
     {% if (status.user.username != last_user or last_date != status.week_start.date()) and not loop.first %}
       {{ end_user_statuses(status) }}
     {% endif %}
@@ -151,7 +146,7 @@
       {{ end_user_statuses(status) }}
     {% endif %}
   {% endfor %}
-  {{ end_of_statuses(url, statuses, week) }}
+  {{ end_of_statuses(url, statuses) }}
 {% endmacro %}
 
 {% macro statusize() %}

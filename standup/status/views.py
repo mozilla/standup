@@ -1,65 +1,76 @@
+import re
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.views.generic import DetailView
 from django.views.generic import TemplateView
 
 from standup.status.models import Status, Team, Project
+from standup.status.utils import enddate, startdate
 
 
-def paginate_statuses(qs, page, per_page=20):
-    paginator = Paginator(qs, per_page)
-    try:
-        statuses = paginator.page(page)
-    except PageNotAnInteger:
-        statuses = paginator.page(1)
-    except EmptyPage:
-        statuses = paginator.page(paginator.num_pages)
+class PaginateStatusesMixin(object):
+    def paginate_statuses(self, per_page=20):
+        qs = self.get_status_queryset()
+        page = self.request.GET.get('page')
+        paginator = Paginator(qs, per_page)
+        try:
+            statuses = paginator.page(page)
+        except PageNotAnInteger:
+            statuses = paginator.page(1)
+        except EmptyPage:
+            statuses = paginator.page(paginator.num_pages)
 
-    return statuses
+        return statuses
 
+    def get_status_queryset(self):
+        qs = Status.objects.filter(reply_to=None)
+        start = startdate(self.request)
+        if start:
+            end = enddate(self.request)
+            if not end:
+                end = start
 
-class HomeView(TemplateView):
-    template_name = 'status/index.html'
+            qs = qs.filter(created__range=(start, end))
+
+        return qs
 
     def get_context_data(self, **kwargs):
         cxt = super().get_context_data(**kwargs)
-        status_list = Status.objects.filter(reply_to=None)
-        cxt['statuses'] = paginate_statuses(status_list, self.request.GET.get('page'))
+        cxt['statuses'] = self.paginate_statuses()
         return cxt
 
 
-class TeamView(DetailView):
+class HomeView(PaginateStatusesMixin, TemplateView):
+    template_name = 'status/index.html'
+
+
+class WeeklyView(PaginateStatusesMixin, TemplateView):
+    template_name = 'status/weekly.html'
+
+    def get_status_queryset(self):
+        qs = super().get_status_queryset()
+        return qs.order_by('user_id', '-created')
+
+
+class TeamView(PaginateStatusesMixin, DetailView):
     template_name = 'status/team.html'
     model = Team
     context_object_name = 'team'
 
-    def get_context_data(self, **kwargs):
-        cxt = super().get_context_data(**kwargs)
-        statuses = paginate_statuses(self.object.statuses(),
-                                     self.request.GET.get('page'))
-        cxt['statuses'] = statuses
-        return cxt
+    def get_status_queryset(self):
+        return self.object.statuses()
 
 
-class ProjectView(DetailView):
+class ProjectView(PaginateStatusesMixin, DetailView):
     template_name = 'status/project.html'
     model = Project
     context_object_name = 'project'
 
-    def get_context_data(self, **kwargs):
-        cxt = super().get_context_data(**kwargs)
-        statuses = paginate_statuses(self.object.statuses.filter(reply_to=None),
-                                     self.request.GET.get('page'))
-        cxt['statuses'] = statuses
-        return cxt
-
-
-def team_view(request, slug):
-    return 'team'
+    def get_status_queryset(self):
+        return self.object.statuses.filter(reply_to=None)
 
 
 def status_view(request, pk):
     return 'team'
 
 
-def weekly_view(request, week=None):
-    pass
+home_view = HomeView.as_view()

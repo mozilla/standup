@@ -3,7 +3,11 @@ from collections import OrderedDict
 from django.db import models
 from django.utils.timezone import now
 
-from standup.status.utils import format_update
+from standup.status.utils import (
+    format_update,
+    week_end as u_week_end,
+    week_start as u_week_start,
+)
 
 
 class Project(models.Model):
@@ -63,17 +67,17 @@ class Status(models.Model):
     def reply_count(self):
         return self.replies().count()
 
-    # @property
-    # def week_start(self):
-    #     if self.created:
-    #         return h_week_start(self.created)
-    #     return None
+    @property
+    def week_start(self):
+        if self.created:
+            return u_week_start(self.created)
+        return None
 
-    # @property
-    # def week_end(self):
-    #     if self.created:
-    #         return h_week_end(self.created)
-    #     return None
+    @property
+    def week_end(self):
+        if self.created:
+            return u_week_end(self.created)
+        return None
 
     def dictify(self):
         """Returns an OrderedDict of model attributes"""

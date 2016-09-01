@@ -55,7 +55,7 @@
                 <ul>
                   {% for week in weeks %}
                   <li>
-                    <a href="{{ url('status.weekly', week=week.start_date.date()|dateformat('%Y-%m-%d')) }}">
+                    <a href="{{ url('status.weekly') }}?week={{ week.start_date.date()|dateformat('%Y-%m-%d') }}">
                      {{week.start_date.date()|dateformat('%b %d')}} to {{ week.end_date.date()|dateformat('%b %d %Y') }}
                     </a>
                   </li>

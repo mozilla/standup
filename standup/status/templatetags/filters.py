@@ -1,3 +1,5 @@
+from urllib.parse import urlencode
+
 from django_jinja import library
 
 from standup.status.utils import (
@@ -10,4 +12,10 @@ from standup.status.utils import (
 dateformat = library.filter(dateformat)
 format_update = library.filter(format_update)
 
-print('registered filters')
+
+@library.global_function
+def merge_query(request, **kwargs):
+    """merge query params into existing ones"""
+    params = request.GET.dict()
+    params.update(kwargs)
+    return urlencode(params)

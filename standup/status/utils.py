@@ -1,9 +1,10 @@
 import re
-from datetime import date, datetime, timedelta
-
-import bleach
+from datetime import datetime, timedelta
 
 from django.core.urlresolvers import reverse
+from django.utils.timezone import now, make_aware
+
+import bleach
 
 from standup.user.models import StandupUser
 
@@ -13,9 +14,9 @@ def startdate(request):
     day = request.GET.get('day')
     week = request.GET.get('week')
     if dates == '7d':
-        return date.today() - timedelta(days=7)
+        return now().date() - timedelta(days=7)
     elif dates == 'today':
-        return date.today()
+        return now().date()
     elif isday(day):
         return get_day(day)
     elif isday(week):
@@ -38,12 +39,12 @@ def isday(day):
 
 
 def get_day(day):
-    return datetime.strptime(day, '%Y-%m-%d')
+    return make_aware(datetime.strptime(day, '%Y-%m-%d'))
 
 
 def get_weeks(num_weeks=10):
     weeks = []
-    current = datetime.now()
+    current = now()
     for i in range(num_weeks):
         weeks.append({"start_date": week_start(current),
                       "end_date": week_end(current),
@@ -55,13 +56,13 @@ def get_weeks(num_weeks=10):
 def week_start(d):
     """Weeks start on the Monday on or before the given date"""
     d = d - timedelta(d.isoweekday() - 1)
-    return datetime(d.year, d.month, d.day, 0, 0, 0)
+    return make_aware(datetime(d.year, d.month, d.day, 0, 0, 0))
 
 
 def week_end(d):
     """Weeks start on the Sunday on or after the given date"""
     d = d + timedelta(7 - d.isoweekday())
-    return datetime(d.year, d.month, d.day, 23, 59, 59)
+    return make_aware(datetime(d.year, d.month, d.day, 23, 59, 59))
 
 
 def dateformat(date, fmt='%Y-%m-%d'):
