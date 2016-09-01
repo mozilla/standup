@@ -1,10 +1,10 @@
+{% extends "base.html" %}
+
 {% from 'includes/macros.html' import status_updates with context %}
 {% from 'includes/macros.html' import statusize with context %}
 
-{% extends "base.html" %}
-
 {% block title %}
-  @{{ user.username }} | {{ settings.SITE_TITLE }}
+  @{{ suser.username }} | {{ settings.SITE_TITLE }}
 {% endblock %}
 
 {% block before_content %}
@@ -15,10 +15,10 @@
 
 {% block content %}
   <div class="grid_12">
-    {{ status_updates(statuses, url=url('status.user', slug=user.username)) }}
+    {{ status_updates(statuses, url=suser.get_absolute_url()) }}
   </div>
 {% endblock %}
 
 {% block atom_feed %}
-  <link rel="alternate" type="application/atom+xml" href="{{ url('status.user_feed', slug=user.slug) }}" title="{{ settings.SITE_TITLE }} Feed for {{ user.username }}" />
+  <link rel="alternate" type="application/atom+xml" href="{{ url('status.user_feed', slug=suser.slug) }}" title="{{ settings.SITE_TITLE }} Feed for {{ suser.username }}" />
 {% endblock atom_feed %}

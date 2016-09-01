@@ -5,6 +5,7 @@ from django.views.generic import TemplateView
 
 from standup.status.models import Status, Team, Project
 from standup.status.utils import enddate, startdate
+from standup.user.models import StandupUser
 
 
 class PaginateStatusesMixin(object):
@@ -76,8 +77,13 @@ class StatusView(PaginateStatusesMixin, TemplateView):
         return Status.objects.filter(pk=self.kwargs['pk'])
 
 
-def status_view(request, pk):
-    return 'team'
+class UserView(PaginateStatusesMixin, DetailView):
+    template_name = 'status/user.html'
+    model = StandupUser
+    context_object_name = 'suser'
+
+    def get_status_queryset(self):
+        return self.object.statuses.filter(reply_to=None)
 
 
 home_view = HomeView.as_view()
