@@ -18,6 +18,7 @@ services:
       - DEBUG=True
       - ALLOWED_HOSTS=localhost,127.0.0.1
       - SECRET_KEY=itsasekrit
+    command: ./bin/run-supervisor.sh dev
 
   # run the site in a prod-like environment
   prod:
@@ -33,17 +34,16 @@ services:
       - DEBUG=False
       - ALLOWED_HOSTS=localhost,127.0.0.1
       - SECRET_KEY=itsasekrit
+    command: ./bin/run-supervisor.sh prod
 
   # run the tests
   test:
     image: local/standup_dev
     volumes:
       - .:/app
-    command:
-      ./bin/run-tests.sh
+    command: ./bin/run-tests.sh
 
   # run the tests against the files in the image, not local
   test-image:
     image: local/standup_dev
-    command:
-      ./bin/run-tests.sh
+    command: ./bin/run-tests.sh

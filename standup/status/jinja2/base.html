@@ -27,7 +27,7 @@
                 <ul>
                   {% for team in teams %}
                   <li>
-                    <a {% if team == selected %}class="selected"{% endif %} href="{{ url('status.team', slug=team.slug) }}">
+                    <a {% if team == selected %}class="selected"{% endif %} href="{{ team.get_absolute_url() }}">
                     {{ team.name }}
                     </a>
                   </li>
@@ -41,7 +41,7 @@
                 <ul>
                   {% for project in projects %}
                   <li>
-                    <a {% if project == selected %}class="selected"{% endif %} href="{{ url('status.project', slug=project.slug) }}">
+                    <a {% if project == selected %}class="selected"{% endif %} href="{{ project.get_absolute_url() }}">
                     {{ project.name }}
                     </a>
                   </li>

@@ -1,6 +1,7 @@
 from collections import OrderedDict
 
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 from django.db import models
 
 
@@ -38,6 +39,9 @@ class StandupUser(models.Model):
 
     def __repr__(self):
         return '<StandupUser: [{}]>'.format(self.user.username)
+
+    def get_absolute_url(self):
+        return reverse('status.user', kwargs={'slug': self.slug})
 
     @property
     def name(self):

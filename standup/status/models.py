@@ -1,5 +1,6 @@
 from collections import OrderedDict
 
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils.timezone import now
 
@@ -27,6 +28,9 @@ class Project(models.Model):
 
     def __repr__(self):
         return '<Project: [%s] %s>' % (self.slug, self.name)
+
+    def get_absolute_url(self):
+        return reverse('status.project', kwargs={'slug': self.slug})
 
     def dictify(self):
         """Returns an OrderedDict of model attributes"""
@@ -60,8 +64,11 @@ class Status(models.Model):
     def __repr__(self):
         return '<Status: %s: %s>' % (self.user.username, self.content)
 
+    def get_absolute_url(self):
+        return reverse('status.status', kwargs={'pk': self.pk})
+
     def replies(self):
-        return Status.objects.filter(reply_to_id=self.id).order_by('-created')
+        return Status.objects.filter(reply_to=self).order_by('-created')
 
     @property
     def reply_count(self):
@@ -132,6 +139,9 @@ class Team(models.Model):
 
     def __repr__(self):
         return '<Team: [%s]>' % (self.name,)
+
+    def get_absolute_url(self):
+        return reverse('status.team', kwargs={'slug': self.slug})
 
     def statuses(self):
         user_ids = self.users.values_list('id', flat=True)

@@ -1,7 +1,7 @@
 from django.conf import settings
 
 from .models import Project, Team
-from .utils import get_weeks
+from .utils import get_weeks, get_today, get_yesterday
 
 
 def status(request):
@@ -11,4 +11,6 @@ def status(request):
         'teams': Team.objects.all(),
         'projects': Project.objects.all(),
         'weeks': get_weeks(),
+        'today': get_today(),
+        'yesterday': get_yesterday(),
     }

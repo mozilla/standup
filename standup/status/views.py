@@ -69,6 +69,13 @@ class ProjectView(PaginateStatusesMixin, DetailView):
         return self.object.statuses.filter(reply_to=None)
 
 
+class StatusView(PaginateStatusesMixin, TemplateView):
+    template_name = 'status/status.html'
+
+    def get_status_queryset(self):
+        return Status.objects.filter(pk=self.kwargs['pk'])
+
+
 def status_view(request, pk):
     return 'team'
 

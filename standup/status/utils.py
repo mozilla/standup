@@ -9,6 +9,14 @@ import bleach
 from standup.user.models import StandupUser
 
 
+def get_today():
+    return now().date()
+
+
+def get_yesterday():
+    return get_today() - timedelta(days=1)
+
+
 def startdate(request):
     dates = request.GET.get('dates')
     day = request.GET.get('day')

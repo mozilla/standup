@@ -1,14 +1,15 @@
-{% macro comments(statuses, url='/') %}
-  {% if statuses.items %}
+{% macro comments(status, url='/') %}
+  {% set statuses=status.replies() %}
+  {% if statuses %}
     <ul class="comments cf">
-      {% for status in statuses.items %}
+      {% for status in statuses %}
         <li class="cf">
           {{ status.content }}
           <div class="meta">
-            <a href="{{ url('status.user', slug=status.user.slug) }}">
+            <a href="{{ status.user.get_absolute_url() }}">
               {% if status.user.email %}{{ gravatar(status.user.email, 22) }}{% else %}{{ gravatar('None', 60) }}{% endif %}
             </a>
-            <a href="{{ url('status.user', slug=status.user.slug) }}">{{ status.user.name }} (@{{ status.user.username }})</a>
+            <a href="{{ status.user.get_absolute_url() }}">{{ status.user.name }} (@{{ status.user.username }})</a>
             {{ status.created|dateformat('%A, {S} %B %Y at %-I:%M %p') }}
           </div>
         </li>
@@ -22,11 +23,11 @@
 {% macro begin_user_statuses(status) %}
   <div class="status-block cf">
     <div class="user-meta grid_3 alpha">
-      <h4><a href="{{ url('status.user', slug=status.user.slug) }}">{{ status.user.name }}</a></h4>
-      <a href="{{ url('status.user', slug=status.user.slug) }}">@{{ status.user.username }}</a>
+      <h4><a href="{{ status.user.get_absolute_url() }}">{{ status.user.name }}</a></h4>
+      <a href="{{ status.user.get_absolute_url() }}">@{{ status.user.username }}</a>
     </div>
     <div class="grid_1">
-      <a href="{{ url('status.user', slug=status.user.slug) }}">
+      <a href="{{ status.user.get_absolute_url() }}">
         {% if status.user.email %}{{ gravatar(status.user.email, 60) }}{% else %}{{ gravatar('None', 60) }}{% endif %}
       </a>
     </div>
@@ -44,7 +45,7 @@
   <li class="cf">
     <div class="update">{{ status.content_html|format_update(status.project)|safe|urlize(trim_url_limit=32)|markdown }}</div>
     <div class="update-meta">
-      <a class="post-time" href="{{ url('status.status', pk=status.id) }}">
+      <a class="post-time" href="{{ status.get_absolute_url() }}">
         <div datetime="{{ status.created|dateformat('%Y-%m-%dT%H:%M:%SZ') }}">
           {% if include_day %}
             {{ status.created|dateformat('%a %-I:%M %p') }}
@@ -54,12 +55,12 @@
         </div>
       </a>
 
-      <a href="{{ url('status.status', pk=status.id) }}" class="comment-count">{{ status.replies().items|length }}</a>
+      <a href="{{ status.get_absolute_url() }}" class="comment-count">{{ status.replies()|length }}</a>
 
       {% if status.project %}
         <a class="project-name"
            style="{% if status.project.color %}background-color: #{{ status.project.color }}; color: #{{ status.project.color }};{% endif %}"
-           href="{{ url('status.project', slug=status.project.slug) }}">
+           href="{{ status.project.get_absolute_url() }}">
           {{ status.project.name }}
         </a>
       {% endif %}
@@ -95,7 +96,7 @@
       <div class="grid_8 alpha omega prefix_4">
         <h3>
           <a href="?day={{ status.created.date()|dateformat('%Y-%m-%d') }}">
-            {% if status.created.date() == today%}
+            {% if status.created.date() == today %}
               Today
             {% elif status.created.date() == yesterday %}
               Yesterday
