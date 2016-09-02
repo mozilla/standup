@@ -50,7 +50,6 @@ INSTALLED_APPS = (
     'pipeline',
     'django_gravatar',
 
-    'standup.user',
     'standup.api',
     'standup.status',
 )

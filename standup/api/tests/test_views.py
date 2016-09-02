@@ -6,8 +6,7 @@ from django.test import Client, TestCase
 
 from standup.api.tests.factories import SystemTokenFactory
 from standup.status.models import Project, Status
-from standup.status.tests.factories import ProjectFactory, StatusFactory
-from standup.user.tests.factories import StandupUserFactory
+from standup.status.tests.factories import ProjectFactory, StatusFactory, StandupUserFactory
 
 
 def _content_generator():

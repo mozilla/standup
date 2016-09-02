@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from standup.status.models import Project, Team
+from standup.status.models import Project, Team, StandupUser
 
 
 @admin.register(Project)
@@ -17,3 +17,10 @@ class TeamAdmin(admin.ModelAdmin):
     fields = ['name', 'slug']
     list_display = ['name', 'slug']
     prepopulated_fields = {'slug': ['name']}
+
+
+@admin.register(StandupUser)
+class StandupUserAdmin(admin.ModelAdmin):
+    list_display = ['name', 'slug', 'github_handle']
+    search_fields = ['name', 'slug', 'github_handle']
+    filter_horizontal = ['teams']

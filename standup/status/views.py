@@ -3,14 +3,12 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
 from django.views.decorators.http import require_POST
-from django.views.generic import CreateView
 from django.views.generic import DetailView
 from django.views.generic import TemplateView
 
 from standup.status.forms import StatusizeForm
-from standup.status.models import Status, Team, Project
+from standup.status.models import Status, Team, Project, StandupUser
 from standup.status.utils import enddate, startdate
-from standup.user.models import StandupUser
 
 
 class PaginateStatusesMixin(object):

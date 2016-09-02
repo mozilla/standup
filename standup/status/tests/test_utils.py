@@ -1,6 +1,6 @@
 import pytest
 
-from standup.status.utils import format_update, TAG_TMPL
+from standup.status.models import format_update, TAG_TMPL
 
 
 def test_tags():

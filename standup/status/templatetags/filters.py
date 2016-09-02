@@ -2,14 +2,10 @@ from urllib.parse import urlencode
 
 from django_jinja import library
 
-from standup.status.utils import (
-    dateformat,
-    format_update,
-)
+from standup.status.models import format_update
 
 
 # Register template filters
-dateformat = library.filter(dateformat)
 format_update = library.filter(format_update)
 
 
@@ -19,3 +15,12 @@ def merge_query(request, **kwargs):
     params = request.GET.dict()
     params.update(kwargs)
     return urlencode(params)
+
+
+@library.filter
+def dateformat(date, fmt='%Y-%m-%d'):
+    def suffix(d):
+        suffixes = {1: 'st', 2: 'nd', 3: 'rd'}
+        return 'th' if 11 <= d <= 13 else suffixes.get(d % 10, 'th')
+
+    return date.strftime(fmt).replace('{S}', str(date.day) + suffix(date.day))

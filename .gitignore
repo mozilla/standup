@@ -6,7 +6,7 @@
 .env
 local_settings.py
 .docker-build*
-db.sqlite3
+*.sqlite3
 *.dump
 .cache
 node_modules

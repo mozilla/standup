@@ -14,8 +14,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
 
 from .models import SystemToken
-from standup.status.models import Project, Status
-from standup.user.models import StandupUser
+from standup.status.models import Project, Status, StandupUser
 
 
 logger = logging.getLogger(__name__)
