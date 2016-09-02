@@ -15,12 +15,6 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 
-from django_jinja import views
-
-
-handler403 = views.PermissionDenied.as_view(tmpl_name='errors/403.html')
-handler404 = views.PageNotFound.as_view(tmpl_name='errors/404.html')
-handler500 = views.ServerError.as_view(tmpl_name='errors/500.html')
 
 urlpatterns = [
     url(r'^api/', include('standup.api.urls')),
