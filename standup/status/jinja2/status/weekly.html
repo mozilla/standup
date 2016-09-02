@@ -1,16 +1,8 @@
-{% from 'includes/macros.html' import weekly_updates with context %}
-{% from 'includes/macros.html' import statusize with context %}
-
 {% extends "base.html" %}
+{% from 'includes/macros.html' import weekly_updates with context %}
 
 {% block title %}
   {{ settings.SITE_TITLE }}
-{% endblock %}
-
-{% block before_content %}
-  {% if 'user_id' in session %}
-    {{ statusize() }}
-  {% endif %}
 {% endblock %}
 
 {% block content %}

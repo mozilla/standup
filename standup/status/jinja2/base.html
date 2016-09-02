@@ -1,3 +1,4 @@
+{% from 'includes/macros.html' import statusize with context %}
 <!doctype html>
 <html class="no-js">
 <head>
@@ -64,14 +65,14 @@
               </li>
             {% endif %}
               <li>
-                {% if not 'user_id' in session %}
-                  <a href="#" id="login">Sign in with Persona</a>
-                {% else %}
-                  <a href="#" id="user-menu">{{ gravatar(request.user, 22) }}</a>
+                {% if user.is_authenticated() %}
+                  <a href="#" id="user-menu">{{ gravatar(user, 22) }}</a>
                   <ul>
                     <li><a href="{{ url('users.profile') }}">Profile</a></li>
                     <li><a href="#" id="logout">Sign out</a></li>
                   </ul>
+                {% else %}
+                  <a href="#" id="login">Sign in with Persona</a>
                 {% endif %}
               </li>
             </ul>
@@ -91,7 +92,11 @@
 
         {% endblock %}
       </div>
-      {% block before_content %}{% endblock %}
+      {% block before_content %}
+        {% if user.is_authenticated() %}
+          {{ statusize() }}
+        {% endif %}
+      {% endblock %}
       {% block content %}{% endblock %}
       {% block after_content %}{% endblock %}
     </div>

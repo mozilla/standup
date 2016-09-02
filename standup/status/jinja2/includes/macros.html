@@ -43,7 +43,7 @@
 
 {% macro display_one_status(status, include_day=False) %}
   <li class="cf">
-    <div class="update">{{ status.content_html|format_update(status.project)|safe|urlize(trim_url_limit=32)|markdown }}</div>
+    <div class="update">{{ status.content|format_update(status.project)|safe|urlize(trim_url_limit=32)|markdown }}</div>
     <div class="update-meta">
       <a class="post-time" href="{{ status.get_absolute_url() }}">
         <div datetime="{{ status.created|dateformat('%Y-%m-%dT%H:%M:%SZ') }}">
@@ -153,15 +153,18 @@
 {% macro statusize() %}
   <div id="statusize">
     <form action="{{ url('status.statusize') }}" method="POST">
-      {{ csrf()|safe }}
+      {% csrf_token %}
       <div class="grid_4 alpha"></div>
       <div class="grid_7 middle">
-        <textarea name="message" placeholder="What's your status?"></textarea>
-        <input type="hidden" name="redirect_to" value="{{ request.url }}" />
-        <input type="hidden" name="project" value="{{ project.id if project else '' }}" />
+        <textarea name="content" placeholder="What's your status?"></textarea>
+        <input type="hidden" name="redirect_to" value="{{ request.get_full_path() }}" />
+        {% if project %}
+          <input type="hidden" name="project" value="{{ project.id }}" />
+        {% endif %}
+        <input type="hidden" name="user" value="{{ user.profile.id }}" />
       </div>
       <div class="grid_1 omega">
-        {{ gravatar(current_user, 60) }}
+        {{ gravatar(user, 60) }}
         <input type="submit" class="btn" value="Post"/>
       </div>
     </form>

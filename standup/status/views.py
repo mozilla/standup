@@ -1,8 +1,13 @@
-import re
+from django.contrib import messages
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.http import HttpResponseForbidden
+from django.http import HttpResponseRedirect
+from django.views.decorators.http import require_POST
+from django.views.generic import CreateView
 from django.views.generic import DetailView
 from django.views.generic import TemplateView
 
+from standup.status.forms import StatusizeForm
 from standup.status.models import Status, Team, Project
 from standup.status.utils import enddate, startdate
 from standup.user.models import StandupUser
@@ -84,6 +89,24 @@ class UserView(PaginateStatusesMixin, DetailView):
 
     def get_status_queryset(self):
         return self.object.statuses.filter(reply_to=None)
+
+
+@require_POST
+def statusize(request):
+    if not request.user.is_authenticated():
+        return HttpResponseForbidden()
+
+    data = request.POST.dict()
+    data['user'] = request.user.profile.id
+    form = StatusizeForm(data)
+    if form.is_valid():
+        form.save()
+    else:
+        messages.error(request, 'Form error. Please try again.')
+        messages.error(request, form.errors)
+
+    referrer = request.META.get('HTTP_REFERER', '/')
+    return HttpResponseRedirect(data.get('redirect_to', referrer))
 
 
 home_view = HomeView.as_view()

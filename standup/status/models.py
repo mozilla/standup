@@ -47,7 +47,7 @@ class Status(models.Model):
 
     created = models.DateTimeField(default=now)
     user = models.ForeignKey('user.StandupUser', related_name='statuses')
-    project = models.ForeignKey('Project', related_name='statuses', null=True)
+    project = models.ForeignKey('Project', related_name='statuses', null=True, blank=True)
     content = models.TextField()
     content_html = models.TextField()
     reply_to = models.ForeignKey(
@@ -106,7 +106,7 @@ class Status(models.Model):
             data['project'] = self.project.dictify()
         else:
             data['project'] = None
-        data['content'] = format_update(self.content_html)
+        data['content'] = format_update(self.content)
         data['reply_to_id'] = self.reply_to.id
         data['reply_to_user_id'] = reply_to_user_id
         data['reply_to_username'] = reply_to_username

@@ -1,16 +1,8 @@
 {% extends "base.html" %}
-
 {% from 'includes/macros.html' import status_updates with context %}
-{% from 'includes/macros.html' import statusize with context %}
 
 {% block title %}
   @{{ suser.username }} | {{ settings.SITE_TITLE }}
-{% endblock %}
-
-{% block before_content %}
-  {% if 'user_id' in session %}
-    {{ statusize() }}
-  {% endif %}
 {% endblock %}
 
 {% block content %}

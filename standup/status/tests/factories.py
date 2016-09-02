@@ -29,7 +29,6 @@ class StatusFactory(factory.django.DjangoModelFactory):
     )
     project = factory.SubFactory(ProjectFactory)
     content = factory.Faker('sentence')
-    # FIXME: content_html
     reply_to = None
 
 

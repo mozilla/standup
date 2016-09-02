@@ -16,6 +16,7 @@ urlpatterns = [
     # TODO fix these. Just here so templates will work
     url(r'^profile/$', views.home_view, name='users.profile'),
     url(r'^help/$', views.home_view, name='landings.help'),
+    url(r'^statusize/$', views.statusize, name='status.statusize'),
     # feeds
     url(r'^feed/$', views.home_view, name='status.index_feed'),
     url(r'^user/{}.xml$'.format(SLUG_RE), views.home_view, name='status.user_feed'),

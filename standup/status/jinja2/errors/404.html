@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 {% set title = '404: Does not exist!' %}
 
+{% block before_content %}{% endblock %}
 {% block content %}
   <div class="grid_8 prefix_2 suffix_2">
-    <div class="error-message">{{ error }}</div>
+    <div class="error-message">{{ title }}</div>
   </div>
 {% endblock %}
