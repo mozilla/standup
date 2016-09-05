@@ -1,8 +1,9 @@
 DOCKERCOMPOSE = $(shell which docker-compose)
+PG_DUMP_FILE ?= standup.dump
 
-default:
+default: help
+	@echo ""
 	@echo "You need to specify a subcommand."
-	make help
 	@exit 1
 
 help:
@@ -18,10 +19,10 @@ help:
 	@echo "docs          - generate Sphinx HTML documentation, including API docs"
 
 .docker-build-base:
-	make build-base
+	${MAKE} build-base
 
 .docker-build:
-	make build
+	${MAKE} build
 
 build-base:
 	${DOCKERCOMPOSE} -f docker-compose.build.yml build --pull base
@@ -37,6 +38,13 @@ run: .docker-build
 
 shell: .docker-build
 	${DOCKERCOMPOSE} run web python3 manage.py shell
+
+restore-db: .docker-build
+	-${DOCKERCOMPOSE} run web dropdb -h db -U postgres -w postgres
+	${DOCKERCOMPOSE} run web createdb -h db -U postgres -w postgres
+	-${DOCKERCOMPOSE} run web pg_restore -d "postgres://postgres@db/postgres" < ${PG_DUMP_FILE}'
+	${DOCKERCOMPOSE} run web python3 manage.py migrate --fake-initial
+	${DOCKERCOMPOSE} run web python3 manage.py createsuperuser
 
 clean:
 	# python related things
@@ -71,4 +79,4 @@ docs: .docker-build
 	${DOCKERCOMPOSE} run web $(MAKE) -C docs/ clean
 	${DOCKERCOMPOSE} run web $(MAKE) -C docs/ html
 
-.PHONY: default clean build-base build docs lint run shell test test-coverage
+.PHONY: default clean build-base build docs lint run shell test test-coverage restore-db
