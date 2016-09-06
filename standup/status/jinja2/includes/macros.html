@@ -43,7 +43,7 @@
 
 {% macro display_one_status(status, include_day=False) %}
   <li class="cf">
-    <div class="update">{{ status.content|format_update(status.project)|safe|urlize(trim_url_limit=32)|markdown }}</div>
+    <div class="update">{{ status.htmlify()|safe|urlize(trim_url_limit=32)|markdown }}</div>
     <div class="update-meta">
       <a class="post-time" href="{{ status.get_absolute_url() }}">
         <div datetime="{{ status.created|dateformat('%Y-%m-%dT%H:%M:%SZ') }}">

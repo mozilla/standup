@@ -1,7 +1,9 @@
 from django.contrib import messages
+from django.contrib.syndication.views import Feed
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
+from django.utils.feedgenerator import Atom1Feed
 from django.views.decorators.http import require_POST
 from django.views.generic import DetailView
 from django.views.generic import TemplateView
@@ -135,4 +137,73 @@ class HelpView(TemplateView):
     template_name = 'landings/help.html'
 
 
-home_view = HomeView.as_view()
+# FEEDS
+
+
+class StatusesFeed(Feed):
+    feed_type = Atom1Feed
+    feed_limit = 200
+    obj_model = None
+
+    def get_object(self, request, slug=None):
+        if self.obj_model is None:
+            return None
+
+        return self.obj_model.objects.get(slug=slug)
+
+    def link(self, obj):
+        if obj is None:
+            return '/'
+
+        return obj.get_absolute_url()
+
+    def item_title(self, item):
+        return 'From {} at {}'.format(item.user.slug,
+                                      item.created.strftime('%I:%M%p %Z'))
+
+    def item_pubdate(self, item):
+        return item.created
+
+    def item_description(self, item):
+        content = item.htmlify()
+        if item.project:
+            content = '<h3>%s</h3>%s' % (item.project.name, content)
+
+        return content
+
+
+class MainFeed(StatusesFeed):
+    title = 'All status updates'
+
+    def items(self):
+        return Status.objects.filter(reply_to=None)[:self.feed_limit]
+
+
+class UserFeed(StatusesFeed):
+    obj_model = StandupUser
+
+    def title(self, obj):
+        return 'Updates by {}'.format(obj.slug)
+
+    def items(self, obj):
+        return obj.statuses.filter(reply_to=None)[:self.feed_limit]
+
+
+class ProjectFeed(StatusesFeed):
+    obj_model = Project
+
+    def title(self, obj):
+        return 'Updates for {}'.format(obj.name)
+
+    def items(self, obj):
+        return obj.statuses.filter(reply_to=None)[:self.feed_limit]
+
+
+class TeamFeed(StatusesFeed):
+    obj_model = Team
+
+    def title(self, obj):
+        return 'Updates from {}'.format(obj.name)
+
+    def items(self, obj):
+        return obj.statuses()[:self.feed_limit]

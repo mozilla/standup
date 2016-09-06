@@ -1,8 +1,10 @@
 import pytest
 
-from standup.status.models import format_update, TAG_TMPL
+from standup.status.models import TAG_TMPL
+from standup.status.tests.factories import StatusFactory
 
 
+@pytest.mark.django_db()
 def test_tags():
     """Test that format update parses tags correctly"""
 
@@ -10,11 +12,11 @@ def test_tags():
     for tag in ('#t', '#tag', '#TAG', '#tag123'):
         expected = '%s <div class="tags">%s</div>' % (
             tag, TAG_TMPL.format('', tag[1:].lower(), tag[1:]))
-        assert format_update(tag) == expected
+        assert StatusFactory(content=tag).htmlify() == expected
 
     # Test invalid tags.
     for tag in ('#1', '#.abc', '#?abc'):
-        assert format_update(tag) == tag
+        assert StatusFactory(content=tag).htmlify() == tag
 
 
 @pytest.mark.skip('This is busted--fix me.')

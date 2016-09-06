@@ -16,6 +16,13 @@ from standup.status.utils import (
 )
 
 
+TAG_TMPL = '{0} <span class="tag tag-{1}">{2}</span>'
+BUG_RE = re.compile(r'(bug) #?(\d+)', flags=re.I)
+PULL_RE = re.compile(r'(pull|pr) #?(\d+)', flags=re.I)
+USER_RE = re.compile(r'(?<=^|(?<=[^\w\-\.]))@([\w-]+)', flags=re.I)
+TAG_RE = re.compile(r'(?:^|[^\w\\/])#([a-zA-Z][a-zA-Z0-9_\.-]*)(?:\b|$)')
+
+
 class Team(models.Model):
     """A team of users in the organization."""
     name = models.CharField(
@@ -187,6 +194,46 @@ class Status(models.Model):
             return u_week_end(self.created)
         return None
 
+    def htmlify(self):
+        # Remove icky stuff.
+        formatted = bleach.clean(self.content, tags=[])
+
+        # Linkify "bug #n" and "bug n" text.
+        formatted = BUG_RE.sub(
+            r'<a href="http://bugzilla.mozilla.org/show_bug.cgi?id=\2">\1 \2</a>',
+            formatted)
+
+        checked = set()
+        for slug in USER_RE.findall(formatted):
+            if slug in checked:
+                continue
+            slug = slug.lstrip('@')
+            user = StandupUser.objects.filter(slug=slug).first()
+            if user:
+                url = reverse('status.user', kwargs={'slug': slug})
+                at_slug = '@%s' % slug
+                formatted = formatted.replace(at_slug,
+                                              '<a href="%s">%s</a>' %
+                                              (url, at_slug))
+            checked.add(slug)
+
+        # Linkify "pull #n" and "pull n" text.
+        if self.project and self.project.repo_url:
+            formatted = PULL_RE.sub(
+                r'<a href="%s/pull/\2">\1 \2</a>' % self.project.repo_url, formatted)
+
+        # Search for tags on the original, unformatted string. A tag must start
+        # with a letter.
+        tags = TAG_RE.findall(self.content)
+        tags.sort()
+        if tags:
+            tags_html = ''
+            for tag in tags:
+                tags_html = TAG_TMPL.format(tags_html, tag.lower(), tag)
+            formatted = '%s <div class="tags">%s</div>' % (formatted, tags_html)
+
+        return formatted
+
     def dictify(self):
         """Returns an OrderedDict of model attributes"""
         if self.reply_to:
@@ -207,7 +254,7 @@ class Status(models.Model):
             data['project'] = self.project.dictify()
         else:
             data['project'] = None
-        data['content'] = format_update(self.content)
+        data['content'] = self.htmlify()
         data['reply_to_id'] = self.reply_to.id
         data['reply_to_user_id'] = reply_to_user_id
         data['reply_to_username'] = reply_to_username
@@ -218,51 +265,3 @@ class Status(models.Model):
         # data['week_end'] = self.week_end.strftime("%Y-%m-%d")
 
         return data
-
-
-TAG_TMPL = '{0} <span class="tag tag-{1}">{2}</span>'
-BUG_RE = re.compile(r'(bug) #?(\d+)', flags=re.I)
-PULL_RE = re.compile(r'(pull|pr) #?(\d+)', flags=re.I)
-USER_RE = re.compile(r'(?<=^|(?<=[^\w\-\.]))@([\w-]+)', flags=re.I)
-TAG_RE = re.compile(r'(?:^|[^\w\\/])#([a-zA-Z][a-zA-Z0-9_\.-]*)(?:\b|$)')
-
-
-def format_update(update, project=None):
-    # Remove icky stuff.
-    formatted = bleach.clean(update, tags=[])
-
-    # Linkify "bug #n" and "bug n" text.
-    formatted = BUG_RE.sub(
-        r'<a href="http://bugzilla.mozilla.org/show_bug.cgi?id=\2">\1 \2</a>',
-        formatted)
-
-    checked = set()
-    for slug in USER_RE.findall(formatted):
-        if slug in checked:
-            continue
-        slug = slug.lstrip('@')
-        user = StandupUser.objects.filter(slug=slug).first()
-        if user:
-            url = reverse('status.user', kwargs={'slug': slug})
-            at_slug = '@%s' % slug
-            formatted = formatted.replace(at_slug,
-                                          '<a href="%s">%s</a>' %
-                                          (url, at_slug))
-        checked.add(slug)
-
-    # Linkify "pull #n" and "pull n" text.
-    if project and project.repo_url:
-        formatted = PULL_RE.sub(
-            r'<a href="%s/pull/\2">\1 \2</a>' % project.repo_url, formatted)
-
-    # Search for tags on the original, unformatted string. A tag must start
-    # with a letter.
-    tags = TAG_RE.findall(update)
-    tags.sort()
-    if tags:
-        tags_html = ''
-        for tag in tags:
-            tags_html = TAG_TMPL.format(tags_html, tag.lower(), tag)
-        formatted = '%s <div class="tags">%s</div>' % (formatted, tags_html)
-
-    return formatted

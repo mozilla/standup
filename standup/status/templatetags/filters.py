@@ -2,12 +2,6 @@ from urllib.parse import urlencode
 
 from django_jinja import library
 
-from standup.status.models import format_update
-
-
-# Register template filters
-format_update = library.filter(format_update)
-
 
 @library.global_function
 def merge_query(request, **kwargs):
