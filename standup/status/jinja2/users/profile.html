@@ -1,11 +1,11 @@
-{% from 'includes/macros.html' import status_updates with context %}
-
 {% extends "base.html" %}
 
-{% set styles = ('profile',) %}
+{% block more_styles %}
+  {% stylesheet 'profile' %}
+{% endblock %}
 
 {% block title %}
-  Profile | @{{ current_user.username }} | Standup
+  Profile | @{{ request.user.profile.slug or request.user.username }} | Standup
 {% endblock %}
 
 {% block before_content %}{% endblock %}
@@ -14,18 +14,15 @@
     <h1>Your profile</h1>
   </div>
   <div class="grid_6 prefix_3 suffix_3">
-    <form action="{{ request.path }}" method="post">
-      {{ csrf()|safe }}
+    <form action="{{ url('users.profile') }}" method="post">
+      {% csrf_token %}
+      <label for="email">Email Address</label>
+      <div class="fake-input disabled">{{ request.user.email }}</div>
       {% for field in form %}
-        {% if not field.type == 'HiddenField' or field.name == 'email' %}
-          {% for error in field.errors %}
-            <span class="error">{{ error }}</span>
-          {% endfor %}
-          {{ field.label }}
-        {% endif %}
-        {% if field.name == 'email' %}
-          <div class="fake-input disabled">{{ field.data }}</div>
-        {% endif %}
+        {% for error in field.errors %}
+          <span class="error">{{ error }}</span>
+        {% endfor %}
+        {{ field.label }}
         {{ field }}
       {% endfor %}
       <button type="submit" class="btn">Save changes</button>

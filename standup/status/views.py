@@ -5,8 +5,9 @@ from django.http import HttpResponseRedirect
 from django.views.decorators.http import require_POST
 from django.views.generic import DetailView
 from django.views.generic import TemplateView
+from django.views.generic import UpdateView
 
-from standup.status.forms import StatusizeForm
+from standup.status.forms import StatusizeForm, ProfileForm
 from standup.status.models import Status, Team, Project, StandupUser
 from standup.status.utils import enddate, startdate
 
@@ -101,10 +102,33 @@ def statusize(request):
         form.save()
     else:
         messages.error(request, 'Form error. Please try again.')
-        messages.error(request, form.errors)
 
     referrer = request.META.get('HTTP_REFERER', '/')
     return HttpResponseRedirect(data.get('redirect_to', referrer))
+
+
+class ProfileView(UpdateView):
+    template_name = 'users/profile.html'
+    form_class = ProfileForm
+    success_url = '/profile/'
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated():
+            messages.error(request, 'You must be logged-in to view your profile. '
+                                    'Please login and try again.')
+            return HttpResponseRedirect('/')
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_object(self, queryset=None):
+        return self.request.user.profile
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Profile updated successfully.')
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, 'Something went wrong. Please try again.')
+        return super().form_invalid(form)
 
 
 home_view = HomeView.as_view()

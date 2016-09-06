@@ -152,6 +152,8 @@ SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default='false', parser=bool
 GRAVATAR_DEFAULT_IMAGE = 'http://www.standu.ps/static/img/default-avatar.png'
 GRAVATAR_DEFAULT_SECURE = False
 
+LOGIN_URL = '/'
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
