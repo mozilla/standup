@@ -140,7 +140,7 @@ class AuthenticatedAPIView(APIView):
         request.auth_token = token
 
 
-class StatusPost(AuthenticatedAPIView):
+class StatusCreate(AuthenticatedAPIView):
     def post(self, request):
         token = request.auth_token
 

@@ -70,7 +70,7 @@ class TestAPIView(APITestCase):
     """Tests the APIView using the StatusPost view"""
     def test_get_fails(self):
         """Verify GET fails because it's not an allowed method"""
-        resp = self.client.get(reverse('api-status-post'))
+        resp = self.client.get(reverse('api.status-create'))
         assert resp.status_code == 405
         assert resp['content_type'] == 'application/json'
         assert resp.content == b'{"error": "Method not allowed"}'
@@ -84,7 +84,7 @@ class TestStatusPost(APITestCase):
 
         content = next(content_generator)
         resp = self.client.post_json(
-            reverse('api-status-post'),
+            reverse('api.status-create'),
             payload={
                 'api_key': token.token,
                 'user': standupuser.user.username,
@@ -102,7 +102,7 @@ class TestStatusPost(APITestCase):
 
         content = next(content_generator)
         resp = self.client.post_json(
-            reverse('api-status-post'),
+            reverse('api.status-create'),
             payload={
                 'api_key': token.token,
                 'user': standupuser.user.username,
@@ -124,7 +124,7 @@ class TestStatusPost(APITestCase):
 
         content = next(content_generator)
         resp = self.client.post_json(
-            reverse('api-status-post'),
+            reverse('api.status-create'),
             payload={
                 'api_key': token.token,
                 'user': standupuser.user.username,
@@ -144,7 +144,7 @@ class TestStatusPost(APITestCase):
 
         content = next(content_generator)
         resp = self.client.post_json(
-            reverse('api-status-post'),
+            reverse('api.status-create'),
             payload={
                 'api_key': token.token,
                 'user': standupuser.user.username,
@@ -164,7 +164,7 @@ class TestStatusPost(APITestCase):
 
         content = next(content_generator)
         resp = self.client.post_json(
-            reverse('api-status-post'),
+            reverse('api.status-create'),
             payload={
                 'api_key': token.token,
                 'user': standupuser.user.username,
@@ -184,7 +184,7 @@ class TestStatusPost(APITestCase):
 
         content = next(content_generator)
         resp = self.client.post_json(
-            reverse('api-status-post'),
+            reverse('api.status-create'),
             payload={
                 'api_key': token.token,
                 'user': standupuser.user.username,
@@ -204,7 +204,7 @@ class TestStatusPost(APITestCase):
 
         content = next(content_generator)
         resp = self.client.post_json(
-            reverse('api-status-post'),
+            reverse('api.status-create'),
             payload={
                 'api_key': token.token,
                 'user': standupuser.user.username,
@@ -223,7 +223,7 @@ class TestStatusPost(APITestCase):
         """Verify POST with no auth fails"""
         content = next(content_generator)
         resp = self.client.post_json(
-            reverse('api-status-post'),
+            reverse('api.status-create'),
             payload={
                 'user': 'jcoulton',
                 'content': content
@@ -236,7 +236,7 @@ class TestStatusPost(APITestCase):
         """Verify POST fails with wrong auth token"""
         content = next(content_generator)
         resp = self.client.post_json(
-            reverse('api-status-post'),
+            reverse('api.status-create'),
             payload={
                 'api_key': 'ou812',
                 'user': 'jcoulton',
@@ -254,7 +254,7 @@ class TestStatusDelete(APITestCase):
         status = StatusFactory.create(user=standupuser)
 
         resp = self.client.delete_json(
-            reverse('api-status-delete', kwargs={'pk': str(status.id)}),
+            reverse('api.status-delete', kwargs={'pk': str(status.id)}),
             payload={
                 'api_key': token.token,
                 'user': standupuser.username,
@@ -269,7 +269,7 @@ class TestStatusDelete(APITestCase):
         status = StatusFactory.create(user=standupuser)
 
         resp = self.client.delete_json(
-            reverse('api-status-delete', kwargs={'pk': str(status.id)}),
+            reverse('api.status-delete', kwargs={'pk': str(status.id)}),
             payload={
                 'api_key': token.token,
                 'user': ''
@@ -283,7 +283,7 @@ class TestStatusDelete(APITestCase):
         standupuser = StandupUserFactory.create()
 
         resp = self.client.delete_json(
-            reverse('api-status-delete', kwargs={'pk': str(1000)}),
+            reverse('api.status-delete', kwargs={'pk': str(1000)}),
             payload={
                 'api_key': token.token,
                 'user': standupuser.username,
@@ -298,7 +298,7 @@ class TestStatusDelete(APITestCase):
         status = StatusFactory.create(user=standupuser)
 
         resp = self.client.delete_json(
-            reverse('api-status-delete', kwargs={'pk': str(status.id)}),
+            reverse('api.status-delete', kwargs={'pk': str(status.id)}),
             payload={
                 'api_key': token.token,
                 'user': 'fred',
@@ -314,7 +314,7 @@ class TestUpdateUser(APITestCase):
         standupuser = StandupUserFactory.create(name='Data')
 
         resp = self.client.post_json(
-            reverse('api-update-user', kwargs={'username': standupuser.username}),
+            reverse('api.user-update', kwargs={'username': standupuser.username}),
             payload={
                 'api_key': token.token,
                 'name': 'Lor',
@@ -329,7 +329,7 @@ class TestUpdateUser(APITestCase):
         standupuser = StandupUserFactory.create(email='data@example.com')
 
         resp = self.client.post_json(
-            reverse('api-update-user', kwargs={'username': standupuser.username}),
+            reverse('api.user-update', kwargs={'username': standupuser.username}),
             payload={
                 'api_key': token.token,
                 'email': 'lor@example.com',
@@ -344,7 +344,7 @@ class TestUpdateUser(APITestCase):
         standupuser = StandupUserFactory.create(github_handle='data')
 
         resp = self.client.post_json(
-            reverse('api-update-user', kwargs={'username': standupuser.username}),
+            reverse('api.user-update', kwargs={'username': standupuser.username}),
             payload={
                 'api_key': token.token,
                 'github_handle': 'lor',
@@ -358,7 +358,7 @@ class TestUpdateUser(APITestCase):
         token = SystemTokenFactory.create()
 
         resp = self.client.post_json(
-            reverse('api-update-user', kwargs={'username': 'cmdrdata'}),
+            reverse('api.user-update', kwargs={'username': 'cmdrdata'}),
             payload={
                 'api_key': token.token,
                 'name': 'lor',
