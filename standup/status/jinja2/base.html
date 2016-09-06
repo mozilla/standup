@@ -69,10 +69,10 @@
                   <a href="#" id="user-menu">{{ gravatar(user, 22) }}</a>
                   <ul>
                     <li><a href="{{ url('users.profile') }}">Profile</a></li>
-                    <li><a href="#" id="logout">Sign out</a></li>
+                    <li><a href="{{ url('auth.logout') }}" id="logout">Sign out</a></li>
                   </ul>
                 {% else %}
-                  <a href="#" id="login">Sign in with Persona</a>
+                  <a href="{{ url('social:begin', 'github') }}" id="login">Sign in with Github</a>
                 {% endif %}
               </li>
             </ul>

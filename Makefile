@@ -33,6 +33,8 @@ build: .docker-build-base
 	${DOCKERCOMPOSE} -f docker-compose.build.yml build web
 	touch .docker-build
 
+rebuild: clean .docker-build
+
 run: .docker-build
 	${DOCKERCOMPOSE} up web
 
@@ -42,7 +44,7 @@ shell: .docker-build
 restore-db: .docker-build
 	-${DOCKERCOMPOSE} run web dropdb -h db -U postgres -w postgres
 	${DOCKERCOMPOSE} run web createdb -h db -U postgres -w postgres
-	-${DOCKERCOMPOSE} run web pg_restore -d "postgres://postgres@db/postgres" < ${PG_DUMP_FILE}'
+	-${DOCKERCOMPOSE} run web pg_restore -d "postgres://postgres@db/postgres" < ${PG_DUMP_FILE}
 	${DOCKERCOMPOSE} run web python3 manage.py migrate --fake-initial
 	${DOCKERCOMPOSE} run web python3 manage.py createsuperuser
 
@@ -79,4 +81,4 @@ docs: .docker-build
 	${DOCKERCOMPOSE} run web $(MAKE) -C docs/ clean
 	${DOCKERCOMPOSE} run web $(MAKE) -C docs/ html
 
-.PHONY: default clean build-base build docs lint run shell test test-coverage restore-db
+.PHONY: default clean build-base build docs lint run shell test test-coverage restore-db rebuild

@@ -4,8 +4,6 @@ from collections import OrderedDict
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 from django.utils.timezone import now
 
 import bleach
@@ -108,15 +106,6 @@ class TeamUser(models.Model):
     class Meta:
         db_table = 'team_users'
         unique_together = (('team', 'user'),)
-
-
-@receiver(post_save, sender=User)
-def create_profile(sender, instance, created, **kwargs):
-    if created:
-        StandupUser.objects.create(
-            user=instance,
-            slug=instance.username,
-        )
 
 
 class Project(models.Model):
