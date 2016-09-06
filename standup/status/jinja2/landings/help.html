@@ -1,7 +1,6 @@
-{% from 'includes/macros.html' import show_status, user_banner %}
-
 {% extends "base.html" %}
 
+{% block before_content %}{% endblock %}
 {% block content %}
   <div class="grid_8">
     <h1>Help!</h1>
@@ -23,7 +22,7 @@
         !help to your irc bot will get you a list of commands, including how to make and join teams.
       </p>
     </div>
-    
+
     <div class="box content-box">
       <h2>Status message syntax</h2>
       <p>
@@ -37,7 +36,7 @@
           Some hashtags have special meaning. All hashtags get re-printed at the
           beginning of your status message.
         </dd>
-          
+
         <dt><code>bug #n</code> and <code>bug n</code></dt>
         <dd>
           Will linkify this to the Mozilla Bugzilla url.

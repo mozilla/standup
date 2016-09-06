@@ -131,4 +131,8 @@ class ProfileView(UpdateView):
         return super().form_invalid(form)
 
 
+class HelpView(TemplateView):
+    template_name = 'landings/help.html'
+
+
 home_view = HomeView.as_view()

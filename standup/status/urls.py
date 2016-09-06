@@ -15,7 +15,7 @@ urlpatterns = [
     url(r'^weekly/$', views.WeeklyView.as_view(), name='status.weekly'),
     # TODO fix these. Just here so templates will work
     url(r'^profile/$', views.ProfileView.as_view(), name='users.profile'),
-    url(r'^help/$', views.home_view, name='landings.help'),
+    url(r'^help/$', views.HelpView.as_view(), name='landings.help'),
     url(r'^statusize/$', views.statusize, name='status.statusize'),
     # feeds
     url(r'^feed/$', views.home_view, name='status.index_feed'),
