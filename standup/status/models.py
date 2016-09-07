@@ -4,6 +4,8 @@ from collections import OrderedDict
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.utils.timezone import now
 
 import bleach
@@ -254,3 +256,12 @@ class Status(models.Model):
         # data['week_end'] = self.week_end.strftime("%Y-%m-%d")
 
         return data
+
+
+@receiver(post_save, sender=User)
+def create_profile(sender, instance, created, **kwargs):
+    if created:
+        StandupUser.objects.get_or_create(
+            user=instance,
+            slug=instance.username,
+        )

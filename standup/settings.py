@@ -50,6 +50,7 @@ INSTALLED_APPS = (
     'pipeline',
     'django_gravatar',
     'social.apps.django_app.default',
+    'django_browserid',
 
     'standup.api',
     'standup.status',
@@ -58,6 +59,7 @@ INSTALLED_APPS = (
 MIDDLEWARE_CLASSES = (
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'standup.status.middleware.NewUserProfileMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -77,6 +79,7 @@ _CONTEXT_PROCESSORS = [
     'django.contrib.auth.context_processors.auth',
     'django.contrib.messages.context_processors.messages',
     'standup.status.context_processors.status',
+    'social.apps.django_app.context_processors.backends',
 ]
 
 TEMPLATES = [
@@ -155,12 +158,23 @@ GRAVATAR_DEFAULT_SECURE = False
 LOGIN_URL = '/'
 HELP_FAQ_URL = config('HELP_FAQ_URL', raise_error=False)
 
-# social auth
+# auth
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
+    'django_browserid.auth.BrowserIDBackend',
     'social.backends.github.GithubOAuth2',
 )
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
+BROWSERID_AUDIENCES = config('BROWSERID_AUDIENCES',
+                             default='http://localhost:8000,'
+                                     'http://www.standu.ps,'
+                                     'http://standupstage.herokuapp.com',
+                             parser=ListOf(str))
+BROWSERID_REQUEST_ARGS = {
+    'siteName': SITE_TITLE,
+}
+BROWSERID_CREATE_USER = 'standup.status.auth.browserid_create_user'
+LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL_FAILURE = '/'
 SOCIAL_AUTH_LOGIN_ERROR_URL = '/'
 SOCIAL_AUTH_NEW_USER_REDIRECT_URL = '/profile/'
 SOCIAL_AUTH_ADMIN_USER_SEARCH_FIELDS = ['username', 'first_name', 'last_name', 'email']
@@ -182,7 +196,6 @@ SOCIAL_AUTH_PIPELINE = (
     'social.pipeline.social_auth.load_extra_data',
     'social.pipeline.user.user_details'
 )
->>>>>>> Fix #179: Add Github Auth
 
 
 # Static files (CSS, JavaScript, Images)

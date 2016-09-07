@@ -15,6 +15,8 @@ urlpatterns = [
     url(r'^status/(?P<pk>\d{1,8})/$', views.StatusView.as_view(), name='status.status'),
     url(r'^weekly/$', views.WeeklyView.as_view(), name='status.weekly'),
     url(r'^profile/$', views.ProfileView.as_view(), name='users.profile'),
+    url(r'^new-profile/$', views.ProfileView.as_view(new_profile=True),
+        name='users.new_profile'),
     url(r'^statusize/$', views.statusize, name='status.statusize'),
     # feeds
     url(r'^statuses.xml$', views.MainFeed(), name='status.index_feed'),

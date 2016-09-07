@@ -22,5 +22,6 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^logout/$', logout, kwargs={'next_page': '/'}, name='auth.logout'),
     url(r'', include('social.apps.django_app.urls', namespace='social')),
+    url(r'', include('django_browserid.urls')),
     url(r'', include('standup.status.urls')),
 ]

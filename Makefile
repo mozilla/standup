@@ -7,15 +7,16 @@ default: help
 	@exit 1
 
 help:
-	@echo "build         - build docker containers for dev"
+	@echo "build         - build docker images for dev"
 	@echo "run           - docker-compose up the entire system for dev"
 	@echo ""
 	@echo "clean         - remove all build, test, coverage and Python artifacts"
+	@echo "rebuild       - force a rebuild of all of the docker images"
 	@echo "lint          - check style with flake8"
 	@echo "test          - run tests against local files"
 	@echo "test-image    - run tests against files in docker image"
 	@echo "test-coverage - run tests and generate coverage report in cover/"
-	@echo "build-base    - (re)build base docker container"
+	@echo "build-base    - (re)build base docker image"
 	@echo "docs          - generate Sphinx HTML documentation, including API docs"
 
 .docker-build-base:
