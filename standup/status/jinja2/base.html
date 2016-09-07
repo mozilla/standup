@@ -113,7 +113,9 @@
         <div class="grid_6">
           <nav>
             <ul>
-              <li><a href="{{ url('landings.help') }}">Help &amp; FAQ</a></li>
+              {% if settings.HELP_FAQ_URL %}
+                <li><a href="{{ settings.HELP_FAQ_URL }}">Help &amp; FAQ</a></li>
+              {% endif %}
               <li><a href="https://github.com/mozilla/standup/issues">Report a bug</a></li>
               <li><a href="https://github.com/mozilla/standup">Contribute</a></li>
             </ul>

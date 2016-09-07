@@ -134,14 +134,12 @@ DATABASES = {
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
+
+# security
 
 SECURE_BROWSER_XSS_FILTER = config('SECURE_BROWSER_XSS_FILTER', default='true', parser=bool)
 # this should be 31536000 in prod (1 year)
@@ -153,6 +151,7 @@ GRAVATAR_DEFAULT_IMAGE = 'http://www.standu.ps/static/img/default-avatar.png'
 GRAVATAR_DEFAULT_SECURE = False
 
 LOGIN_URL = '/'
+HELP_FAQ_URL = config('HELP_FAQ_URL', raise_error=False)
 
 
 # Static files (CSS, JavaScript, Images)

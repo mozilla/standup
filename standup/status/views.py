@@ -133,10 +133,6 @@ class ProfileView(UpdateView):
         return super().form_invalid(form)
 
 
-class HelpView(TemplateView):
-    template_name = 'landings/help.html'
-
-
 # FEEDS
 
 
