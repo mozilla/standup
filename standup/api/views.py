@@ -140,7 +140,7 @@ class AuthenticatedAPIView(APIView):
         request.auth_token = token
 
 
-class StatusPost(AuthenticatedAPIView):
+class StatusCreate(AuthenticatedAPIView):
     def post(self, request):
         token = request.auth_token
 
@@ -155,7 +155,7 @@ class StatusPost(AuthenticatedAPIView):
 
         # Validate we have the required fields.
         if not (username and content):
-            return HttpResponseBadRequest('Missing required fields')
+            return HttpResponseBadRequest('Missing required fields.')
 
         # If this is a reply make sure that the status being replied to
         # exists and is not itself a reply
@@ -190,3 +190,50 @@ class StatusPost(AuthenticatedAPIView):
         status.save()
 
         return HttpResponseJSON({'id': status.id, 'content': content})
+
+
+class StatusDelete(AuthenticatedAPIView):
+    def delete(self, request, pk):
+        token = request.auth_token
+
+        # FIXME: Authorize this operation.
+
+        username = request.json_body.get('user')
+
+        if not username:
+            return HttpResponseBadRequest('Missing required fields.')
+
+        status = Status.objects.filter(id=pk).first()
+        if not status:
+            return HttpResponseBadRequest('Status does not exist.')
+
+        if status.user.username != username:
+            return HttpResponseForbidden('You cannot delete this status.')
+
+        status_id = status.id
+        status.delete()
+
+        return HttpResponseJSON({'id': status_id})
+
+
+class UpdateUser(AuthenticatedAPIView):
+    def post(self, request, username):
+        token = request.auth_token
+
+        # FIXME: Authorize this operation.
+
+        user = StandupUser.objects.filter(user__username=username).first()
+        if not user:
+            return HttpResponseBadRequest('User does not exist.')
+
+        if 'name' in request.json_body:
+            user.name = request.json_body['name']
+        if 'email' in request.json_body:
+            user.user.email = request.json_body['email']
+        if 'github_handle' in request.json_body:
+            user.github_handle = request.json_body['github_handle']
+
+        user.save()
+        user.user.save()
+
+        return HttpResponseJSON({'id': user.id})
