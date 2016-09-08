@@ -110,15 +110,6 @@ class TeamUser(models.Model):
         unique_together = (('team', 'user'),)
 
 
-@receiver(post_save, sender=User)
-def create_profile(sender, instance, created, **kwargs):
-    if created:
-        StandupUser.objects.create(
-            user=instance,
-            slug=instance.username,
-        )
-
-
 class Project(models.Model):
     """A project that does standups."""
 
@@ -265,3 +256,12 @@ class Status(models.Model):
         # data['week_end'] = self.week_end.strftime("%Y-%m-%d")
 
         return data
+
+
+@receiver(post_save, sender=User)
+def create_profile(sender, instance, created, **kwargs):
+    if created:
+        StandupUser.objects.get_or_create(
+            user=instance,
+            slug=instance.username,
+        )

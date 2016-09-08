@@ -14,12 +14,14 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.contrib.auth.views import logout
 
 
 urlpatterns = [
     url(r'^api/', include('standup.api.urls')),
     url(r'^admin/', include(admin.site.urls)),
-
+    url(r'^logout/$', logout, kwargs={'next_page': '/'}, name='auth.logout'),
+    url(r'', include('social.apps.django_app.urls', namespace='social')),
+    url(r'', include('django_browserid.urls')),
     url(r'', include('standup.status.urls')),
-
 ]

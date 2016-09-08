@@ -11,7 +11,15 @@
 {% block before_content %}{% endblock %}
 {% block content %}
   <div class="grid_12 banner">
-    <h1>Your profile</h1>
+    {% if new_profile %}
+      <h1>Welcome to Standup!</h1>
+      <p>
+        Before you can start kicking it with your peeps on Standup, you must
+        create a profile.
+      </p>
+    {% else %}
+      <h1>Your profile</h1>
+    {% endif %}
   </div>
   <div class="grid_6 prefix_3 suffix_3">
     <form action="{{ url('users.profile') }}" method="post">

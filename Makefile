@@ -7,15 +7,16 @@ default: help
 	@exit 1
 
 help:
-	@echo "build         - build docker containers for dev"
+	@echo "build         - build docker images for dev"
 	@echo "run           - docker-compose up the entire system for dev"
 	@echo ""
 	@echo "clean         - remove all build, test, coverage and Python artifacts"
+	@echo "rebuild       - force a rebuild of all of the docker images"
 	@echo "lint          - check style with flake8"
 	@echo "test          - run tests against local files"
 	@echo "test-image    - run tests against files in docker image"
 	@echo "test-coverage - run tests and generate coverage report in cover/"
-	@echo "build-base    - (re)build base docker container"
+	@echo "build-base    - (re)build base docker image"
 	@echo "docs          - generate Sphinx HTML documentation, including API docs"
 
 .docker-build-base:
@@ -33,6 +34,8 @@ build: .docker-build-base
 	${DOCKERCOMPOSE} -f docker-compose.build.yml build web
 	touch .docker-build
 
+rebuild: clean .docker-build
+
 run: .docker-build
 	${DOCKERCOMPOSE} up web
 
@@ -42,7 +45,7 @@ shell: .docker-build
 restore-db: .docker-build
 	-${DOCKERCOMPOSE} run web dropdb -h db -U postgres -w postgres
 	${DOCKERCOMPOSE} run web createdb -h db -U postgres -w postgres
-	-${DOCKERCOMPOSE} run web pg_restore -d "postgres://postgres@db/postgres" < ${PG_DUMP_FILE}'
+	-${DOCKERCOMPOSE} run web pg_restore -d "postgres://postgres@db/postgres" < ${PG_DUMP_FILE}
 	${DOCKERCOMPOSE} run web python3 manage.py migrate --fake-initial
 	${DOCKERCOMPOSE} run web python3 manage.py createsuperuser
 
@@ -79,4 +82,4 @@ docs: .docker-build
 	${DOCKERCOMPOSE} run web $(MAKE) -C docs/ clean
 	${DOCKERCOMPOSE} run web $(MAKE) -C docs/ html
 
-.PHONY: default clean build-base build docs lint run shell test test-coverage restore-db
+.PHONY: default clean build-base build docs lint run shell test test-coverage restore-db rebuild

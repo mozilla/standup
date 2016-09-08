@@ -217,7 +217,7 @@ class TestStatusPost(APITestCase):
         post = Status.objects.get(content=content)
         assert post.user.id == standupuser.id
         assert post.reply_to.id == status.id
-        assert post.project == None
+        assert post.project is None
 
     def test_post_no_auth(self):
         """Verify POST with no auth fails"""

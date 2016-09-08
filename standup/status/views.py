@@ -113,6 +113,7 @@ class ProfileView(UpdateView):
     template_name = 'users/profile.html'
     form_class = ProfileForm
     success_url = '/profile/'
+    new_profile = False
 
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated():
@@ -120,6 +121,11 @@ class ProfileView(UpdateView):
                                     'Please login and try again.')
             return HttpResponseRedirect('/')
         return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['new_profile'] = self.new_profile
+        return ctx
 
     def get_object(self, queryset=None):
         return self.request.user.profile

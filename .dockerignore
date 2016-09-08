@@ -1,2 +1,12 @@
 .git
 .env
+.docker-build*
+*.sqlite3
+*.dump
+*.pyc
+*.db
+*.swp
+.coverage
+.cache
+local_settings.py
+node_modules

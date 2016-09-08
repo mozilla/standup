@@ -13,6 +13,7 @@
   {% javascript 'modernizr' %}
 </head>
 <body>
+  {{ browserid_info() }}
   <div class="page">
   <header>
     <div class="container_12">
@@ -69,10 +70,14 @@
                   <a href="#" id="user-menu">{{ gravatar(user, 22) }}</a>
                   <ul>
                     <li><a href="{{ url('users.profile') }}">Profile</a></li>
-                    <li><a href="#" id="logout">Sign out</a></li>
+                    <li>{{ browserid_logout(text='Sign out') }}</li>
                   </ul>
                 {% else %}
-                  <a href="#" id="login">Sign in with Persona</a>
+                  <a href="#">Sign in...</a>
+                  <ul>
+                    <li><a href="{{ url('social:begin', 'github') }}" id="gh-login">with Github</a></li>
+                    <li>{{ browserid_login(text='with Persona') }}</li>
+                  </ul>
                 {% endif %}
               </li>
             </ul>
@@ -89,7 +94,9 @@
           {% endfor %}
         {% endif %}
         {% block notices %}
-
+          {% if user.is_authenticated() and not backends.associated %}
+            <div class="notice warn">Persona auth will soon be unavailable. Please <a href="{{ url('social:begin', 'github') }}">associate a Github account</a> as soon as possible.</div>
+          {% endif %}
         {% endblock %}
       </div>
       {% block before_content %}
@@ -125,5 +132,6 @@
     </footer>
   </div>
   {% javascript 'common' %}
+  {{ browserid_js() }}
 </body>
 </html>

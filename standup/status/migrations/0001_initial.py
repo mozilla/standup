@@ -49,7 +49,8 @@ class Migration(migrations.Migration):
                 ('content', models.TextField()),
                 ('content_html', models.TextField()),
                 ('project', models.ForeignKey(to='status.Project', null=True, blank=True, related_name='statuses')),
-                ('reply_to', models.ForeignKey(to='status.Status', null=True, blank=True, on_delete=django.db.models.deletion.SET_DEFAULT, default=None)),
+                ('reply_to', models.ForeignKey(to='status.Status', null=True, blank=True,
+                                               on_delete=django.db.models.deletion.SET_DEFAULT, default=None)),
                 ('user', models.ForeignKey(to='status.StandupUser', related_name='statuses')),
             ],
             options={
