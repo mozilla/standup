@@ -1,5 +1,6 @@
 FROM local/standup_base
 
+COPY requirements-dev.txt ./
 RUN pip3 install --require-hashes --no-cache-dir -r requirements-dev.txt
 
 CMD ["./bin/run-supervisor.sh", "dev"]

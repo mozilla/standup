@@ -142,7 +142,7 @@ class AuthenticatedAPIView(APIView):
 
 class StatusCreate(AuthenticatedAPIView):
     def post(self, request):
-        token = request.auth_token
+        # token = request.auth_token
 
         # FIXME: Authorize operation.
 
@@ -194,7 +194,7 @@ class StatusCreate(AuthenticatedAPIView):
 
 class StatusDelete(AuthenticatedAPIView):
     def delete(self, request, pk):
-        token = request.auth_token
+        # token = request.auth_token
 
         # FIXME: Authorize this operation.
 
@@ -218,7 +218,7 @@ class StatusDelete(AuthenticatedAPIView):
 
 class UpdateUser(AuthenticatedAPIView):
     def post(self, request, username):
-        token = request.auth_token
+        # token = request.auth_token
 
         # FIXME: Authorize this operation.
 
