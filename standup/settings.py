@@ -144,11 +144,15 @@ USE_TZ = True
 SECURE_BROWSER_XSS_FILTER = config('SECURE_BROWSER_XSS_FILTER', default='true', parser=bool)
 # this should be 31536000 in prod (1 year)
 SECURE_HSTS_SECONDS = config('SECURE_HSTS_SECONDS', default='0', parser=int)
+SECURE_HSTS_INCLUDE_SUBDOMAINS = config('SECURE_HSTS_INCLUDE_SUBDOMAINS',
+                                        default='false', parser=bool)
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default='false', parser=bool)
+SESSION_COOKIE_SECURE = CSRF_COOKIE_SECURE = SECURE_SSL_REDIRECT
 
-GRAVATAR_DEFAULT_IMAGE = 'http://www.standu.ps/static/img/default-avatar.png'
-GRAVATAR_DEFAULT_SECURE = False
+# must be a full publicly accessible URL, or a name of a gravatar default theme
+GRAVATAR_DEFAULT_IMAGE = config('GRAVATAR_DEFAULT_IMAGE', default='mm')
+GRAVATAR_DEFAULT_SECURE = SECURE_SSL_REDIRECT
 
 LOGIN_URL = '/'
 HELP_FAQ_URL = config('HELP_FAQ_URL', raise_error=False)
