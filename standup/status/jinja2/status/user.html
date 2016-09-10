@@ -2,7 +2,7 @@
 {% from 'includes/macros.html' import status_updates with context %}
 
 {% block title %}
-  @{{ suser.username }} | {{ settings.SITE_TITLE }}
+  @{{ suser.username }} | {{ super() }}
 {% endblock %}
 
 {% block content %}

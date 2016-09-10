@@ -31,7 +31,7 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default='false', parser=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', parser=ListOf(str), default='localhost')
-SITE_TITLE = config('SITE_TITLE', default='standup')
+SITE_TITLE = config('SITE_TITLE', default='Standup')
 
 # Application definition
 
@@ -158,7 +158,6 @@ SESSION_COOKIE_SECURE = CSRF_COOKIE_SECURE = SECURE_SSL_REDIRECT
 GRAVATAR_DEFAULT_IMAGE = config('GRAVATAR_DEFAULT_IMAGE', default='mm')
 GRAVATAR_DEFAULT_SECURE = SECURE_SSL_REDIRECT
 
-LOGIN_URL = '/'
 HELP_FAQ_URL = config('HELP_FAQ_URL', raise_error=False)
 
 # auth
@@ -176,6 +175,8 @@ BROWSERID_REQUEST_ARGS = {
     'siteName': SITE_TITLE,
 }
 BROWSERID_CREATE_USER = 'standup.status.auth.browserid_create_user'
+LOGIN_URL = '/'
+LOGOUT_URL = '/logout/'
 LOGIN_REDIRECT_URL = '/'
 LOGIN_REDIRECT_URL_FAILURE = '/'
 SOCIAL_AUTH_LOGIN_ERROR_URL = '/'
@@ -227,6 +228,12 @@ PIPELINE = {
             ),
             'output_filename': 'css/profile.min.css',
         },
+        'browserid': {
+            'source_filenames': (
+                'browserid/persona-buttons.css',
+            ),
+            'output_filename': 'css/browserid.min.css',
+        }
     },
     'JAVASCRIPT': {
         'common': {
@@ -241,6 +248,13 @@ PIPELINE = {
                 'js/vendor/modernizr-2.6.1.js',
             ),
             'output_filename': 'js/modernizr.min.js',
+        },
+        'browserid': {
+            'source_filenames': (
+                'browserid/api.js',
+                'browserid/browserid.js',
+            ),
+            'output_filename': 'js/browserid.min.js',
         }
     },
     'DISABLE_WRAPPER': True,

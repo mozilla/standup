@@ -2,10 +2,6 @@
 
 {% extends "base.html" %}
 
-{% block title %}
-  {{ settings.SITE_TITLE }}
-{% endblock %}
-
 {% block content %}
   <div class="grid_12">
     {{ status_updates(statuses) }}

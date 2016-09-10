@@ -1,9 +1,7 @@
 {% extends "base.html" %}
 {% from 'includes/macros.html' import weekly_updates with context %}
 
-{% block title %}
-  {{ settings.SITE_TITLE }}
-{% endblock %}
+{% block title %}Weekly | {{ super() }}{% endblock %}
 
 {% block content %}
   <div class="grid_12">

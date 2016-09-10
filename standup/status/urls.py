@@ -17,6 +17,7 @@ urlpatterns = [
     url(r'^new-profile/$', views.ProfileView.as_view(new_profile=True),
         name='users.new_profile'),
     url(r'^statusize/$', views.statusize, name='status.statusize'),
+    url(r'^login/$', views.LoginView.as_view(), name='users.login'),
     # feeds
     url(r'^statuses.xml$', views.MainFeed(), name='status.index_feed'),
     url(r'^user/{}.xml$'.format(SLUG_RE), views.UserFeed(), name='status.user_feed'),

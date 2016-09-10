@@ -2,7 +2,7 @@
 {% from 'includes/macros.html' import status_updates with context %}
 
 {% block title %}
-  Team: {{ team.name }} | {{ settings.SITE_TITLE }}
+  Team: {{ team.name }} | {{ super() }}
 {% endblock %}
 
 {% block content %}
