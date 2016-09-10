@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block title %}
-  Profile | @{{ request.user.profile.slug or request.user.username }} | Standup
+  Profile | @{{ request.user.profile.slug or request.user.username }} | {{ super() }}
 {% endblock %}
 
 {% block before_content %}{% endblock %}

@@ -188,29 +188,13 @@ header {
           line-height: 46px;
           padding: 0 15px 0 20px;
 
-          &:after {
+          &.dropdown:after {
             background: url('../img/icons-sprite.png') -57px -183px no-repeat;
             content: '';
             float: right;
             height: 5px;
             margin: 22px 0 0 10px;
             width: 9px;
-          }
-
-          &#persona-login {
-            &:after {
-              background-position: -57px -304px;
-              height: 11px;
-              margin-top: 19px;
-            }
-          }
-
-          &#gh-login {
-            &:after {
-              background-position: -57px -304px;
-              height: 11px;
-              margin-top: 19px;
-            }
           }
 
           &#user-menu {
@@ -778,5 +762,17 @@ input[type='text'],
       text-align: center;
       width: 60px;
     }
+  }
+}
+
+.persona-button {
+  &.github span:after{
+    background: url('../img/GitHub-Mark-32px.png') 8px center no-repeat;
+    background-size: 18px;
+  }
+
+  &:visited,
+  &:hover {
+    color: #fff;
   }
 }

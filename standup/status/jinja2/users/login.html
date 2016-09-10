@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Sign in | {{ super() }}{% endblock %}
+
+{% block more_styles %}{% stylesheet 'browserid' %}{% endblock %}
+{% block before_content %}{% endblock %}
+{% block content %}
+  <div class="grid_12"><h1>Sign in</h1></div>
+
+  <div class="grid_6">
+    <div class="box content-box">
+      <h2>Persona</h2>
+      <p>You can login using <a href="https://login.persona.org/">Mozilla Persona</a>. This service will be going away later this year however.</p>
+      <p>
+        If you've logged into the site before, you should use this method now. You'll be prompted after
+        signing in to associate a Github account. Doing this is the best way to ensure that your existing
+        account is associated with your Github account.
+      </p>
+      <p>
+        {{ browserid_login('Sign in with Persona', color='dark') }}
+      </p>
+    </div>
+  </div>
+
+  <div class="grid_6">
+    <div class="box content-box">
+      <h2>Github</h2>
+      <p>
+        You can also login using your <a href="https://github.com">Github</a> account. This will be the only way to login after Persona
+        is decommissioned and until we decide to add more.
+      </p>
+      <p>
+        Use this if you're signing up for the first time or you've already associated your Github account with your Persona one.
+        You can also try this if you just can't get Persona to work.
+      </p>
+      <p>
+        <a class="persona-button github blue" href="{{ url('social:begin', 'github') }}">
+          <span>Sign in with Github</span>
+        </a>
+      </p>
+    </div>
+  </div>
+{% endblock %}

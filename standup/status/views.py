@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.syndication.views import Feed
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.core.urlresolvers import reverse
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
 from django.utils.feedgenerator import Atom1Feed
@@ -117,9 +118,9 @@ class ProfileView(UpdateView):
 
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated():
-            messages.error(request, 'You must be logged-in to view your profile. '
-                                    'Please login and try again.')
-            return HttpResponseRedirect('/')
+            messages.error(request, 'You must be signed in to view your profile. '
+                                    'Please sign in and try again.')
+            return HttpResponseRedirect(reverse('users.login'))
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -137,6 +138,16 @@ class ProfileView(UpdateView):
     def form_invalid(self, form):
         messages.error(self.request, 'Something went wrong. Please try again.')
         return super().form_invalid(form)
+
+
+class LoginView(TemplateView):
+    template_name = 'users/login.html'
+
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated():
+            messages.info(request, 'You are already signed in')
+            return HttpResponseRedirect('/')
+        return super().get(request, *args, **kwargs)
 
 
 # FEEDS
