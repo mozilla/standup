@@ -10,9 +10,7 @@ echo "TRAVIS_BRANCH=$TRAVIS_BRANCH"
 # tag has to be in the form "2016-08-30" (optionally with a ".1" after for same day deploys)
 if [[ "$1" == "prod" ]] && [[ "$TRAVIS_TAG" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}(\.[0-9])?$ ]]; then
   # TODO enable this when we're really ready for prod
-  # HEROKU_APP="$HEROKU_PROD_APP"
-  echo "Would have deployed to Prod on Heroku, but we're not ready yet."
-  exit 0
+  HEROKU_APP="$HEROKU_PROD_APP"
 elif [[ "$1" == "stage" ]] && [[ "${TRAVIS_PULL_REQUEST}" == "false" ]] && [[ "$TRAVIS_BRANCH" == "master" ]]; then
   HEROKU_APP="$HEROKU_STAGE_APP"
 else
