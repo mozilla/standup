@@ -50,6 +50,7 @@ INSTALLED_APPS = (
     'django_gravatar',
     'social.apps.django_app.default',
     'django_browserid',
+    'raven.contrib.django.raven_compat',
 
     'standup.api',
     'standup.status',
@@ -269,6 +270,11 @@ PIPELINE = {
     'CSS_COMPRESSOR': 'pipeline.compressors.yuglify.YuglifyCompressor',
     'YUGLIFY_BINARY': config('PIPELINE_YUGLIFY_BINARY',
                              default=path('node_modules', '.bin', 'yuglify')),
+}
+
+RAVEN_CONFIG = {
+    'dsn': config('SENTRY_DSN', raise_error=False),
+    'release': config('GIT_SHA', raise_error=False),
 }
 
 if sys.argv[0].endswith('py.test'):

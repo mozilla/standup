@@ -55,3 +55,6 @@ requests-oauthlib==0.6.2 \
 django-browserid==2.0.2 \
     --hash=sha256:25642be39a7e89f1defe7f1e3fd43b91e33e41c49cc7e6623ce5ab42e3acc6a0 \
     --hash=sha256:48f31d43b7cb3368725955dc8976833fc4bcefc5968331470ca1ac7c663cf37d
+raven==5.27.1 \
+    --hash=sha256:6d98c03c789e2d15dc61992e5e2c1ef0018c467d3ce7b9aa5830e7940a77b69a \
+    --hash=sha256:1a7b595391c4557d8a9d9245138158130e43dcad02757f18d0a458e55c1e7162
