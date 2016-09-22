@@ -10,10 +10,10 @@ from django.utils.timezone import now
 
 import bleach
 from jinja2 import Markup
-from jinja2.utils import urlize
 from markdown import Markdown
 
 from standup.status.utils import (
+    trim_urls,
     week_end as u_week_end,
     week_start as u_week_start,
 )
@@ -24,7 +24,11 @@ BUG_RE = re.compile(r'(bug) #?(\d+)', flags=re.I)
 PULL_RE = re.compile(r'(pull|pr) #?(\d+)', flags=re.I)
 USER_RE = re.compile(r'(?<=^|(?<=[^\w\-.]))@([\w-]+)', flags=re.I)
 TAG_RE = re.compile(r'(?:^|[^\w\\/])#([a-z][a-z0-9_.-]*)(?:\b|$)', flags=re.I)
-MD = Markdown(extensions=[NixHeaderExtension(), 'nl2br'])
+MD = Markdown(output_format='html5', extensions=[
+    NixHeaderExtension(),
+    'nl2br',
+    'smart_strong'
+])
 
 
 class Team(models.Model):
@@ -194,7 +198,7 @@ class Status(models.Model):
         formatted = bleach.clean(self.content, tags=[])
 
         # linkify urls
-        formatted = urlize(formatted, trim_url_limit=32)
+        formatted = bleach.linkify(formatted, [trim_urls], parse_email=True)
 
         # Linkify "bug #n" and "bug n" text.
         formatted = BUG_RE.sub(

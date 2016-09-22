@@ -4,6 +4,24 @@ from datetime import datetime, timedelta
 from django.utils.timezone import now, make_aware
 
 
+def trim_urls(attrs, new=False):
+    """Bleach linkify callback to shorten overly-long URLs in the text.
+
+    Pretty much straight out of the bleach docs.
+
+    https://bleach.readthedocs.io/en/latest/linkify.html#altering-attributes
+    """
+    if not new:  # Only looking at newly-created links.
+        return attrs
+
+    # _text will be the same as the URL for new links.
+    text = attrs['_text']
+    if len(text) > 32:
+        attrs['_text'] = text[0:30] + '...'
+
+    return attrs
+
+
 def get_today():
     return now().date()
 
