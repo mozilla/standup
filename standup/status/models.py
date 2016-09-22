@@ -9,18 +9,22 @@ from django.dispatch import receiver
 from django.utils.timezone import now
 
 import bleach
+from jinja2 import Markup
+from jinja2.utils import urlize
+from markdown import Markdown
 
 from standup.status.utils import (
     week_end as u_week_end,
     week_start as u_week_start,
 )
+from standup.mdext.nixheaders import NixHeaderExtension
 
 
-TAG_TMPL = '{0} <span class="tag tag-{1}">{2}</span>'
 BUG_RE = re.compile(r'(bug) #?(\d+)', flags=re.I)
 PULL_RE = re.compile(r'(pull|pr) #?(\d+)', flags=re.I)
-USER_RE = re.compile(r'(?<=^|(?<=[^\w\-\.]))@([\w-]+)', flags=re.I)
-TAG_RE = re.compile(r'(?:^|[^\w\\/])#([a-zA-Z][a-zA-Z0-9_\.-]*)(?:\b|$)')
+USER_RE = re.compile(r'(?<=^|(?<=[^\w\-.]))@([\w-]+)', flags=re.I)
+TAG_RE = re.compile(r'(?:^|[^\w\\/])#([a-z][a-z0-9_.-]*)(?:\b|$)', flags=re.I)
+MD = Markdown(extensions=[NixHeaderExtension(), 'nl2br'])
 
 
 class Team(models.Model):
@@ -189,10 +193,24 @@ class Status(models.Model):
         # Remove icky stuff.
         formatted = bleach.clean(self.content, tags=[])
 
+        # linkify urls
+        formatted = urlize(formatted, trim_url_limit=32)
+
         # Linkify "bug #n" and "bug n" text.
         formatted = BUG_RE.sub(
             r'<a href="http://bugzilla.mozilla.org/show_bug.cgi?id=\2">\1 \2</a>',
             formatted)
+
+        # Wrap tags in a span for formatting
+        checked = set()
+        for tag in TAG_RE.findall(formatted):
+            if tag in checked:
+                continue
+            hashtag = '#%s' % tag
+            formatted = formatted.replace(hashtag,
+                                          '<span class="tag tag-%s">%s</span>' %
+                                          (tag.lower(), hashtag))
+            checked.add(tag)
 
         checked = set()
         for slug in USER_RE.findall(formatted):
@@ -213,17 +231,7 @@ class Status(models.Model):
             formatted = PULL_RE.sub(
                 r'<a href="%s/pull/\2">\1 \2</a>' % self.project.repo_url, formatted)
 
-        # Search for tags on the original, unformatted string. A tag must start
-        # with a letter.
-        tags = TAG_RE.findall(self.content)
-        tags.sort()
-        if tags:
-            tags_html = ''
-            for tag in tags:
-                tags_html = TAG_TMPL.format(tags_html, tag.lower(), tag)
-            formatted = '%s <div class="tags">%s</div>' % (formatted, tags_html)
-
-        return formatted
+        return Markup(MD.convert(formatted))
 
     def dictify(self):
         """Returns an OrderedDict of model attributes"""
