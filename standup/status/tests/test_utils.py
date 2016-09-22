@@ -2,7 +2,6 @@
 
 import pytest
 
-from standup.status.models import TAG_TMPL
 from standup.status.tests.factories import StatusFactory
 
 
@@ -12,13 +11,12 @@ def test_tags():
 
     # Test valid tags.
     for tag in ('#t', '#tag', '#TAG', '#tag123'):
-        expected = '%s <div class="tags">%s</div>' % (
-            tag, TAG_TMPL.format('', tag[1:].lower(), tag[1:]))
+        expected = '<p><span class="tag tag-%s">%s</span></p>' % (tag[1:].lower(), tag)
         assert StatusFactory(content=tag).htmlify() == expected
 
-    # Test invalid tags.
-    for tag in ('#1', '#.abc', '#?abc'):
-        assert StatusFactory(content=tag).htmlify() == tag
+    # Test invalid tags. Not first b/c markdown.
+    for tag in ('tag #1', 'tag #.abc', 'tag #?abc'):
+        assert StatusFactory(content=tag).htmlify() == '<p>%s</p>' % tag
 
 
 @pytest.mark.skip('This is busted--fix me.')
