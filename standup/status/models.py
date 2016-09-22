@@ -197,8 +197,8 @@ class Status(models.Model):
         # Remove icky stuff.
         formatted = bleach.clean(self.content, tags=[])
 
-        # linkify urls
-        formatted = bleach.linkify(formatted, [trim_urls], parse_email=True)
+        # Linkify urls
+        formatted = bleach.linkify(formatted, [trim_urls])
 
         # Linkify "bug #n" and "bug n" text.
         formatted = BUG_RE.sub(
