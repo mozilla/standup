@@ -94,6 +94,7 @@
           {% if user.is_authenticated() and not backends.associated %}
             <div class="notice warn">Persona auth will soon be unavailable. Please <a href="{{ url('social:begin', 'github') }}">associate a Github account</a> as soon as possible.</div>
           {% endif %}
+          <div class="notice">Welcome to Standup v2! We rewrote it and pushed it out on September 23rd. If you have any problems, see <a href="https://wiki.mozilla.org/Standup">the Standup wiki page</a> for help.</div>
         {% endblock %}
       </div>
       {% block before_content %}
