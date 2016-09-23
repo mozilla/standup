@@ -1,9 +1,52 @@
-{% extends "base.html" %}
 {% set title = '500: Something went wrong...' %}
 
-{% block before_content %}{% endblock %}
-{% block content %}
-  <div class="grid_8 prefix_2 suffix_2">
-    <div class="error-message">{{ title }}</div>
-  </div>
-{% endblock %}
+<!doctype html>
+<html class="no-js">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>{{ title }}</title>
+    <meta name="description" content="Daily standup updates for your projects.">
+    <link rel="icon" type="image/png" href="{{ static('img/favicon.png') }}" />
+    {% stylesheet 'common' %}
+    {% javascript 'modernizr' %}
+  </head>
+  <body>
+    <div class="page">
+      <header>
+        <div class="container_12">
+          <div class="grid_2">
+            Standup
+          </div>
+        </div>
+      </header>
+
+      <div id="main-content" class="container_12 cf">
+        <div class="grid_8 prefix_2 suffix_2">
+          <div class="error-message">{{ title }}</div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="container_12 cf">
+          <div class="grid_1">
+            <img src="{{ static('img/logo-grey.png') }}" alt="">
+          </div>
+          <div class="grid_5">
+            Standup is a neat little app that helps to organize and publish
+            asynchronous status updates.
+          </div>
+          <div class="grid_6">
+            <nav>
+              <ul>
+                <li><a href="https://github.com/mozilla/standup/issues">Report a bug</a></li>
+                <li><a href="https://github.com/mozilla/standup">Contribute</a></li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </footer>
+    </div>
+    {% javascript 'common' %}
+    {% javascript 'browserid' %}
+  </body>
+</html>
