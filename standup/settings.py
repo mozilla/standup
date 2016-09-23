@@ -170,7 +170,8 @@ AUTHENTICATION_BACKENDS = (
 BROWSERID_AUDIENCES = config('BROWSERID_AUDIENCES',
                              default='http://localhost:8000,'
                                      'http://www.standu.ps,'
-                                     'http://standupstage.herokuapp.com',
+                                     'https://www.standu.ps,'
+                                     'https://standupstage.herokuapp.com',
                              parser=ListOf(str))
 BROWSERID_REQUEST_ARGS = {
     'siteName': SITE_TITLE,
