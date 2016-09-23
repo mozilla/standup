@@ -2,7 +2,7 @@ import re
 from collections import OrderedDict
 
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, NoReverseMatch
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -50,7 +50,10 @@ class Team(models.Model):
         return '<Team: [%s]>' % (self.name,)
 
     def get_absolute_url(self):
-        return reverse('status.team', kwargs={'slug': self.slug})
+        try:
+            return reverse('status.team', kwargs={'slug': self.slug})
+        except NoReverseMatch:
+            return ''
 
     def statuses(self):
         user_ids = self.users.values_list('id', flat=True)
@@ -85,7 +88,10 @@ class StandupUser(models.Model):
         return '<StandupUser: [{}]>'.format(self.slug)
 
     def get_absolute_url(self):
-        return reverse('status.user', kwargs={'slug': self.slug})
+        try:
+            return reverse('status.user', kwargs={'slug': self.slug})
+        except NoReverseMatch:
+            return ''
 
     @property
     def username(self):
@@ -137,7 +143,10 @@ class Project(models.Model):
         return '<Project: [%s] %s>' % (self.slug, self.name)
 
     def get_absolute_url(self):
-        return reverse('status.project', kwargs={'slug': self.slug})
+        try:
+            return reverse('status.project', kwargs={'slug': self.slug})
+        except NoReverseMatch:
+            return ''
 
     def dictify(self):
         """Returns an OrderedDict of model attributes"""
@@ -172,7 +181,10 @@ class Status(models.Model):
         return '<Status: %s: %s>' % (self.user.username, self.content)
 
     def get_absolute_url(self):
-        return reverse('status.status', kwargs={'pk': self.pk})
+        try:
+            return reverse('status.status', kwargs={'pk': self.pk})
+        except NoReverseMatch:
+            return ''
 
     def replies(self):
         return Status.objects.filter(reply_to=self).order_by('-created')
@@ -223,7 +235,10 @@ class Status(models.Model):
             slug = slug.lstrip('@')
             user = StandupUser.objects.filter(slug=slug).first()
             if user:
-                url = reverse('status.user', kwargs={'slug': slug})
+                try:
+                    url = reverse('status.user', kwargs={'slug': slug})
+                except NoReverseMatch:
+                    continue
                 at_slug = '@%s' % slug
                 formatted = formatted.replace(at_slug,
                                               '<a href="%s">%s</a>' %
