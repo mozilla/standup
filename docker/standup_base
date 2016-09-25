@@ -1,10 +1,13 @@
 FROM quay.io/mozmar/base
 
 # Set Python-related environment variables to reduce annoying-ness
-ENV PYTHONUNBUFFERED 1
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PIP_DISABLE_PIP_VERSION_CHECK 1
-ENV LANG C.UTF-8
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1
+ENV LANG=C.UTF-8
+ENV PATH=/usr/local/lib/node_modules/standup/node_modules/.bin:$PATH
+ENV PIPELINE_LESS_BINARY=lessc
+ENV PIPELINE_YUGLIFY_BINARY=yuglify
 
 # Project settings
 ENV DJANGO_SETTINGS_MODULE standup.settings
@@ -22,7 +25,7 @@ RUN apt-get update && \
 
 # First copy requirements.txt so we can take advantage of docker caching.
 COPY package.json ./
-RUN npm install
+RUN npm install -g
 
 COPY requirements.txt ./
 RUN pip3 install --require-hashes --no-cache-dir -r requirements.txt
