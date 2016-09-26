@@ -147,7 +147,7 @@ USE_L10N = True
 USE_TZ = True
 
 # security
-
+SECURE_CONTENT_TYPE_NOSNIFF = config('SECURE_CONTENT_TYPE_NOSNIFF', default='true', parser=bool)
 SECURE_BROWSER_XSS_FILTER = config('SECURE_BROWSER_XSS_FILTER', default='true', parser=bool)
 # this should be 31536000 in prod (1 year)
 SECURE_HSTS_SECONDS = config('SECURE_HSTS_SECONDS', default='0', parser=int)
