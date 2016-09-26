@@ -31,6 +31,7 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default='false', parser=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', parser=ListOf(str), default='localhost')
+ENFORCE_HOSTNAME = config('ENFORCE_HOSTNAME', parser=ListOf(str), raise_error=False)
 SITE_TITLE = config('SITE_TITLE', default='Standup')
 
 # Application definition
@@ -58,6 +59,7 @@ INSTALLED_APPS = (
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.security.SecurityMiddleware',
+    'standup.status.middleware.EnforceHostnameMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'standup.status.middleware.NewUserProfileMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
