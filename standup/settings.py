@@ -185,6 +185,12 @@ CSP_STYLE_SRC = (
 CSP_FONT_SRC = (
     "'self'",
 )
+CSP_FORM_ACTION = (
+    "'self'",
+)
+CSP_CONNECT_SRC = (
+    "'self'",
+)
 CSP_SCRIPT_SRC = (
     "'self'",
     'login.persona.org',
@@ -194,7 +200,7 @@ CSP_IMG_SRC = (
     'data:',
     'www.gravatar.com',
 )
-# should really just be connect-src as frame-src is deprecated,
+# should really just be child-src as frame-src is deprecated,
 # but certain browsers (eyes safari) don't support connect-src.
 CSP_FRAME_SRC = (
     'login.persona.org',
@@ -202,6 +208,10 @@ CSP_FRAME_SRC = (
 CSP_FRAME_ANCESTORS = (
     '*.mozilla.org',
 )
+CSP_REPORT_ONLY = config('CSP_REPORT_ONLY', default='false', parser=bool)
+CSP_REPORT_ENABLE = config('CSP_REPORT_ENABLE', default='false', parser=bool)
+if CSP_REPORT_ENABLE:
+    CSP_REPORT_URI = config('CSP_REPORT_URI', default='/csp-violation-capture')
 
 # auth
 AUTHENTICATION_BACKENDS = (
