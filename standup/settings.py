@@ -218,6 +218,7 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'pipeline.finders.PipelineFinder',
 )
+WHITENOISE_ROOT = path('root_files')
 
 PIPELINE = {
     'STYLESHEETS': {

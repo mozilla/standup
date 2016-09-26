@@ -1,0 +1,32 @@
+{
+    "name": "Standup",
+    "description": "Web app that logs daily standup updates",
+    "repository": {
+        "url": "https://github.com/mozilla/standup",
+        "license": "BSD-3-Clause",
+        "tests": "https://travis-ci.org/mozilla/standup/"
+    },
+    "participate": {
+        "home": "https://github.com/mozilla/standup",
+        "docs": "https://github.com/mozilla/standup#readme",
+        "irc": "irc://irc.mozilla.org/#standup",
+        "irc-contacts": [
+            "pmac",
+            "willkg"
+        ]
+    },
+    "bugs": {
+        "list": "https://github.com/mozilla/standup/issues",
+        "report": "https://github.com/mozilla/standup/issues/new"
+    },
+    "urls": {
+        "prod": "https://www.standu.ps",
+        "stage": "https://standupstage.herokuapp.com"
+    },
+    "keywords": [
+        "python",
+        "less-css",
+        "django",
+        "html5"
+    ]
+}
