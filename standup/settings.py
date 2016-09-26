@@ -268,10 +268,12 @@ PIPELINE = {
     'LESS_BINARY': config('PIPELINE_LESS_BINARY',
                           default=path('node_modules', '.bin', 'lessc')),
     # 'LESS_ARGUMENTS': config('PIPELINE_LESS_ARGUMENTS', default='-s'),
-    'JS_COMPRESSOR': 'pipeline.compressors.yuglify.YuglifyCompressor',
-    'CSS_COMPRESSOR': 'pipeline.compressors.yuglify.YuglifyCompressor',
-    'YUGLIFY_BINARY': config('PIPELINE_YUGLIFY_BINARY',
-                             default=path('node_modules', '.bin', 'yuglify')),
+    'JS_COMPRESSOR': 'pipeline.compressors.uglifyjs.UglifyJSCompressor',
+    'CSS_COMPRESSOR': 'standup.pipeline.CleanCSSCompressor',
+    'CLEANCSS_BINARY': config('PIPELINE_CLEANCSS_BINARY',
+                              default=path('node_modules', '.bin', 'cleancss')),
+    'UGLIFYJS_BINARY': config('PIPELINE_UGLIFYJS_BINARY',
+                              default=path('node_modules', '.bin', 'uglifyjs')),
 }
 
 RAVEN_CONFIG = {

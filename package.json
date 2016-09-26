@@ -19,7 +19,8 @@
   },
   "homepage": "https://github.com/mozilla/standup#readme",
   "dependencies": {
+    "clean-css": "3.4.19",
     "less": "2.7.1",
-    "yuglify": "0.1.4"
+    "uglify-js": "2.7.3"
   }
 }
