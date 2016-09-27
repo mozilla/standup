@@ -18,3 +18,7 @@ class HomeViewTestCase(TestCase):
         # FIXME: Need a better assertion here. Should probably assert that 5
         # statuses got rendered.
         self.assertNotContains(resp, 'No status updates available')
+
+    def test_status_404(self):
+        resp = self.client.get(reverse('status.status', kwargs={'pk': 1234}))
+        assert resp.status_code == 404

@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.contrib.syndication.views import Feed
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.core.urlresolvers import reverse
+from django.http import Http404
 from django.http import (HttpResponse, HttpResponseBadRequest,
                          HttpResponseForbidden, HttpResponseRedirect)
 from django.utils.feedgenerator import Atom1Feed
@@ -86,7 +87,11 @@ class StatusView(PaginateStatusesMixin, TemplateView):
     template_name = 'status/status.html'
 
     def get_status_queryset(self):
-        return Status.objects.filter(pk=self.kwargs['pk'])
+        qs = Status.objects.filter(pk=self.kwargs['pk'])
+        if not qs:
+            raise Http404()
+
+        return qs
 
 
 class UserView(PaginateStatusesMixin, DetailView):
