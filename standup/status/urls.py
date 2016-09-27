@@ -23,4 +23,6 @@ urlpatterns = [
     url(r'^user/{}.xml$'.format(SLUG_RE), views.UserFeed(), name='status.user_feed'),
     url(r'^team/{}.xml$'.format(SLUG_RE), views.TeamFeed(), name='status.team_feed'),
     url(r'^project/{}.xml$'.format(SLUG_RE), views.ProjectFeed(), name='status.project_feed'),
+    # csp
+    url(r'^csp-violation-capture$', views.csp_violation_capture),
 ]

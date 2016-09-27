@@ -62,6 +62,7 @@ MIDDLEWARE_CLASSES = (
     'standup.status.middleware.EnforceHostnameMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'standup.status.middleware.NewUserProfileMiddleware',
+    'csp.middleware.CSPMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -164,6 +165,53 @@ GRAVATAR_DEFAULT_IMAGE = config('GRAVATAR_DEFAULT_IMAGE', default='mm')
 GRAVATAR_DEFAULT_SECURE = SECURE_SSL_REDIRECT
 
 HELP_FAQ_URL = config('HELP_FAQ_URL', raise_error=False)
+
+# CSP
+CSP_DEFAULT_SRC = (
+    "'none'",
+)
+CSP_OBJECT_SRC = (
+    "'none'",
+)
+CSP_BASE_URI = (
+    "'self'",
+)
+CSP_STYLE_SRC = (
+    "'self'",
+    # because projects can set custom colors which happen
+    # in inline style attributes. we should fix that.
+    "'unsafe-inline'",
+)
+CSP_FONT_SRC = (
+    "'self'",
+)
+CSP_FORM_ACTION = (
+    "'self'",
+)
+CSP_CONNECT_SRC = (
+    "'self'",
+)
+CSP_SCRIPT_SRC = (
+    "'self'",
+    'login.persona.org',
+)
+CSP_IMG_SRC = (
+    "'self'",
+    'data:',
+    'www.gravatar.com',
+)
+# should really just be child-src as frame-src is deprecated,
+# but certain browsers (eyes safari) don't support connect-src.
+CSP_FRAME_SRC = (
+    'login.persona.org',
+)
+CSP_FRAME_ANCESTORS = (
+    '*.mozilla.org',
+)
+CSP_REPORT_ONLY = config('CSP_REPORT_ONLY', default='false', parser=bool)
+CSP_REPORT_ENABLE = config('CSP_REPORT_ENABLE', default='false', parser=bool)
+if CSP_REPORT_ENABLE:
+    CSP_REPORT_URI = config('CSP_REPORT_URI', default='/csp-violation-capture')
 
 # auth
 AUTHENTICATION_BACKENDS = (
