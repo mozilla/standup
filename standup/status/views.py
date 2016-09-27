@@ -241,7 +241,7 @@ def csp_violation_capture(request):
         'logger': 'CSP',
     })
     try:
-        csp_data = json.loads(request.body)
+        csp_data = json.loads(request.body.decode())
     except ValueError:
         # Cannot decode CSP violation data, ignore
         return HttpResponseBadRequest('Invalid CSP Report')
