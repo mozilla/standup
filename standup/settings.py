@@ -163,6 +163,10 @@ SESSION_COOKIE_SECURE = CSRF_COOKIE_SECURE = SECURE_SSL_REDIRECT
 # must be a full publicly accessible URL, or a name of a gravatar default theme
 GRAVATAR_DEFAULT_IMAGE = config('GRAVATAR_DEFAULT_IMAGE', default='mm')
 GRAVATAR_DEFAULT_SECURE = SECURE_SSL_REDIRECT
+if GRAVATAR_DEFAULT_SECURE:
+    gravatar_domain = 'secure.gravatar.com'
+else:
+    gravatar_domain = 'www.gravatar.com'
 
 HELP_FAQ_URL = config('HELP_FAQ_URL', raise_error=False)
 
@@ -198,7 +202,7 @@ CSP_SCRIPT_SRC = (
 CSP_IMG_SRC = (
     "'self'",
     'data:',
-    'www.gravatar.com',
+    gravatar_domain,
 )
 # should really just be child-src as frame-src is deprecated,
 # but certain browsers (eyes safari) don't support connect-src.
