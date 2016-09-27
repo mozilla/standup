@@ -3,6 +3,7 @@ from pathlib import Path
 
 from everett.manager import ConfigManager, ConfigEnvFileEnv, ConfigOSEnv, ListOf
 import dj_database_url
+import django_cache_url
 
 
 ROOT_PATH = Path(__file__).resolve().parents[1]
@@ -58,6 +59,7 @@ INSTALLED_APPS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'standup.status.middleware.EnforceHostnameMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -72,6 +74,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'social.apps.django_app.middleware.SocialAuthExceptionMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware',
 )
 
 ROOT_URLCONF = 'standup.urls'
@@ -138,6 +141,14 @@ DATABASES = {
                       parser=dj_database_url.parse,
                       default='sqlite:///db.sqlite3')
 }
+
+CACHES = {
+    'default': config('CACHE_URL',
+                      parser=django_cache_url.parse,
+                      default='locmem:default')
+}
+CACHE_MIDDLEWARE_SECONDS = config('CACHE_MIDDLEWARE_SECONDS', default='30', parser=int)
+CACHE_FEEDS_SECONDS = config('CACHE_FEEDS_SECONDS', default='1800', parser=int)  # 30 min
 
 
 # Internationalization
@@ -343,3 +354,4 @@ RAVEN_CONFIG = {
 if sys.argv[0].endswith('py.test'):
     # won't barf if staticfiles are missing
     STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+    CACHES['default'] = django_cache_url.parse('dummy:')
