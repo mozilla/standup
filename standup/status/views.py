@@ -160,7 +160,7 @@ class LoginView(TemplateView):
 
 class StatusesFeed(Feed):
     feed_type = Atom1Feed
-    feed_limit = 200
+    feed_limit = 50
     obj_model = None
 
     def get_object(self, request, slug=None):
