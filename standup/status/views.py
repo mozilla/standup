@@ -261,3 +261,12 @@ def csp_violation_capture(request):
                           data=data)
 
     return HttpResponse('Captured CSP violation, thanks for reporting.')
+
+
+def robots_txt(request):
+    if settings.ROBOTS_ALLOW:
+        content = ''
+    else:
+        content = 'User-agent: *\nDisallow: /'
+
+    return HttpResponse(content, content_type='text/plain')
