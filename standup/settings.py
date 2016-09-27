@@ -148,6 +148,8 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
+ROBOTS_ALLOW = config('ROBOTS_ALLOW', default='false', parser=bool)
+
 # security
 SECURE_CONTENT_TYPE_NOSNIFF = config('SECURE_CONTENT_TYPE_NOSNIFF', default='true', parser=bool)
 SECURE_BROWSER_XSS_FILTER = config('SECURE_BROWSER_XSS_FILTER', default='true', parser=bool)

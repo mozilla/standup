@@ -25,4 +25,5 @@ urlpatterns = [
     url(r'^project/{}.xml$'.format(SLUG_RE), views.ProjectFeed(), name='status.project_feed'),
     # csp
     url(r'^csp-violation-capture$', views.csp_violation_capture),
+    url(r'^robots\.txt$', views.robots_txt),
 ]
