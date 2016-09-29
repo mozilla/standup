@@ -125,6 +125,7 @@ TEMPLATES = [
         },
     },
 ]
+DEFAULT_JINJA2_TEMPLATE_EXTENSION = '.html'
 
 WSGI_APPLICATION = 'standup.wsgi.application'
 
