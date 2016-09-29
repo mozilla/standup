@@ -66,3 +66,5 @@ contextlib2==0.5.4 \
 django-csp==3.1 \
     --hash=sha256:9208219c341ddbe371b5fd217ced0c916a5e2f7184bc603415074afcace6b51c \
     --hash=sha256:b3fed21f5cae56763119abc93c0ee43d897e39a597ed99b2ca617ff6e4b595fc
+newrelic==2.70.0.51 \
+    --hash=sha256:54e1da319d4670b4887b463309907cbefeff847a26e378609d04126a14d01b13
