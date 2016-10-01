@@ -270,3 +270,9 @@ def robots_txt(request):
         content = 'User-agent: *\nDisallow: /'
 
     return HttpResponse(content, content_type='text/plain')
+
+
+def errormenow(request):
+    # This is an intentional error designed to kick up the error page because otherwise it's
+    # difficult to test.
+    1 / 0  # noqa

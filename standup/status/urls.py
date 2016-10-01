@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.conf.urls import url
 
 from . import views
@@ -27,3 +28,7 @@ urlpatterns = [
     url(r'^csp-violation-capture$', views.csp_violation_capture),
     url(r'^robots\.txt$', views.robots_txt),
 ]
+
+if getattr(settings, 'SITE_TITLE', '').endswith('-stage'):
+    # This is for debugging, so we only want it running in dev and in stage environments.
+    urlpatterns.append(url(r'^errormenow$', views.errormenow))

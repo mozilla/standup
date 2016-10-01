@@ -23,6 +23,17 @@
       <div id="main-content" class="container_12 cf">
         <div class="grid_8 prefix_2 suffix_2">
           <div class="error-message">{{ title }}</div>
+          <div class="box content-box">
+            <p>
+              If you hit this error page after logging in with github, please let
+              us know so we can fix your Standup user account.
+            </p>
+            {% if settings.HELP_FAQ_URL %}
+            <p>
+              See <a href="{{ settings.HELP_FAQ_URL }}">our help page</a> for how to report bugs.
+            </p>
+            {% endif %}
+          </div>
         </div>
       </div>
 
@@ -32,8 +43,8 @@
             <img src="{{ static('img/logo-grey.png') }}" alt="">
           </div>
           <div class="grid_5">
-            Standup is a neat little app that helps to organize and publish
-            asynchronous status updates.
+            {{ settings.SITE_TITLE }} is a neat little app that helps to
+            organize and publish asynchronous status updates.
           </div>
           <div class="grid_6">
             <nav>
