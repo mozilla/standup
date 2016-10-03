@@ -14,7 +14,8 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='standupuser',
             name='irc_nick',
-            field=models.CharField(help_text='IRC nick for this particular user', max_length=100, null=True, unique=True, blank=True),
+            field=models.CharField(help_text='IRC nick for this particular user',
+                                   max_length=100, null=True, unique=True, blank=True),
         ),
         migrations.AlterField(
             model_name='standupuser',
