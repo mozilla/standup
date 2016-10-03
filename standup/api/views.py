@@ -91,7 +91,7 @@ class APIView(View):
         """Dispatches like View, except always returns JSON responses"""
         try:
             if request.body:
-                # FIXME: This assumes the body is utf-8.
+                # FIXME(willkg): This assumes the body is utf-8.
                 request.json_body = json.loads(force_str(request.body))
                 if not isinstance(request.json_body, dict):
                     raise Exception('Unrecognized JSON payload.')
@@ -144,9 +144,10 @@ class StatusCreate(AuthenticatedAPIView):
     def post(self, request):
         # token = request.auth_token
 
-        # FIXME: Authorize operation.
+        # FIXME(willkg): Authorize operation.
 
-        username = request.json_body.get('user')
+        # FIXME(willkg): This makes the API irc-specific.
+        irc_nick = request.json_body.get('user')
         project_slug = request.json_body.get('project')
         content = request.json_body.get('content')
         reply_to = request.json_body.get('reply_to')
@@ -154,7 +155,7 @@ class StatusCreate(AuthenticatedAPIView):
         replied = None
 
         # Validate we have the required fields.
-        if not (username and content):
+        if not (irc_nick and content):
             return HttpResponseBadRequest('Missing required fields.')
 
         # If this is a reply make sure that the status being replied to
@@ -167,7 +168,7 @@ class StatusCreate(AuthenticatedAPIView):
                 return HttpResponseBadRequest('Cannot reply to a reply.')
 
         # Get the user
-        user = StandupUser.objects.filter(user__username=username).first()
+        user = StandupUser.objects.filter(irc_nick=irc_nick).first()
         if not user:
             return HttpResponseBadRequest('User does not exist.')
 
@@ -196,18 +197,19 @@ class StatusDelete(AuthenticatedAPIView):
     def delete(self, request, pk):
         # token = request.auth_token
 
-        # FIXME: Authorize this operation.
+        # FIXME(willkg): Authorize this operation.
 
-        username = request.json_body.get('user')
+        # FIXME(willkg): This makes the API irc-specific.
+        irc_nick = request.json_body.get('user')
 
-        if not username:
+        if not irc_nick:
             return HttpResponseBadRequest('Missing required fields.')
 
         status = Status.objects.filter(id=pk).first()
         if not status:
             return HttpResponseBadRequest('Status does not exist.')
 
-        if status.user.username != username:
+        if status.user.irc_nick != irc_nick:
             return HttpResponseForbidden('You cannot delete this status.')
 
         status_id = status.id
@@ -220,9 +222,10 @@ class UpdateUser(AuthenticatedAPIView):
     def post(self, request, username):
         # token = request.auth_token
 
-        # FIXME: Authorize this operation.
+        # FIXME(willkg): Authorize this operation.
 
-        user = StandupUser.objects.filter(user__username=username).first()
+        # FIXME(willkg): This makes the API irc-specific.
+        user = StandupUser.objects.filter(irc_nick=username).first()
         if not user:
             return HttpResponseBadRequest('User does not exist.')
 

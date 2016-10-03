@@ -16,8 +16,8 @@ class StatusizeForm(forms.ModelForm):
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = StandupUser
-        fields = ['name', 'slug', 'github_handle']
+        fields = ['name', 'irc_nick', 'github_handle']
         labels = {
-            'slug': 'IRC Handle',
+            'irc_nick': 'IRC Handle',
             'github_handle': 'Github Handle',
         }

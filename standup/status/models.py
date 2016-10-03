@@ -74,6 +74,10 @@ class StandupUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     name = models.CharField(max_length=100, blank=True, null=True)
     slug = models.SlugField(max_length=100, blank=True, null=True, unique=True)
+    irc_nick = models.CharField(
+        max_length=100, blank=True, null=True, unique=True,
+        help_text='IRC nick for this particular user'
+    )
     github_handle = models.CharField(max_length=100, blank=True, null=True, unique=True)
     teams = models.ManyToManyField(Team, related_name='users', through='TeamUser')
 
@@ -105,9 +109,9 @@ class StandupUser(models.Model):
         """Returns an OrderedDict of model attributes"""
         data = OrderedDict()
         data['id'] = self.id
-        data['username'] = self.username
         data['name'] = self.name
         data['slug'] = self.slug
+        data['irc_nick'] = self.irc_nick
         # FIXME: Should we be providing email addresses publicly via the api?
         # data['email'] = self.user.email
         data['github_handle'] = self.github_handle

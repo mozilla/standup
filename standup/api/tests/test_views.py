@@ -87,7 +87,7 @@ class TestStatusPost(APITestCase):
             reverse('api.status-create'),
             payload={
                 'api_key': token.token,
-                'user': standupuser.user.username,
+                'user': standupuser.irc_nick,
                 'content': content
             }
         )
@@ -105,7 +105,7 @@ class TestStatusPost(APITestCase):
             reverse('api.status-create'),
             payload={
                 'api_key': token.token,
-                'user': standupuser.user.username,
+                'user': standupuser.irc_nick,
                 'project': 'jcoulton',
                 'content': content
             }
@@ -127,7 +127,7 @@ class TestStatusPost(APITestCase):
             reverse('api.status-create'),
             payload={
                 'api_key': token.token,
-                'user': standupuser.user.username,
+                'user': standupuser.irc_nick,
                 'project': project.slug,
                 'content': content
             }
@@ -147,7 +147,7 @@ class TestStatusPost(APITestCase):
             reverse('api.status-create'),
             payload={
                 'api_key': token.token,
-                'user': standupuser.user.username,
+                'user': standupuser.irc_nick,
                 'reply_to': status.id,
                 'content': content
             }
@@ -167,7 +167,7 @@ class TestStatusPost(APITestCase):
             reverse('api.status-create'),
             payload={
                 'api_key': token.token,
-                'user': standupuser.user.username,
+                'user': standupuser.irc_nick,
                 'reply_to': 1000,
                 'content': content
             }
@@ -187,7 +187,7 @@ class TestStatusPost(APITestCase):
             reverse('api.status-create'),
             payload={
                 'api_key': token.token,
-                'user': standupuser.user.username,
+                'user': standupuser.irc_nick,
                 'reply_to': reply.id,
                 'content': content
             }
@@ -207,7 +207,7 @@ class TestStatusPost(APITestCase):
             reverse('api.status-create'),
             payload={
                 'api_key': token.token,
-                'user': standupuser.user.username,
+                'user': standupuser.irc_nick,
                 'reply_to': status.id,
                 'project': project.id,
                 'content': content
@@ -257,7 +257,7 @@ class TestStatusDelete(APITestCase):
             reverse('api.status-delete', kwargs={'pk': str(status.id)}),
             payload={
                 'api_key': token.token,
-                'user': standupuser.username,
+                'user': standupuser.irc_nick,
             }
         )
         assert resp.status_code == 200
@@ -286,7 +286,7 @@ class TestStatusDelete(APITestCase):
             reverse('api.status-delete', kwargs={'pk': str(1000)}),
             payload={
                 'api_key': token.token,
-                'user': standupuser.username,
+                'user': standupuser.irc_nick,
             }
         )
         assert resp.status_code == 400
@@ -314,7 +314,7 @@ class TestUpdateUser(APITestCase):
         standupuser = StandupUserFactory.create(name='Data')
 
         resp = self.client.post_json(
-            reverse('api.user-update', kwargs={'username': standupuser.username}),
+            reverse('api.user-update', kwargs={'username': standupuser.irc_nick}),
             payload={
                 'api_key': token.token,
                 'name': 'Lor',
@@ -329,7 +329,7 @@ class TestUpdateUser(APITestCase):
         standupuser = StandupUserFactory.create(email='data@example.com')
 
         resp = self.client.post_json(
-            reverse('api.user-update', kwargs={'username': standupuser.username}),
+            reverse('api.user-update', kwargs={'username': standupuser.irc_nick}),
             payload={
                 'api_key': token.token,
                 'email': 'lor@example.com',
@@ -344,7 +344,7 @@ class TestUpdateUser(APITestCase):
         standupuser = StandupUserFactory.create(github_handle='data')
 
         resp = self.client.post_json(
-            reverse('api.user-update', kwargs={'username': standupuser.username}),
+            reverse('api.user-update', kwargs={'username': standupuser.irc_nick}),
             payload={
                 'api_key': token.token,
                 'github_handle': 'lor',
