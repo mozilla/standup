@@ -37,7 +37,7 @@ class PaginateStatusesMixin(object):
         return statuses
 
     def get_status_queryset(self):
-        qs = Status.objects.filter(reply_to=None)
+        qs = Status.objects.filter(reply_to=None).select_related('project', 'user')
         start = startdate(self.request)
         if start:
             end = enddate(self.request)
@@ -101,7 +101,7 @@ class UserView(PaginateStatusesMixin, DetailView):
     context_object_name = 'suser'
 
     def get_status_queryset(self):
-        return self.object.statuses.filter(reply_to=None)
+        return self.object.statuses.filter(reply_to=None).select_related('project', 'user')
 
 
 @require_POST
@@ -200,7 +200,7 @@ class MainFeed(StatusesFeed):
     title = 'All status updates'
 
     def items(self):
-        return Status.objects.filter(reply_to=None)[:self.feed_limit]
+        return Status.objects.filter(reply_to=None).select_related('project', 'user')[:self.feed_limit]
 
 
 class UserFeed(StatusesFeed):
@@ -210,7 +210,7 @@ class UserFeed(StatusesFeed):
         return 'Updates by {}'.format(obj.slug)
 
     def items(self, obj):
-        return obj.statuses.filter(reply_to=None)[:self.feed_limit]
+        return obj.statuses.filter(reply_to=None).select_related('project', 'user')[:self.feed_limit]
 
 
 class ProjectFeed(StatusesFeed):
@@ -220,7 +220,7 @@ class ProjectFeed(StatusesFeed):
         return 'Updates for {}'.format(obj.name)
 
     def items(self, obj):
-        return obj.statuses.filter(reply_to=None)[:self.feed_limit]
+        return obj.statuses.filter(reply_to=None).select_related('project', 'user')[:self.feed_limit]
 
 
 class TeamFeed(StatusesFeed):
@@ -230,7 +230,7 @@ class TeamFeed(StatusesFeed):
         return 'Updates from {}'.format(obj.name)
 
     def items(self, obj):
-        return obj.statuses()[:self.feed_limit]
+        return obj.statuses().select_related('project', 'user')[:self.feed_limit]
 
 
 @csrf_exempt
