@@ -68,9 +68,12 @@
             {% endif %}
               <li>
                 {% if user.is_authenticated() %}
-                  <a href="#" id="user-menu">{{ gravatar(user, 22) }}</a>
+                  <a href="{{ url('users.profile') }}" id="user-menu">{{ gravatar(user, 22) }}</a>
                   <ul>
                     <li><a href="{{ url('users.profile') }}">Profile</a></li>
+                    {% if user.is_staff -%}
+                      <li><a href="{{ url('admin:index') }}">Admin</a></li>
+                    {%- endif %}
                     <li>{{ browserid_logout(text='Sign out') }}</li>
                   </ul>
                 {% else %}
