@@ -23,3 +23,11 @@ echo "Pushing $DOCKER_TAG"
 docker login -u "$HEROKU_EMAIL" -p "$HEROKU_API_KEY" "$DOCKER_REGISTRY"
 docker tag local/standup_base "$DOCKER_TAG"
 docker push "$DOCKER_TAG"
+
+if [[ "$1" == "prod" && -n "$NEWRELIC_API_KEY" ]]; then
+  curl -H "x-api-key:$NEWRELIC_API_KEY" \
+       -d "deployment[app_name]=$NEWRELIC_APP_NAME" \
+       -d "deployment[revision]=$TRAVIS_COMMIT" \
+       -d "deployment[user]=Travis-CI" \
+       https://api.newrelic.com/deployments.xml
+fi
