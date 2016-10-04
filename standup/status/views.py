@@ -189,7 +189,7 @@ class StatusesFeed(Feed):
         return item.created
 
     def item_description(self, item):
-        content = item.htmlify()
+        content = str(item.htmlify())
         if item.project:
             content = '<h3>%s</h3>%s' % (item.project.name, content)
 
