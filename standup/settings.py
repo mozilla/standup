@@ -351,6 +351,23 @@ RAVEN_CONFIG = {
     'release': config('GIT_SHA', raise_error=False),
 }
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': config('DJANGO_LOG_LEVEL', default='INFO'),
+        },
+    },
+}
+
+
 if sys.argv[0].endswith('py.test'):
     # won't barf if staticfiles are missing
     STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
