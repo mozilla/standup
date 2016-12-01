@@ -147,6 +147,11 @@ CACHES = {
                       parser=django_cache_url.parse,
                       default='locmem:default')
 }
+if CACHES['default'].get('BACKEND', '') == 'django.core.cache.backends.locmem.LocMemCache':
+    # If we're using locmem, set timeout for 60 seconds and restrict
+    # cache to 100 things so as to not run rampant with memory usage.
+    CACHES['default']['timeout'] = 60
+    CACHES['default'].setdefault('OPTIONS', {})['MAX_ENTRIES'] = 100
 CACHE_MIDDLEWARE_SECONDS = config('CACHE_MIDDLEWARE_SECONDS', default='30', parser=int)
 CACHE_FEEDS_SECONDS = config('CACHE_FEEDS_SECONDS', default='1800', parser=int)  # 30 min
 
