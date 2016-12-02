@@ -12,7 +12,7 @@ from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.http import (HttpResponse, HttpResponseBadRequest,
                          HttpResponseForbidden, HttpResponseRedirect)
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.utils.feedgenerator import Atom1Feed
 from django.views.decorators.cache import cache_page
 from django.views.decorators.csrf import csrf_exempt
@@ -313,8 +313,6 @@ def statistics(request):
         ('Objects count', len(gc.get_objects())),
     ])
 
-    return render_to_response('status/statistics.html', {
+    return render(request, 'status/statistics.html', {
         'statsitems': groups,
-        'user': request.user,
-        'settings': settings,
     })
