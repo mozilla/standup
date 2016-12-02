@@ -26,8 +26,10 @@ urlpatterns = [
     url(r'^team/{}.xml$'.format(SLUG_RE), cache_feed(views.TeamFeed()), name='status.team_feed'),
     url(r'^project/{}.xml$'.format(SLUG_RE), cache_feed(views.ProjectFeed()),
         name='status.project_feed'),
+    url(r'^statistics/$', views.statistics, name='status.statistics'),
     # csp
     url(r'^csp-violation-capture$', views.csp_violation_capture),
+    # robots
     url(r'^robots\.txt$', views.robots_txt),
 ]
 

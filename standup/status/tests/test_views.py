@@ -42,3 +42,9 @@ class RobotsViewTestCase(TestCase):
         assert resp.status_code == 200
         assert resp['content-type'] == 'text/plain'
         assert resp.content == b'User-agent: *\nDisallow: /'
+
+
+class StatisticsViewTestCase(TestCase):
+    def test_statistics(self):
+        resp = self.client.get(reverse('status.statistics'))
+        assert resp.status_code == 200
