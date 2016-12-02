@@ -254,7 +254,8 @@ class Status(models.Model):
             formatted = PULL_RE.sub(
                 r'<a href="%s/pull/\2">\1 \2</a>' % self.project.repo_url, formatted)
 
-        return Markup(MD.convert(formatted))
+        formatted = MD.reset().convert(formatted)
+        return Markup(formatted)
 
     def dictify(self):
         """Returns an OrderedDict of model attributes"""
