@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="grid_12">
+  <h1>Statistics</h1>
+  {% for groupname, groupitems in statsitems.items() %}
+  <h2>{{ groupname }}</h2>
+    <table class="stats">
+      {% for key, val in groupitems.items() %}
+      <tr>
+        <td class="key">{{ key }}</td>
+        <td class="val">{{ val }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  {% endfor %}
+</div>
+{% endblock %}
