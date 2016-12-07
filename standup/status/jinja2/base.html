@@ -10,11 +10,9 @@
   {% block more_styles %}{% endblock %}
   <link rel="alternate" type="application/atom+xml" href="{{ url('status.index_feed') }}" title="{{ settings.SITE_TITLE }} Feed" />
   {% block atom_feed %}{% endblock atom_feed %}
-  <script src="https://login.persona.org/include.js"></script>
   {% javascript 'modernizr' %}
 </head>
 <body>
-  {{ browserid_info() }}
   <div class="page">
   <header>
     <div class="container_12">
@@ -74,7 +72,6 @@
                     {% if user.is_staff -%}
                       <li><a href="{{ url('admin:index') }}">Admin</a></li>
                     {%- endif %}
-                    <li>{{ browserid_logout(text='Sign out') }}</li>
                   </ul>
                 {% else %}
                   <a href="{{ url('users.login') }}">Sign in</a>
@@ -94,9 +91,6 @@
           {% endfor %}
         {% endif %}
         {% block notices %}
-          {% if user.is_authenticated() and not backends.associated %}
-            <div class="notice warn">Persona auth will soon be unavailable. Please <a href="{{ url('social:begin', 'github') }}">associate a Github account</a> as soon as possible.</div>
-          {% endif %}
           <div class="notice success">Welcome to Standup v2! We rewrote it and pushed it out on September 23rd. If you have any problems, see <a href="https://wiki.mozilla.org/Standup">the Standup wiki page</a> for help.</div>
         {% endblock %}
       </div>
@@ -133,6 +127,5 @@
     </footer>
   </div>
   {% javascript 'common' %}
-  {% javascript 'browserid' %}
 </body>
 </html>

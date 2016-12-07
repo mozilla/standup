@@ -51,7 +51,6 @@ INSTALLED_APPS = (
     'pipeline',
     'django_gravatar',
     'social.apps.django_app.default',
-    'django_browserid',
     'raven.contrib.django.raven_compat',
 
     'standup.api',
@@ -216,7 +215,6 @@ CSP_CONNECT_SRC = (
 )
 CSP_SCRIPT_SRC = (
     "'self'",
-    'login.persona.org',
 )
 CSP_IMG_SRC = (
     "'self'",
@@ -226,7 +224,6 @@ CSP_IMG_SRC = (
 # should really just be child-src as frame-src is deprecated,
 # but certain browsers (eyes safari) don't support connect-src.
 CSP_FRAME_SRC = (
-    'login.persona.org',
 )
 CSP_FRAME_ANCESTORS = (
     '*.mozilla.org',
@@ -239,19 +236,8 @@ if CSP_REPORT_ENABLE:
 # auth
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
-    'django_browserid.auth.BrowserIDBackend',
     'social.backends.github.GithubOAuth2',
 )
-BROWSERID_AUDIENCES = config('BROWSERID_AUDIENCES',
-                             default='http://localhost:8000,'
-                                     'http://www.standu.ps,'
-                                     'https://www.standu.ps,'
-                                     'https://standupstage.herokuapp.com',
-                             parser=ListOf(str))
-BROWSERID_REQUEST_ARGS = {
-    'siteName': SITE_TITLE,
-}
-BROWSERID_CREATE_USER = 'standup.status.auth.browserid_create_user'
 LOGIN_URL = '/'
 LOGOUT_URL = '/logout/'
 LOGIN_REDIRECT_URL = '/'
@@ -306,12 +292,6 @@ PIPELINE = {
             ),
             'output_filename': 'css/profile.min.css',
         },
-        'browserid': {
-            'source_filenames': (
-                'browserid/persona-buttons.css',
-            ),
-            'output_filename': 'css/browserid.min.css',
-        }
     },
     'JAVASCRIPT': {
         'common': {
@@ -327,13 +307,6 @@ PIPELINE = {
             ),
             'output_filename': 'js/modernizr.min.js',
         },
-        'browserid': {
-            'source_filenames': (
-                'browserid/api.js',
-                'browserid/browserid.js',
-            ),
-            'output_filename': 'js/browserid.min.js',
-        }
     },
     'DISABLE_WRAPPER': True,
     'SHOW_ERRORS_INLINE': False,
