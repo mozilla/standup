@@ -59,9 +59,6 @@ requests==2.12.3 \
 requests-oauthlib==0.6.2 \
     --hash=sha256:161ec8aaa360befac7079bcf20dc2a3993d1ddef19bc21d8118232a98f716e7a \
     --hash=sha256:9742667ee57090973baba18a9f0ddab9a7b84ffd44e236e44ada0c660eaf731f
-django-browserid==2.0.2 \
-    --hash=sha256:25642be39a7e89f1defe7f1e3fd43b91e33e41c49cc7e6623ce5ab42e3acc6a0 \
-    --hash=sha256:48f31d43b7cb3368725955dc8976833fc4bcefc5968331470ca1ac7c663cf37d
 raven==5.32.0 \
     --hash=sha256:a06517e9b7858ac41963f9741cc8358005d37511475aaa4c8b692d29ae0a7d94 \
     --hash=sha256:13e68bbf21d4d6f0cae4458da5be2d0d538733beabc5f93cb185048b28a77457

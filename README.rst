@@ -2,19 +2,12 @@
 README
 ======
 
-STATUS: August 26th, 2016
-=========================
-
-This is currently undergoing a django rewrite of the original app. It's pretty
-far from complete.
-
-
 Summary
 =======
 
-standup is an app that logs daily status updates.
-It is in perpetual Beta which is to say that it probably has bugs and you
-shouldn't bet a million dollars on it.
+Standup is an app that logs daily status updates.  It is in perpetual Beta
+which is to say that it probably has bugs and you shouldn't bet a million
+dollars on it.
 
 We developed it with the following priorities:
 
@@ -31,6 +24,8 @@ We developed it with the following priorities:
 Years passed. It was cool, then time passed and it bitrotted and in that
 time we discovered we had various needs and Persona was dying. So a small
 elite group of us rewrote it in Django.
+
+This is Standup v2--a Django rewrite of the original.
 
 
 Hacking
