@@ -5,6 +5,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
   <title>{% block title %}{{ settings.SITE_TITLE }}{% endblock %}</title>
   <meta name="description" content="Daily standup updates for your projects.">
+  {% block more_meta %}{% endblock %}
   <link rel="icon" type="image/png" href="{{ static('img/favicon.png') }}" />
   {% stylesheet 'common' %}
   {% block more_styles %}{% endblock %}
@@ -72,9 +73,10 @@
                     {% if user.is_staff -%}
                       <li><a href="{{ url('admin:index') }}">Admin</a></li>
                     {%- endif %}
+                    <li><a href="{{ url('users.logout') }}">Logout</a></li>
                   </ul>
                 {% else %}
-                  <a href="{{ url('users.login') }}">Sign in</a>
+                  <a href="{{ url('users.loginform') }}"">Sign in</a>
                 {% endif %}
               </li>
             </ul>
@@ -126,6 +128,8 @@
       </div>
     </footer>
   </div>
-  {% javascript 'common' %}
+  {% block javascript %}
+    {% javascript 'common' %}
+  {% endblock %}
 </body>
 </html>

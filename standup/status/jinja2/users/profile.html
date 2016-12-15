@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block more_styles %}
-  {% stylesheet 'profile' %}
+  {% stylesheet 'user' %}
 {% endblock %}
 
 {% block title %}
@@ -15,13 +15,26 @@
       <h1>Welcome to Standup!</h1>
       <p>
         Before you can start kicking it with your peeps on Standup, you must
-        create a profile.
+        fill out a profile.
       </p>
     {% else %}
       <h1>Your profile</h1>
     {% endif %}
   </div>
   <div class="grid_6 prefix_3 suffix_3">
+    {% if settings.HELP_FAQ_URL %}
+      <p>
+        If you think you already have an account with a profile, then
+        log out and let us know. We can check the database and merge your
+        accounts.
+      </p>
+      <p>
+        If you need to change your email address, let us know.
+      </p>
+      <p>
+        See <a href="{{ settings.HELP_FAQ_URL }}">for contact information</a>.
+      </p>
+    {% endif %}
     <form action="{{ url('users.profile') }}" method="post">
       {% csrf_token %}
       <label for="email">Email Address</label>
