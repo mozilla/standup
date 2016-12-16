@@ -1,5 +1,4 @@
 .git
-.env
 .docker-build*
 *.sqlite3
 *.dump
