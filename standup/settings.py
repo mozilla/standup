@@ -189,10 +189,6 @@ HELP_FAQ_URL = config('HELP_FAQ_URL', raise_error=False)
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
-LOGIN_URL = '/'
-LOGOUT_URL = '/logout/'
-LOGIN_REDIRECT_URL = '/'
-LOGIN_REDIRECT_URL_FAILURE = '/'
 
 AUTH0_CLIENT_ID = config('AUTH0_CLIENT_ID')
 AUTH0_CLIENT_SECRET = config('AUTH0_CLIENT_SECRET')
