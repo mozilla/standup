@@ -320,8 +320,8 @@ class Auth0LoginCallback(View):
             )
             return HttpResponseRedirect(reverse('users.loginform'))
 
-        # Get or create User instance
-        user = get_or_create_user(user_info['email'], user_info.get('name'))
+        # Get or create User instance using email address and nickname
+        user = get_or_create_user(user_info['email'], user_info.get('nickname'))
 
         # If inactive, add message and redirect to login page
         if not user.is_active:
