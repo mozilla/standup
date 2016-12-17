@@ -171,7 +171,7 @@ class LoginView(TemplateView):
 
 class LogoutView(View):
     """Logs a user out"""
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated():
             messages.info(request, 'You are not logged in.')
         else:
