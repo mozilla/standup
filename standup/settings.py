@@ -287,7 +287,7 @@ PIPELINE = {
                 'js/standup.js',
                 'js/signin.js',
             ),
-            'output_filename': 'js/common.min.js',
+            'output_filename': 'js/signin.min.js',
         },
         'modernizr': {
             'source_filenames': (
