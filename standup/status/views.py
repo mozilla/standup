@@ -175,10 +175,13 @@ class LogoutView(View):
         if not request.user.is_authenticated():
             messages.info(request, 'You are not logged in.')
         else:
-            # FIXME(willkg): Should require a csrf.
             logout(request)
             messages.info(request, 'You have been logged out.')
         return HttpResponseRedirect('/')
+
+
+class Exhausted(Exception):
+    pass
 
 
 def username_generator(base):
@@ -186,8 +189,11 @@ def username_generator(base):
     yield base
 
     count = 2
-    while True:
+    while count < 50:
         yield '%s%d' % (base, count)
+        count += 1
+
+    raise Exhausted('No more slots available for generation. Base was "%s"' % base)
 
 
 def get_or_create_user(email, name=None):
@@ -339,7 +345,6 @@ class Auth0LoginCallback(View):
         user.backend = 'django.contrib.auth.backends.ModelBackend'
         login(request, user)
 
-        # FIXME(willkg): Should we send them to the front page or their user page?
         return HttpResponseRedirect(reverse('status.index'))
 
 
