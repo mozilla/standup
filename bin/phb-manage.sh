@@ -9,6 +9,12 @@
 #
 # Example: phb-manage.sh collectstatic --noinput
 
-export DEBUG=False SECRET_KEY=foo DATABASE_URL=sqlite://
+export DEBUG=False
+export SECRET_KEY=foo
+export DATABASE_URL=sqlite://
+export AUTH0_CLIENT_ID=foo
+export AUTH0_CLIENT_SECRET=foo
+export AUTH0_DOMAIN=foo
+export AUTH0_CALLBACK_URL=foo
 
 python3 manage.py $@

@@ -1,4 +1,10 @@
 $(function() {
+    // Make the logout link submit the form with a CSRF token
+    $('#logout-link').click(function(ev) {
+        $('#logout-form').submit();
+        return false;
+    });
+
     fixTimezones();
 });
 

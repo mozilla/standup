@@ -1,20 +1,56 @@
 {% extends "base.html" %}
 
-{% block title %}Sign in | {{ super() }}{% endblock %}
+{% if request.user.is_active %}
+{% set title = "Sign out" %}
+{% else %}
+{% set title = "Sign in" %}
+{% endif %}
+
+{% block more_styles %}
+  {% stylesheet 'user' %}
+{% endblock %}
+
+{% block title %}{{ title }} | {{ super() }}{% endblock %}
+{% block more_meta %}
+  <meta name="auth0-client-id" content="{{ settings.AUTH0_CLIENT_ID }}">
+  <meta name="auth0-domain" content="{{ settings.AUTH0_DOMAIN }}">
+  <meta name="auth0-callback-url" content="{{ settings.AUTH0_CALLBACK_URL }}">
+{% endblock %}
 
 {% block before_content %}{% endblock %}
 {% block content %}
-  <div class="grid_12"><h1>Sign in</h1></div>
-
-  <div class="box content-box">
-    <h2>Github</h2>
+  <div class="grid_12 banner">
+    <h1>{{ title }}</h1>
     <p>
-      You can log in using your <a href="https://github.com">Github</a> account.
+      {{ settings.SITE_TITLE }} uses Auth0 for authentication.
     </p>
+    {% if settings.HELP_FAQ_URL %}
     <p>
-      <a class="login-button github blue" href="{{ url('social:begin', 'github') }}">
-        <span>Sign in with Github</span>
-      </a>
+      If you have problems logging in, please check out
+      <a href="{{ settings.HELP_FAQ_URL }}">our FAQ</a>.
     </p>
+    {% endif %}
   </div>
+
+  <div class="grid_6 prefix_3 suffix_3">
+    {% if request.user.is_active %}
+      <p>
+        You are currently signed in as <b>{{ request.user.email }}</b>.
+      </p>
+      <form action="{{ url('users.logout') }}" method="post">
+        {% csrf_token %}
+        <button type="submit">Sign out</button>
+      </form>
+    {% else %}
+      <div class="signin-link">
+        <form>
+          <button class="btn login-button" type="submit"><span>Sign in using Auth0</span></button>
+        </form>
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}
+
+{% block javascript %}
+  {% javascript 'signin' %}
 {% endblock %}

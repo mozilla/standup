@@ -50,7 +50,6 @@ INSTALLED_APPS = (
     'django_jinja_markdown',
     'pipeline',
     'django_gravatar',
-    'social.apps.django_app.default',
     'raven.contrib.django.raven_compat',
 
     'standup.api',
@@ -62,7 +61,6 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.security.SecurityMiddleware',
     'standup.status.middleware.EnforceHostnameMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
-    'standup.status.middleware.NewUserProfileMiddleware',
     'csp.middleware.CSPMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -72,8 +70,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'social.apps.django_app.middleware.SocialAuthExceptionMiddleware',
     'django.middleware.cache.FetchFromCacheMiddleware',
+    'standup.status.middleware.NewUserProfileMiddleware',
 )
 
 ROOT_URLCONF = 'standup.urls'
@@ -85,7 +83,6 @@ _CONTEXT_PROCESSORS = [
     'django.contrib.auth.context_processors.auth',
     'django.contrib.messages.context_processors.messages',
     'standup.status.context_processors.status',
-    'social.apps.django_app.context_processors.backends',
 ]
 
 TEMPLATES = [
@@ -188,6 +185,17 @@ else:
 
 HELP_FAQ_URL = config('HELP_FAQ_URL', raise_error=False)
 
+# auth
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+AUTH0_CLIENT_ID = config('AUTH0_CLIENT_ID')
+AUTH0_CLIENT_SECRET = config('AUTH0_CLIENT_SECRET')
+AUTH0_DOMAIN = config('AUTH0_DOMAIN')
+AUTH0_CALLBACK_URL = config('AUTH0_CALLBACK_URL')
+AUTH0_PATIENCE_TIMEOUT = config('AUTH0_PATIENCE_TIMEOUT', default='5', parser=int)
+
 # CSP
 CSP_DEFAULT_SRC = (
     "'none'",
@@ -209,9 +217,11 @@ CSP_FONT_SRC = (
 )
 CSP_FORM_ACTION = (
     "'self'",
+    AUTH0_DOMAIN,
 )
 CSP_CONNECT_SRC = (
     "'self'",
+    AUTH0_DOMAIN,
 )
 CSP_SCRIPT_SRC = (
     "'self'",
@@ -220,6 +230,7 @@ CSP_IMG_SRC = (
     "'self'",
     'data:',
     gravatar_domain,
+    'cdn.auth0.com',
 )
 # should really just be child-src as frame-src is deprecated,
 # but certain browsers (eyes safari) don't support connect-src.
@@ -232,38 +243,6 @@ CSP_REPORT_ONLY = config('CSP_REPORT_ONLY', default='false', parser=bool)
 CSP_REPORT_ENABLE = config('CSP_REPORT_ENABLE', default='false', parser=bool)
 if CSP_REPORT_ENABLE:
     CSP_REPORT_URI = config('CSP_REPORT_URI', default='/csp-violation-capture')
-
-# auth
-AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.ModelBackend',
-    'social.backends.github.GithubOAuth2',
-)
-LOGIN_URL = '/'
-LOGOUT_URL = '/logout/'
-LOGIN_REDIRECT_URL = '/'
-LOGIN_REDIRECT_URL_FAILURE = '/'
-SOCIAL_AUTH_LOGIN_ERROR_URL = '/'
-SOCIAL_AUTH_NEW_USER_REDIRECT_URL = '/profile/'
-SOCIAL_AUTH_ADMIN_USER_SEARCH_FIELDS = ['username', 'first_name', 'last_name', 'email']
-SOCIAL_AUTH_GITHUB_KEY = config('SOCIAL_AUTH_GITHUB_KEY', raise_error=False)
-SOCIAL_AUTH_GITHUB_SECRET = config('SOCIAL_AUTH_GITHUB_SECRET', raise_error=False)
-SOCIAL_AUTH_GITHUB_SCOPE = ['user:email']
-# from social/pipeline/__init__.py
-SOCIAL_AUTH_PIPELINE = (
-    'social.pipeline.social_auth.social_details',
-    'social.pipeline.social_auth.social_uid',
-    'social.pipeline.social_auth.social_user',
-    'social.pipeline.user.get_username',
-    # uncomment the following for debug output
-    # 'social.pipeline.debug.debug',
-    'social.pipeline.social_auth.associate_by_email',
-    'social.pipeline.user.create_user',
-    'standup.status.auth.create_user_profile',
-    'social.pipeline.social_auth.associate_user',
-    'social.pipeline.social_auth.load_extra_data',
-    'social.pipeline.user.user_details'
-)
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
@@ -286,11 +265,11 @@ PIPELINE = {
             ),
             'output_filename': 'css/common.min.css',
         },
-        'profile': {
+        'user': {
             'source_filenames': (
-                'less/profile.less',
+                'less/user.less',
             ),
-            'output_filename': 'css/profile.min.css',
+            'output_filename': 'css/user.min.css',
         },
     },
     'JAVASCRIPT': {
@@ -298,6 +277,15 @@ PIPELINE = {
             'source_filenames': (
                 'js/vendor/jquery-3.1.0.js',
                 'js/standup.js',
+            ),
+            'output_filename': 'js/common.min.js',
+        },
+        'signin': {
+            'source_filenames': (
+                'js/vendor/jquery-3.1.0.js',
+                'js/vendor/lock-passwordless-2.2.min.js',
+                'js/standup.js',
+                'js/signin.js',
             ),
             'output_filename': 'js/common.min.js',
         },

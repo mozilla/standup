@@ -19,7 +19,12 @@ urlpatterns = [
     url(r'^new-profile/$', views.ProfileView.as_view(new_profile=True),
         name='users.new_profile'),
     url(r'^statusize/$', views.statusize, name='status.statusize'),
-    url(r'^login/$', views.LoginView.as_view(), name='users.login'),
+
+    # auth
+    url(r'^auth/login-form$', views.LoginView.as_view(), name='users.loginform'),
+    url(r'^auth/logout$', views.LogoutView.as_view(), name='users.logout'),
+    url(r'^auth/login$', views.Auth0LoginCallback.as_view(), name='auth0.login'),
+
     # feeds
     url(r'^statuses.xml$', cache_feed(views.MainFeed()), name='status.index_feed'),
     url(r'^user/{}.xml$'.format(SLUG_RE), cache_feed(views.UserFeed()), name='status.user_feed'),
@@ -27,8 +32,10 @@ urlpatterns = [
     url(r'^project/{}.xml$'.format(SLUG_RE), cache_feed(views.ProjectFeed()),
         name='status.project_feed'),
     url(r'^statistics/$', views.statistics, name='status.statistics'),
+
     # csp
     url(r'^csp-violation-capture$', views.csp_violation_capture),
+
     # robots
     url(r'^robots\.txt$', views.robots_txt),
 ]
