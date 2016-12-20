@@ -159,8 +159,22 @@ class ProfileView(UpdateView):
         return super().form_invalid(form)
 
 
+def is_auth0_configured():
+    return (
+        settings.AUTH0_CLIENT_ID and
+        settings.AUTH0_CLIENT_SECRET and
+        settings.AUTH0_DOMAIN and
+        settings.AUTH0_CALLBACK_URL
+    )
+
+
 class LoginView(TemplateView):
     template_name = 'users/login.html'
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['auth0_configured'] = is_auth0_configured()
+        return ctx
 
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated():
