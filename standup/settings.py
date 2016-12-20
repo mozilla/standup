@@ -190,10 +190,11 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
-AUTH0_CLIENT_ID = config('AUTH0_CLIENT_ID')
-AUTH0_CLIENT_SECRET = config('AUTH0_CLIENT_SECRET')
-AUTH0_DOMAIN = config('AUTH0_DOMAIN')
-AUTH0_CALLBACK_URL = config('AUTH0_CALLBACK_URL')
+# auth0 thing--if these are not set, then signin will be disabled
+AUTH0_CLIENT_ID = config('AUTH0_CLIENT_ID', raise_error=False)
+AUTH0_CLIENT_SECRET = config('AUTH0_CLIENT_SECRET', raise_error=False)
+AUTH0_DOMAIN = config('AUTH0_DOMAIN', raise_error=False)
+AUTH0_CALLBACK_URL = config('AUTH0_CALLBACK_URL', raise_error=False)
 AUTH0_PATIENCE_TIMEOUT = config('AUTH0_PATIENCE_TIMEOUT', default='5', parser=int)
 
 # CSP
@@ -215,14 +216,8 @@ CSP_STYLE_SRC = (
 CSP_FONT_SRC = (
     "'self'",
 )
-CSP_FORM_ACTION = (
-    "'self'",
-    AUTH0_DOMAIN,
-)
-CSP_CONNECT_SRC = (
-    "'self'",
-    AUTH0_DOMAIN,
-)
+CSP_FORM_ACTION = ("'self'", AUTH0_DOMAIN) if AUTH0_DOMAIN else ("'self'",)
+CSP_CONNECT_SRC = ("'self'", AUTH0_DOMAIN) if AUTH0_DOMAIN else ("'self'",)
 CSP_SCRIPT_SRC = (
     "'self'",
 )
