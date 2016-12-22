@@ -11,13 +11,6 @@
 {% endblock %}
 
 {% block title %}{{ title }} | {{ super() }}{% endblock %}
-{% block more_meta %}
-  {% if auth0_configured %}
-    <meta name="auth0-client-id" content="{{ settings.AUTH0_CLIENT_ID }}">
-    <meta name="auth0-domain" content="{{ settings.AUTH0_DOMAIN }}">
-    <meta name="auth0-callback-url" content="{{ settings.AUTH0_CALLBACK_URL }}">
-  {% endif %}
-{% endblock %}
 
 {% block before_content %}{% endblock %}
 {% block content %}
@@ -45,9 +38,7 @@
     {% else %}
       {% if auth0_configured %}
         <div class="signin-link">
-          <form>
-            <button class="btn login-button" type="submit"><span>Sign in to Standup</span></button>
-          </form>
+          <a href="{{ auth0_login_url }}"><button class="btn login-button">Sign in to Standup</button></a>
         </div>
       {% else %}
         <p>
@@ -56,8 +47,4 @@
       {% endif %}
     {% endif %}
   </div>
-{% endblock %}
-
-{% block javascript %}
-  {% javascript 'signin' %}
 {% endblock %}

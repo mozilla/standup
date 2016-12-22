@@ -174,6 +174,14 @@ class LoginView(TemplateView):
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['auth0_configured'] = is_auth0_configured()
+
+        ctx['auth0_login_url'] = settings.AUTH0_LOGIN_URL.format(
+            AUTH0_DOMAIN=settings.AUTH0_DOMAIN,
+            AUTH0_CLIENT_ID=settings.AUTH0_CLIENT_ID,
+            AUTH0_CALLBACK_URL=settings.AUTH0_CALLBACK_URL,
+            # FIXME(willkg): This should be a token that ties both ends.
+            STATE='foo',
+        )
         return ctx
 
     def get(self, request, *args, **kwargs):
