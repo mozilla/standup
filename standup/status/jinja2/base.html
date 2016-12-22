@@ -92,9 +92,6 @@
             <div class="notice {{ message.tags }}">{{ message }}</div>
           {% endfor %}
         {% endif %}
-        {% block notices %}
-          <div class="notice success">Welcome to Standup v2! We rewrote it and pushed it out on September 23rd. If you have any problems, see <a href="https://wiki.mozilla.org/Standup">the Standup wiki page</a> for help.</div>
-        {% endblock %}
       </div>
       {% block before_content %}
         {% if user.is_authenticated() %}
