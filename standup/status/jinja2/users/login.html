@@ -24,9 +24,6 @@
   <div class="grid_12 banner">
     <h1>{{ title }}</h1>
     {% if auth0_configured %}
-      <p>
-        {{ settings.SITE_TITLE }} uses Auth0 for authentication.
-      </p>
       {% if settings.HELP_FAQ_URL %}
       <p>
         If you have problems logging in, please check out
@@ -49,12 +46,12 @@
       {% if auth0_configured %}
         <div class="signin-link">
           <form>
-            <button class="btn login-button" type="submit"><span>Sign in using Auth0</span></button>
+            <button class="btn login-button" type="submit"><span>Sign in to Standup</span></button>
           </form>
         </div>
       {% else %}
         <p>
-          Auth0 is not configured. Signin is disabled.
+          Sign in is not configured so it is disabled.
         </p>
       {% endif %}
     {% endif %}
