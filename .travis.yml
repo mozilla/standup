@@ -1,4 +1,6 @@
-services: docker
+services:
+  - docker
+  - postgres
 env:
   global:
     - DOCKER_REGISTRY=registry.heroku.com
@@ -6,6 +8,7 @@ env:
     - HEROKU_STAGE_APP=standupstage
     - HEROKU_PROC_TYPE=web
     - DOCKER_CACHE_FILE=/home/travis/docker/cache.tar.gz
+    - DATABASE_URL=postgres://postgres:@localhost/standup
 cache:
   directories:
     - /home/travis/docker/
@@ -15,6 +18,8 @@ before_install:
   - echo "ENV GIT_SHA ${TRAVIS_COMMIT}" >> docker/standup_base
   - bin/travis-docker-cache.sh load
 install: make build
+before_script:
+  - psql -c 'create database standup;' -U postgres
 script:
   - make test-image
   - bin/travis-docker-cache.sh save
