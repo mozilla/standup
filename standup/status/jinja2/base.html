@@ -125,7 +125,7 @@
       </div>
     </footer>
   </div>
-  <form id="logout-form" method="POST" action="{{ url('users.logout') }}">
+  <form id="logout-form" method="POST" action="{{ url('auth0.logout') }}">
     {% csrf_token %}
   </form>
   {% block javascript %}

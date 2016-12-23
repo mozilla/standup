@@ -31,10 +31,6 @@
       <p>
         You are currently signed in as <b>{{ request.user.email }}</b>.
       </p>
-      <form action="{{ url('users.logout') }}" method="post">
-        {% csrf_token %}
-        <button type="submit">Sign out</button>
-      </form>
     {% else %}
       {% if auth0_configured %}
         <div class="signin-link">
