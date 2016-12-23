@@ -15,15 +15,13 @@ urlpatterns = [
     url(r'^user/{}/$'.format(SLUG_RE), views.UserView.as_view(), name='status.user'),
     url(r'^status/(?P<pk>\d{1,8})/$', views.StatusView.as_view(), name='status.status'),
     url(r'^weekly/$', views.WeeklyView.as_view(), name='status.weekly'),
+    url(r'^statusize/$', views.statusize, name='status.statusize'),
+
+    # profile and signin
     url(r'^profile/$', views.ProfileView.as_view(), name='users.profile'),
     url(r'^new-profile/$', views.ProfileView.as_view(new_profile=True),
         name='users.new_profile'),
-    url(r'^statusize/$', views.statusize, name='status.statusize'),
-
-    # auth
-    url(r'^auth/login-form$', views.LoginView.as_view(), name='users.loginform'),
-    url(r'^auth/logout$', views.LogoutView.as_view(), name='users.logout'),
-    url(r'^auth/login$', views.Auth0LoginCallback.as_view(), name='auth0.login'),
+    url(r'^login-form/$', views.LoginView.as_view(), name='users.loginform'),
 
     # feeds
     url(r'^statuses.xml$', cache_feed(views.MainFeed()), name='status.index_feed'),

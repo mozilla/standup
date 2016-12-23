@@ -6,11 +6,9 @@ import logging
 
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import get_user_model, login, logout
 from django.contrib.syndication.views import Feed
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.core.urlresolvers import reverse
-from django.db import IntegrityError
 from django.http import Http404
 from django.http import (HttpResponse, HttpResponseBadRequest,
                          HttpResponseForbidden, HttpResponseRedirect)
@@ -19,12 +17,11 @@ from django.utils.feedgenerator import Atom1Feed
 from django.views.decorators.cache import cache_page
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from django.views.generic import DetailView, TemplateView, UpdateView, View
+from django.views.generic import DetailView, TemplateView, UpdateView
 
 from raven.contrib.django.models import client
-import requests
-from requests.exceptions import ConnectTimeout, ReadTimeout
 
+from standup.auth0.utils import is_auth0_configured
 from standup.status.forms import StatusizeForm, ProfileForm
 from standup.status.models import Status, Team, Project, StandupUser
 from standup.status.utils import enddate, startdate
@@ -159,21 +156,20 @@ class ProfileView(UpdateView):
         return super().form_invalid(form)
 
 
-def is_auth0_configured():
-    return (
-        settings.AUTH0_CLIENT_ID and
-        settings.AUTH0_CLIENT_SECRET and
-        settings.AUTH0_DOMAIN and
-        settings.AUTH0_CALLBACK_URL
-    )
-
-
 class LoginView(TemplateView):
     template_name = 'users/login.html'
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['auth0_configured'] = is_auth0_configured()
+
+        ctx['auth0_login_url'] = settings.AUTH0_LOGIN_URL.format(
+            AUTH0_DOMAIN=settings.AUTH0_DOMAIN,
+            AUTH0_CLIENT_ID=settings.AUTH0_CLIENT_ID,
+            AUTH0_CALLBACK_URL=settings.AUTH0_CALLBACK_URL,
+            # FIXME(willkg): This should be a token that ties both ends.
+            STATE='foo',
+        )
         return ctx
 
     def get(self, request, *args, **kwargs):
@@ -181,185 +177,6 @@ class LoginView(TemplateView):
             messages.info(request, 'You are already signed in.')
             return HttpResponseRedirect('/')
         return super().get(request, *args, **kwargs)
-
-
-class LogoutView(View):
-    """Logs a user out"""
-    def post(self, request, *args, **kwargs):
-        if not request.user.is_authenticated():
-            messages.info(request, 'You are not logged in.')
-        else:
-            logout(request)
-            messages.info(request, 'You have been logged out.')
-        return HttpResponseRedirect('/')
-
-
-class Exhausted(Exception):
-    pass
-
-
-def username_generator(base):
-    """Generates usernames using a base plus some count"""
-    yield base
-
-    count = 2
-    while count < 50:
-        yield '%s%d' % (base, count)
-        count += 1
-
-    raise Exhausted('No more slots available for generation. Base was "%s"' % base)
-
-
-def get_or_create_user(email, name=None):
-    """Retrieves or creates a User instance
-
-    :arg str email: the email of the user
-    :arg str name: the name of the user (or none)
-
-    :returns: User instance
-
-    """
-    User = get_user_model()
-    try:
-        # Try matching on email first--that's our canonical lookup.
-        return User.objects.get(email__iexact=email)
-
-    except User.DoesNotExist:
-        try:
-            # Didn't match on email, so this might be an older account that's never had a profile.
-            # So try to match on username, but only if the email field is empty.
-            return User.objects.get(email='', username__iexact=email.split('@', 1)[0])
-
-        except User.DoesNotExist:
-            # Didn't match email or username, so this is probably a new user.
-            username_base = name or email.split('@', 1)[0]
-            password = User.objects.make_random_password()
-
-            for username in username_generator(username_base):
-                try:
-                    user = User.objects.create(
-                        username=username,
-                        email=email,
-                        password=password,
-                    )
-                    user.save()
-                    return user
-
-                except IntegrityError:
-                    pass
-
-
-def get_or_create_profile(user):
-    """Retrieves or creates a StandupUser instance
-
-    If this creates a new StandupUser, it makes sure that the StandupUser has a unique slug.
-
-    :arg user User: a User instance
-
-    :returns: StandupUser instance
-
-    """
-    try:
-        profile = user.profile
-    except StandupUser.DoesNotExist:
-        profile = StandupUser.objects.create(
-            user=user
-        )
-
-    if not profile.slug:
-        for slug in username_generator(user.username):
-            try:
-                profile.slug = slug
-                profile.save()
-            except IntegrityError:
-                pass
-    return profile
-
-
-class Auth0LoginCallback(View):
-    def get(self, request):
-        """Auth0 redirects to this view so we can log the user in
-
-        This handles creating User and StandupUser objects if needed.
-
-        """
-        code = request.GET.get('code', '')
-
-        if not code:
-            if request.GET.get('error'):
-                messages.error(
-                    request,
-                    'Unable to sign in because of an error from Auth0. ({msg})'.format(
-                        msg=request.GET.get('error_description', request.GET['error'])
-                    )
-                )
-                return HttpResponseRedirect(reverse('users.loginform'))
-            return HttpResponseBadRequest('Missing "code"')
-
-        json_header = {
-            'content-type': 'application/json'
-        }
-
-        token_url = 'https://{domain}/oauth/token'.format(domain=settings.AUTH0_DOMAIN)
-
-        token_payload = {
-            'client_id': settings.AUTH0_CLIENT_ID,
-            'client_secret': settings.AUTH0_CLIENT_SECRET,
-            'redirect_uri': settings.AUTH0_CALLBACK_URL,
-            'code': code,
-            'grant_type': 'authorization_code'
-        }
-
-        try:
-            token_info = requests.post(
-                token_url,
-                headers=json_header,
-                json=token_payload,
-                timeout=settings.AUTH0_PATIENCE_TIMEOUT
-            ).json()
-
-            if not token_info.get('access_token'):
-                messages.error(
-                    request,
-                    'Unable to authenticate with Auth0 at this time. Please refresh to '
-                    'try again.'
-                )
-                return HttpResponseRedirect(reverse('users.loginform'))
-
-            user_url = 'https://{domain}/userinfo?access_token={access_token}'.format(
-                domain=settings.AUTH0_DOMAIN, access_token=token_info['access_token']
-            )
-
-            user_info = requests.get(user_url).json()
-
-        except (ConnectTimeout, ReadTimeout):
-            messages.error(
-                request,
-                'Unable to authenticate with Auth0 at this time. Please wait a bit '
-                'and try again.'
-            )
-            return HttpResponseRedirect(reverse('users.loginform'))
-
-        # Get or create User instance using email address and nickname
-        user = get_or_create_user(user_info['email'], user_info.get('nickname'))
-
-        # If inactive, add message and redirect to login page
-        if not user.is_active:
-            messages.error(
-                request,
-                'This user account is inactive.'
-            )
-            return HttpResponseRedirect(reverse('users.loginform'))
-
-        # Make sure they have a profile
-        get_or_create_profile(user)
-
-        # Log the user in
-        # FIXME(willkg): This is sort of a lie--should we have our own backend?
-        user.backend = 'django.contrib.auth.backends.ModelBackend'
-        login(request, user)
-
-        return HttpResponseRedirect(reverse('status.index'))
 
 
 # FEEDS

@@ -11,22 +11,12 @@
 {% endblock %}
 
 {% block title %}{{ title }} | {{ super() }}{% endblock %}
-{% block more_meta %}
-  {% if auth0_configured %}
-    <meta name="auth0-client-id" content="{{ settings.AUTH0_CLIENT_ID }}">
-    <meta name="auth0-domain" content="{{ settings.AUTH0_DOMAIN }}">
-    <meta name="auth0-callback-url" content="{{ settings.AUTH0_CALLBACK_URL }}">
-  {% endif %}
-{% endblock %}
 
 {% block before_content %}{% endblock %}
 {% block content %}
   <div class="grid_12 banner">
     <h1>{{ title }}</h1>
     {% if auth0_configured %}
-      <p>
-        {{ settings.SITE_TITLE }} uses Auth0 for authentication.
-      </p>
       {% if settings.HELP_FAQ_URL %}
       <p>
         If you have problems logging in, please check out
@@ -41,26 +31,16 @@
       <p>
         You are currently signed in as <b>{{ request.user.email }}</b>.
       </p>
-      <form action="{{ url('users.logout') }}" method="post">
-        {% csrf_token %}
-        <button type="submit">Sign out</button>
-      </form>
     {% else %}
       {% if auth0_configured %}
         <div class="signin-link">
-          <form>
-            <button class="btn login-button" type="submit"><span>Sign in using Auth0</span></button>
-          </form>
+          <a href="{{ auth0_login_url }}"><button class="btn login-button">Sign in to Standup</button></a>
         </div>
       {% else %}
         <p>
-          Auth0 is not configured. Signin is disabled.
+          Sign in is not configured so it is disabled.
         </p>
       {% endif %}
     {% endif %}
   </div>
-{% endblock %}
-
-{% block javascript %}
-  {% javascript 'signin' %}
 {% endblock %}

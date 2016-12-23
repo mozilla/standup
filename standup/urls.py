@@ -1,6 +1,5 @@
 from django.conf.urls import include, url
 from django.contrib import admin
-from django.contrib.auth.views import logout
 
 from django_jinja import views
 
@@ -14,6 +13,6 @@ handler500 = views.ServerError.as_view()
 urlpatterns = [
     url(r'^api/', include('standup.api.urls')),
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^logout/$', logout, kwargs={'next_page': '/'}, name='auth.logout'),
     url(r'', include('standup.status.urls')),
+    url(r'', include('standup.auth0.urls')),
 ]

@@ -53,6 +53,7 @@ INSTALLED_APPS = (
     'raven.contrib.django.raven_compat',
 
     'standup.api',
+    'standup.auth0',
     'standup.status',
 )
 
@@ -193,6 +194,16 @@ AUTHENTICATION_BACKENDS = (
 # auth0 thing--if these are not set, then signin will be disabled
 AUTH0_CLIENT_ID = config('AUTH0_CLIENT_ID', raise_error=False)
 AUTH0_CLIENT_SECRET = config('AUTH0_CLIENT_SECRET', raise_error=False)
+AUTH0_LOGIN_URL = config(
+    'AUTH0_LOGIN_URL',
+    default=(
+        'https://{AUTH0_DOMAIN}/authorize?'
+        'response_type=code'
+        '&client_id={AUTH0_CLIENT_ID}'
+        '&redirect_url={AUTH0_CALLBACK_URL}'
+        '&state={STATE}'
+    )
+)
 AUTH0_DOMAIN = config('AUTH0_DOMAIN', raise_error=False)
 AUTH0_CALLBACK_URL = config('AUTH0_CALLBACK_URL', raise_error=False)
 AUTH0_PATIENCE_TIMEOUT = config('AUTH0_PATIENCE_TIMEOUT', default='5', parser=int)
@@ -274,15 +285,6 @@ PIPELINE = {
                 'js/standup.js',
             ),
             'output_filename': 'js/common.min.js',
-        },
-        'signin': {
-            'source_filenames': (
-                'js/vendor/jquery-3.1.0.js',
-                'js/vendor/lock-passwordless-2.2.min.js',
-                'js/standup.js',
-                'js/signin.js',
-            ),
-            'output_filename': 'js/signin.min.js',
         },
         'modernizr': {
             'source_filenames': (
