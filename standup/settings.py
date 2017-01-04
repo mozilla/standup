@@ -332,22 +332,26 @@ RAVEN_CONFIG = {
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '[%(asctime)s] %(levelname)s %(name)s: %(message)s',
+            'datefmt': '%d/%b/%Y %H:%M:%S',
+        },
+    },
     'handlers': {
         'console': {
-            'level': config('DJANGO_LOG_LEVEL', default='INFO'),
             'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
         },
     },
     'loggers': {
         'django': {
             'handlers': ['console'],
             'level': config('DJANGO_LOG_LEVEL', default='INFO'),
-            'propagate': True,
         },
         'standup': {
             'handlers': ['console'],
-            'level': config('DJANGO_LOG_LEVEL', default='INFO'),
-            'propagate': True,
+            'level': config('DJANGO_LOG_LEVEL', default='DEBUG'),
         },
     },
 }

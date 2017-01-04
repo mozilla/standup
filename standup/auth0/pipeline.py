@@ -8,7 +8,7 @@ from django.http import HttpResponseRedirect
 from django.utils.module_loading import import_string
 
 
-logger = logging.getLogger(__file__)
+logger = logging.getLogger(__name__)
 
 
 def run_pipeline(pipeline, **kwargs):
