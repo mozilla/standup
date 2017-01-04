@@ -334,6 +334,7 @@ LOGGING = {
     'disable_existing_loggers': False,
     'handlers': {
         'console': {
+            'level': config('DJANGO_LOG_LEVEL', default='INFO'),
             'class': 'logging.StreamHandler',
         },
     },
@@ -341,10 +342,12 @@ LOGGING = {
         'django': {
             'handlers': ['console'],
             'level': config('DJANGO_LOG_LEVEL', default='INFO'),
+            'propagate': True,
         },
         'standup': {
             'handlers': ['console'],
             'level': config('DJANGO_LOG_LEVEL', default='INFO'),
+            'propagate': True,
         },
     },
 }
