@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import login
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.views.generic import View
@@ -8,7 +7,7 @@ from django.views.generic import View
 import requests
 from requests.exceptions import ConnectTimeout, ReadTimeout
 
-from standup.auth0.utils import get_or_create_profile, get_or_create_user
+from standup.auth0.pipeline import run_pipeline
 
 
 class Auth0LoginCallback(View):
@@ -59,7 +58,7 @@ class Auth0LoginCallback(View):
                     'Unable to authenticate with Auth0 at this time. Please refresh to '
                     'try again.'
                 )
-                return HttpResponseRedirect(reverse('users.loginform'))
+                return HttpResponseRedirect(reverse(settings.AUTH0_SIGNIN_VIEW))
 
             user_url = 'https://{domain}/userinfo?access_token={access_token}'.format(
                 domain=settings.AUTH0_DOMAIN, access_token=token_info['access_token']
@@ -73,25 +72,19 @@ class Auth0LoginCallback(View):
                 'Unable to authenticate with Auth0 at this time. Please wait a bit '
                 'and try again.'
             )
-            return HttpResponseRedirect(reverse('users.loginform'))
+            return HttpResponseRedirect(reverse(settings.AUTH0_SIGNIN_VIEW))
 
-        # Get or create User instance using email address and nickname
-        user = get_or_create_user(user_info['email'], user_info.get('nickname'))
+        # We've got our user_info and all our auth0 stuff is done. Now run that through the pipeline
+        # and return whatever we get.
+        kwargs = {
+            'request': request,
+            'user_info': user_info,
+        }
+        result = run_pipeline(settings.AUTH0_PIPELINE, **kwargs)
+        if result and not isinstance(result, dict):
+            # If we got a truthy but non-dict back, then it's probably an HttpResponse and we should
+            # just return that.
+            return result
 
-        # If inactive, add message and redirect to login page
-        if not user.is_active:
-            messages.error(
-                request,
-                'This user account is inactive.'
-            )
-            return HttpResponseRedirect(reverse('users.loginform'))
-
-        # Make sure they have a profile
-        get_or_create_profile(user)
-
-        # Log the user in
-        # FIXME(willkg): This is sort of a lie--should we have our own backend?
-        user.backend = 'django.contrib.auth.backends.ModelBackend'
-        login(request, user)
-
+        # FIXME(willkg): Use a setting for this.
         return HttpResponseRedirect(reverse('status.index'))

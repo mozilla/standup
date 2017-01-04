@@ -194,6 +194,20 @@ AUTHENTICATION_BACKENDS = (
 # auth0 thing--if these are not set, then signin will be disabled
 AUTH0_CLIENT_ID = config('AUTH0_CLIENT_ID', raise_error=False)
 AUTH0_CLIENT_SECRET = config('AUTH0_CLIENT_SECRET', raise_error=False)
+AUTH0_SIGNIN_VIEW = 'users.loginform'
+AUTH0_PIPELINE = [
+    # FIXME(willkg): Remove this after we have things working.
+    'standup.auth0.pipeline.log_user_info',
+
+    # These all kick off after auth0 calls the callback url and we've pulled out
+    # the user_info data.
+    'standup.auth0.pipeline.get_user_by_email',
+    'standup.auth0.pipeline.create_user',
+
+    'standup.status.auth.create_profile',
+
+    'standup.auth0.pipeline.login_user',
+]
 AUTH0_LOGIN_URL = config(
     'AUTH0_LOGIN_URL',
     default=(
@@ -207,6 +221,7 @@ AUTH0_LOGIN_URL = config(
 AUTH0_DOMAIN = config('AUTH0_DOMAIN', raise_error=False)
 AUTH0_CALLBACK_URL = config('AUTH0_CALLBACK_URL', raise_error=False)
 AUTH0_PATIENCE_TIMEOUT = config('AUTH0_PATIENCE_TIMEOUT', default='5', parser=int)
+AUTH0_RENEW_ID_TOKEN_EXPIRY_SECONDS = config('AUTH0_RENEW_ID_TOKEN_EXPIRY_SECONDS', default='900', parser=int)
 
 # CSP
 CSP_DEFAULT_SRC = (
