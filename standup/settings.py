@@ -342,6 +342,10 @@ LOGGING = {
             'handlers': ['console'],
             'level': config('DJANGO_LOG_LEVEL', default='INFO'),
         },
+        'standup': {
+            'handlers': ['console'],
+            'level': config('DJANGO_LOG_LEVEL', default='INFO'),
+        },
     },
 }
 
