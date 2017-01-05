@@ -37,9 +37,9 @@ whitenoise==3.2.2 \
 # configuration
 configobj==5.0.6 \
     --hash=sha256:a2f5650770e1c87fb335af19a9b7eb73fc05ccf22144eb68db7d00cd2bcb0902
-everett==0.6 \
-    --hash=sha256:52848a30c302cd92fff98f1afb1b2ff4f5d7decf88404240c0009d90ce54867b \
-    --hash=sha256:9cce5d4d009eea4d32d1a313d1cf2a563ce2eba7ec709ec9faf8e62e108c6bba
+everett==0.7 \
+    --hash=sha256:980f0b3e2048866f42ae6b3e61261a249c971dbe8bd540b4eeba797b23a2ed50 \
+    --hash=sha256:94c67f362a4f86ca2f249d17fd82a4dc5c3be534261d63d6b8e07ba63a756421
 dj-database-url==0.4.1 --hash=sha256:7f4c78d2a090df8dfaf56d5d3ff7bbee17360436e4879558317e2314424864cd
 PyJWT==1.4.2 \
     --hash=sha256:99fe612dbe5f41e07124d9002c118c14f3ee703574ffa9779fee78135b8b94b6 \
