@@ -32,13 +32,13 @@
         You are currently signed in as <b>{{ request.user.email }}</b>.
       </p>
     {% else %}
-      {% if auth0_configured %}
+      {% if auth0configured %}
         <div class="signin-link">
-          <a href="{{ auth0_login_url }}"><button class="btn login-button">Sign in to Standup</button></a>
+          <a href="{{ auth0loginurl }}"><button class="btn login-button">Sign in to Standup</button></a>
         </div>
       {% else %}
         <p>
-          Sign in is not configured so it is disabled.
+          Signin is not configured so it is disabled.
         </p>
       {% endif %}
     {% endif %}

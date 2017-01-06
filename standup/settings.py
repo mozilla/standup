@@ -83,6 +83,8 @@ _CONTEXT_PROCESSORS = [
     'django.template.context_processors.static',
     'django.contrib.auth.context_processors.auth',
     'django.contrib.messages.context_processors.messages',
+
+    'standup.auth0.context_processors.auth0',
     'standup.status.context_processors.status',
 ]
 
@@ -214,7 +216,7 @@ AUTH0_LOGIN_URL = config(
         'https://{AUTH0_DOMAIN}/authorize?'
         'response_type=code'
         '&client_id={AUTH0_CLIENT_ID}'
-        '&redirect_url={AUTH0_CALLBACK_URL}'
+        '&redirect_uri={AUTH0_CALLBACK_URL}'
         '&state={STATE}'
     )
 )
