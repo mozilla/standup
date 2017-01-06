@@ -24,7 +24,9 @@ def build_auth0_url(request):
 
 
 def auth0(request):
-    return {
+    ret = {
         'auth0configured': is_auth0_configured(),
-        'auth0loginurl': build_auth0_url(request)
     }
+    if is_auth0_configured():
+        ret['auth0loginurl'] = build_auth0_url(request)
+    return ret
