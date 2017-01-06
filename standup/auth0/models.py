@@ -3,11 +3,11 @@ from django.db import models
 
 
 class IdToken(models.Model):
-    """Relates an ID token to a user
+    """Associates a user with their id token
 
-    These tokens need to be renewed on a periodic basis and if they fail, they cause the Django
-    session to expire.
+    These tokens need to be renewed on a periodic basis and if they fail, they force Django logout.
 
     """
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    id_token = models.TextField(max_length=100, null=True)
+    id_token = models.TextField(help_text='The id token for this user.')
+    expire = models.DateTimeField()

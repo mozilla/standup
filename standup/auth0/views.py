@@ -1,3 +1,5 @@
+from urllib.parse import urlencode
+
 from django.conf import settings
 from django.contrib import messages
 from django.core.urlresolvers import reverse
@@ -34,8 +36,8 @@ class Auth0LoginCallback(View):
             'content-type': 'application/json'
         }
 
+        # https://tools.ietf.org/html/rfc6749#section-5.1
         token_url = 'https://{domain}/oauth/token'.format(domain=settings.AUTH0_DOMAIN)
-
         token_payload = {
             'client_id': settings.AUTH0_CLIENT_ID,
             'client_secret': settings.AUTH0_CLIENT_SECRET,
@@ -52,6 +54,9 @@ class Auth0LoginCallback(View):
                 timeout=settings.AUTH0_PATIENCE_TIMEOUT
             ).json()
 
+            # FIXME(willkg): Improve this to more correctly handle the various
+            # oauth2 token situations.
+            # https://tools.ietf.org/html/rfc6749#section-5.2
             if not token_info.get('access_token'):
                 messages.error(
                     request,
@@ -60,8 +65,9 @@ class Auth0LoginCallback(View):
                 )
                 return HttpResponseRedirect(reverse(settings.AUTH0_SIGNIN_VIEW))
 
-            user_url = 'https://{domain}/userinfo?access_token={access_token}'.format(
-                domain=settings.AUTH0_DOMAIN, access_token=token_info['access_token']
+            user_url = 'https://{domain}/userinfo?{querystring}'.format(
+                domain=settings.AUTH0_DOMAIN,
+                querystring=urlencode({'access_token': token_info['access_token']})
             )
 
             user_info = requests.get(user_url).json()
@@ -79,6 +85,7 @@ class Auth0LoginCallback(View):
         kwargs = {
             'request': request,
             'user_info': user_info,
+            'token_info': token_info,
         }
         result = run_pipeline(settings.AUTH0_PIPELINE, **kwargs)
         if result and not isinstance(result, dict):
@@ -86,5 +93,6 @@ class Auth0LoginCallback(View):
             # just return that.
             return result
 
-        # FIXME(willkg): Use a setting for this.
-        return HttpResponseRedirect(reverse('status.index'))
+        # This goes to /. If someone wants it to go somewhere else, they can do it as a pipeline
+        # rule.
+        return HttpResponseRedirect('/')
