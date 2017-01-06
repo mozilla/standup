@@ -22,6 +22,7 @@ from standup.mdext.nixheaders import NixHeaderExtension
 
 BUG_RE = re.compile(r'(bug) #?(\d+)', flags=re.I)
 PULL_RE = re.compile(r'(pull|pr) #?(\d+)', flags=re.I)
+ISSUE_RE = re.compile(r'(issue) #?(\d+)', flags=re.I)
 USER_RE = re.compile(r'(?<=^|(?<=[^\w\-.]))@([\w-]+)', flags=re.I)
 TAG_RE = re.compile(r'(?:^|[^\w\\/])#([a-z][a-z0-9_.-]*)(?:\b|$)', flags=re.I)
 MD = Markdown(output_format='html5', extensions=[
@@ -253,6 +254,8 @@ class Status(models.Model):
         if self.project and self.project.repo_url:
             formatted = PULL_RE.sub(
                 r'<a href="%s/pull/\2">\1 \2</a>' % self.project.repo_url, formatted)
+            formatted = ISSUE_RE.sub(
+                r'<a href="%s/issues/\2">\1 \2</a>' % self.project.repo_url, formatted)
 
         formatted = MD.reset().convert(formatted)
         return Markup(formatted)
