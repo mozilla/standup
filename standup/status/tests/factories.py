@@ -15,7 +15,7 @@ class ProjectFactory(factory.django.DjangoModelFactory):
     name = factory.Faker('name')
     slug = factory.LazyAttribute(lambda obj: slugify(obj.name))
     color = 'ffffff'  # white
-    repo_url = factory.Faker('uri')
+    repo_url = 'https://github.com/dude/whatnot/'
 
 
 class TeamFactory(factory.django.DjangoModelFactory):

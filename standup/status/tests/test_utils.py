@@ -2,22 +2,6 @@
 
 import pytest
 
-from standup.status.tests.factories import StatusFactory
-
-
-@pytest.mark.django_db()
-def test_tags():
-    """Test that format update parses tags correctly"""
-
-    # Test valid tags.
-    for tag in ('#t', '#tag', '#TAG', '#tag123'):
-        expected = '<p><span class="tag tag-%s">%s</span></p>' % (tag[1:].lower(), tag)
-        assert StatusFactory(content=tag).htmlify() == expected
-
-    # Test invalid tags. Not first b/c markdown.
-    for tag in ('tag #1', 'tag #.abc', 'tag #?abc'):
-        assert StatusFactory(content=tag).htmlify() == '<p>%s</p>' % tag
-
 
 @pytest.mark.skip('This is busted--fix me.')
 def test_gravatar_url():
