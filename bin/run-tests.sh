@@ -1,5 +1,6 @@
 #!/bin/bash -ex
 
+export DJANGO_SETTINGS_MODULE=standup.settings
 export DATABASE_URL=sqlite://
 export SECRET_KEY=itsasekrit
 export DJANGO_SETTINGS_MODULE=standup.settings

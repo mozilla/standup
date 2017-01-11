@@ -68,35 +68,43 @@ class ValidateIdToken(object):
                 # might never renew.
                 not request.is_ajax() and
                 request.user.is_active and
+                request.user.email and
                 request.path not in self.exception_paths
         ):
+            # Verify their domain is one of the domains we need to look at
+            domain = request.user.email.lower().split('@', 1)[1]
+            if domain not in settings.AUTH0_ID_TOKEN_DOMAINS:
+                return
+
             cache_key = 'auth0:renew_id_token:%s' % request.user.id
 
-            # Look up expiration in cache to see if id_token needs to be renewed.
+            # Look up expiration in cache to see if id_token needs to be renewed
+            # FIXME(willkg): Try named cache and if that doesn't exist, fall back to default.
             if cache.get(cache_key):
                 return
 
-            # The id_token has expired, so we renew it now.
+            # The id_token has expired, so we renew it now
             try:
                 token = IdToken.objects.get(user=request.user)
+
             except IdToken.DoesNotExist:
-                # If there is no IdToken, check if this domain requires them and if so, redirect and
-                # if not, we're fine.
-                if request.user.email:
-                    domain = request.user.email.lower().split('@', 1)[1]
-                    if domain in settings.AUTH0_ID_TOKEN_DOMAINS:
-                        messages.error(
-                            request,
-                            'You can\'t log in with that email address using the provider you '
-                            'used. Please log in with the Oauth2 provider.',
-                            fail_silently=True
-                        )
-                        return HttpResponseRedirect(reverse(settings.AUTH0_SIGNIN_VIEW))
-                return
+                # If there is no IdToken then something is weird because they should have one. So
+                # log them out and tell them to sign in
+                messages.error(
+                    request,
+                    'You can\'t log in with that email address using the provider you '
+                    'used. Please log in with the Oauth2 provider.',
+                    fail_silently=True
+                )
+                logout(request.user)
+                return HttpResponseRedirect(reverse(settings.AUTH0_SIGNIN_VIEW))
 
             try:
                 new_id_token = renew_id_token(token.id_token)
+
             except (ConnectTimeout, ReadTimeout):
+                # Log the user out because their id_token didn't renew and send them to
+                # home page
                 messages.error(
                     request,
                     'Unable to validate your authentication with Auth0. '
@@ -104,28 +112,26 @@ class ValidateIdToken(object):
                     'problem. Please sign in again.',
                     fail_silently=True
                 )
-                # Log the user out because their id_token didn't renew and send them to
-                # home page.
                 logout(request)
                 return HttpResponseRedirect(reverse(settings.AUTH0_SIGNIN_VIEW))
 
             if new_id_token:
-                # Save new token and re-up it in cache
+                # Save new token and re-up it in cache--all set!
                 token.id_token = new_id_token
                 token.expire = datetime.utcnow() + timedelta(seconds=settings.AUTH0_ID_TOKEN_EXPIRY)
                 token.save()
 
                 cache.set(cache_key, True, settings.AUTH0_ID_TOKEN_EXPIRY)
+                return
 
-            else:
-                # If we don't have a new id_token, then it's not valid anymore. We log the user
-                # out and send them to the home page.
-                logout(request)
-                messages.error(
-                    request,
-                    'Unable to validate your authentication with Auth0. '
-                    'This is most likely due to an expired authentication '
-                    'session. You have to sign in again.',
-                    fail_silently=True
-                )
-                return HttpResponseRedirect(reverse(settings.AUTH0_SIGNIN_VIEW))
+            # If we don't have a new id_token, then it's not valid anymore. We log the user
+            # out and send them to the home page
+            messages.error(
+                request,
+                'Unable to validate your authentication with Auth0. '
+                'This is most likely due to an expired authentication '
+                'session. You have to sign in again.',
+                fail_silently=True
+            )
+            logout(request)
+            return HttpResponseRedirect(reverse(settings.AUTH0_SIGNIN_VIEW))
