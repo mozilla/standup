@@ -20,7 +20,7 @@ class Auth0LoginCallback(View):
 
         """
         # Verify that the STATE we sent in is the same; no match--send user back to the signin view
-        if not request.session or request.session['auth0_state'] != request.GET.get('state', ''):
+        if not request.session or request.session.get('auth0_state') != request.GET.get('state', ''):
             return HttpResponseRedirect(reverse(settings.AUTH0_SIGNIN_VIEW))
 
         # Get the code from the request so we can verify it
