@@ -182,7 +182,6 @@ class RejectUnverifiedEmailTestCase(TestCase):
         assert isinstance(ret, HttpResponseRedirect)
 
 
-# FIXME(willkg): RequireIdTokenTestCase
 class RequireIdTokenTestCase(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
