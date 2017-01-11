@@ -3,7 +3,7 @@ from urllib.parse import urlencode
 from django.conf import settings
 from django.contrib import messages
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseBadRequest, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.views.generic import View
 
 import requests
@@ -19,19 +19,28 @@ class Auth0LoginCallback(View):
         This handles creating User and StandupUser objects if needed.
 
         """
-        code = request.GET.get('code', '')
+        # Verify that the STATE we sent in is the same; no match--send user back to the signin view
+        if not request.session or request.session['auth0_state'] != request.GET.get('state', ''):
+            return HttpResponseRedirect(reverse(settings.AUTH0_SIGNIN_VIEW))
 
+        # Get the code from the request so we can verify it
+        code = request.GET.get('code', '')
         if not code:
             if request.GET.get('error'):
                 messages.error(
                     request,
                     'Unable to sign in because of an error from Auth0. ({msg})'.format(
                         msg=request.GET.get('error_description', request.GET['error'])
-                    )
+                    ),
+                    fail_silently=True
                 )
-                return HttpResponseRedirect(reverse('users.loginform'))
-            return HttpResponseBadRequest('Missing "code"')
+                return HttpResponseRedirect(reverse(settings.AUTH0_SIGNIN_VIEW))
 
+            else:
+                # No code and no error--send the user back to the signin view
+                return HttpResponseRedirect(reverse(settings.AUTH0_SIGNIN_VIEW))
+
+        # Verify the code
         json_header = {
             'content-type': 'application/json'
         }
@@ -80,8 +89,8 @@ class Auth0LoginCallback(View):
             )
             return HttpResponseRedirect(reverse(settings.AUTH0_SIGNIN_VIEW))
 
-        # We've got our user_info and all our auth0 stuff is done. Now run that through the pipeline
-        # and return whatever we get.
+        # We've got our user_info and all our auth0 stuff is done; run through the pipeline and
+        # return whatever we get
         kwargs = {
             'request': request,
             'user_info': user_info,
@@ -89,10 +98,10 @@ class Auth0LoginCallback(View):
         }
         result = run_pipeline(settings.AUTH0_PIPELINE, **kwargs)
         if result and not isinstance(result, dict):
-            # If we got a truthy but non-dict back, then it's probably an HttpResponse and we should
-            # just return that.
+            # If we got a truthy but non-dict back, then it's probably a response and we should just
+            # return that
             return result
 
-        # This goes to /. If someone wants it to go somewhere else, they can do it as a pipeline
-        # rule.
+        # This goes to /--if someone wants it to go somewhere else, they can do it as a pipeline
+        # rule
         return HttpResponseRedirect('/')
