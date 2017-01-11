@@ -88,7 +88,8 @@ class ValidateIdToken(object):
                         messages.error(
                             request,
                             'You can\'t log in with that email address using the provider you '
-                            'used. Please log in with the Oauth2 provider.'
+                            'used. Please log in with the Oauth2 provider.',
+                            fail_silently=True
                         )
                         return HttpResponseRedirect(reverse(settings.AUTH0_SIGNIN_VIEW))
                 return
@@ -100,7 +101,8 @@ class ValidateIdToken(object):
                     request,
                     'Unable to validate your authentication with Auth0. '
                     'This can happen when there is temporary network '
-                    'problem. Please sign in again.'
+                    'problem. Please sign in again.',
+                    fail_silently=True
                 )
                 # Log the user out because their id_token didn't renew and send them to
                 # home page.
@@ -110,7 +112,7 @@ class ValidateIdToken(object):
             if new_id_token:
                 # Save new token and re-up it in cache
                 token.id_token = new_id_token
-                token.exp = datetime.utcnow() + timedelta(seconds=settings.AUTH0_ID_TOKEN_EXPIRY)
+                token.expire = datetime.utcnow() + timedelta(seconds=settings.AUTH0_ID_TOKEN_EXPIRY)
                 token.save()
 
                 cache.set(cache_key, True, settings.AUTH0_ID_TOKEN_EXPIRY)
@@ -123,6 +125,7 @@ class ValidateIdToken(object):
                     request,
                     'Unable to validate your authentication with Auth0. '
                     'This is most likely due to an expired authentication '
-                    'session. You have to sign in again.'
+                    'session. You have to sign in again.',
+                    fail_silently=True
                 )
                 return HttpResponseRedirect(reverse(settings.AUTH0_SIGNIN_VIEW))

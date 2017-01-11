@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from datetime import datetime, timedelta
 import logging
 
@@ -36,14 +37,17 @@ def run_pipeline(pipeline, **kwargs):
     return kwargs
 
 
-def log_info(user_info, token_info, **kwargs):
-    """Logs user_info and token_info
+def log_info(**kwargs):
+    """Logs all kwargs at this point
 
     Don't use this if you're not debugging!
 
     """
-    logger.info('auth0 user_info: %s', user_info)
-    logger.info('auth0 token_info: %s', token_info)
+    # First, sort it so things aren't jumping around from call to call
+    new_kwargs = OrderedDict(sorted(kwargs.items()))
+    # Log it--doing keys first and separately to make debugging pipeline func args easier
+    logger.info('LOG_INFO KEYS: %r', new_kwargs.keys())
+    logger.info('LOG_INFO: %r', new_kwargs)
 
 
 def get_user_by_username(user_info, **kwargs):
