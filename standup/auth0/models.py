@@ -10,4 +10,4 @@ class IdToken(models.Model):
     """
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     id_token = models.TextField(help_text='The id token for this user.')
-    expire = models.DateTimeField()
+    expire = models.DateTimeField(help_text='Expiration datetime for this token.')

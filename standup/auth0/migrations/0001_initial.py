@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(primary_key=True, verbose_name='ID', serialize=False, auto_created=True)),
                 ('id_token', models.TextField(help_text='The id token for this user.')),
-                ('expire', models.DateTimeField()),
+                ('expire', models.DateTimeField(help_text='Expiration datetime for this token.')),
                 ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL)),
             ],
         ),
