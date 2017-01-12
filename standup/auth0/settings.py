@@ -181,11 +181,27 @@ class AppSettings:
         opt = self._option_map[key]
         val = getattr(settings, opt.key, NO_VALUE)
         if val is not NO_VALUE:
-            return opt.parser(val)
+            try:
+                return opt.parser(val)
+            except Exception:
+                msg = '"%s": "%s" kicked up error when parsing.' % (opt.key, val)
+                if opt.help_text:
+                    msg = '%s\n\n%s' % (msg, opt.help_text)
+                raise ConfigurationError(msg)
 
         if opt.default is not NO_VALUE:
-            return opt.parser(opt.default)
-        raise ConfigurationError('"%s" must be configured in settings. See docs.' % opt.key)
+            try:
+                return opt.parser(opt.default)
+            except Exception:
+                msg = '"%s": "%s" (default) kicked up error when parsing.' % (opt.key, val)
+                if opt.help_text:
+                    msg = '%s\n\n%s' % (msg, opt.help_text)
+                raise ConfigurationError(msg)
+
+        msg = '"%s" must be configured in settings.' % opt.key
+        if opt.help_text:
+            msg = '%s\n\n%s' % (msg, opt.help_text)
+        raise ConfigurationError(msg)
 
     def __getattr__(self, key):
         if key.startswith('AUTH0'):
