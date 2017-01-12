@@ -241,9 +241,11 @@ AUTH0_LOGIN_URL = config(
 )
 AUTH0_DOMAIN = config('AUTH0_DOMAIN', raise_error=False)
 AUTH0_CALLBACK_URL = config('AUTH0_CALLBACK_URL', raise_error=False)
-AUTH0_PATIENCE_TIMEOUT = config('AUTH0_PATIENCE_TIMEOUT', default='5', parser=int)
-AUTH0_ID_TOKEN_DOMAINS = config('AUTH0_ID_TOKEN_DOMAINS', default='', parser=ListOf(str), raise_error=False)
-AUTH0_ID_TOKEN_EXPIRY = config('AUTH0_ID_TOKEN_EXPIRY', default='900', parser=int)
+AUTH0_ID_TOKEN_DOMAINS = config(
+    'AUTH0_ID_TOKEN_DOMAINS',
+    default='mozilla.com,mozillafoundation.org,mozilla-japan.org',
+    parser=ListOf(str)
+)
 
 # CSP
 CSP_DEFAULT_SRC = (

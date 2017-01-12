@@ -5,13 +5,13 @@ import requests
 from requests.exceptions import ConnectTimeout, ReadTimeout
 import simplejson
 
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 
+from standup.auth0.settings import app_settings
 from standup.auth0.models import IdToken
 
 
@@ -27,13 +27,13 @@ def renew_id_token(id_token):
     :returns: delegation result (dict) ``None``
 
     """
-    url = 'https://%s/delegation' % settings.AUTH0_DOMAIN
+    url = 'https://%s/delegation' % app_settings.AUTH0_DOMAIN
     response = requests.post(url, json={
-        'client_id': settings.AUTH0_CLIENT_ID,
+        'client_id': app_settings.AUTH0_CLIENT_ID,
         'api_type': 'app',
         'grant_type': 'urn:ietf:params:oauth:grant-type:jwt-bearer',
         'id_token': id_token,
-    }, timeout=settings.AUTH0_PATIENCE_TIMEOUT)
+    }, timeout=app_settings.AUTH0_PATIENCE_TIMEOUT)
 
     try:
         result = response.json()
@@ -58,7 +58,7 @@ class ValidateIdToken(object):
 
     exception_paths = (
         # Exclude the AUTH0_CALLBACK_URL path, otherwise this can loop
-        urlparse(settings.AUTH0_CALLBACK_URL).path,
+        urlparse(app_settings.AUTH0_CALLBACK_URL).path,
     )
 
     def process_request(self, request):
@@ -73,7 +73,7 @@ class ValidateIdToken(object):
         ):
             # Verify their domain is one of the domains we need to look at
             domain = request.user.email.lower().split('@', 1)[1]
-            if domain not in settings.AUTH0_ID_TOKEN_DOMAINS:
+            if domain not in app_settings.AUTH0_ID_TOKEN_DOMAINS:
                 return
 
             cache_key = 'auth0:renew_id_token:%s' % request.user.id
@@ -97,7 +97,7 @@ class ValidateIdToken(object):
                     fail_silently=True
                 )
                 logout(request.user)
-                return HttpResponseRedirect(reverse(settings.AUTH0_SIGNIN_VIEW))
+                return HttpResponseRedirect(reverse(app_settings.AUTH0_SIGNIN_VIEW))
 
             try:
                 new_id_token = renew_id_token(token.id_token)
@@ -113,15 +113,15 @@ class ValidateIdToken(object):
                     fail_silently=True
                 )
                 logout(request)
-                return HttpResponseRedirect(reverse(settings.AUTH0_SIGNIN_VIEW))
+                return HttpResponseRedirect(reverse(app_settings.AUTH0_SIGNIN_VIEW))
 
             if new_id_token:
                 # Save new token and re-up it in cache--all set!
                 token.id_token = new_id_token
-                token.expire = datetime.utcnow() + timedelta(seconds=settings.AUTH0_ID_TOKEN_EXPIRY)
+                token.expire = datetime.utcnow() + timedelta(seconds=app_settings.AUTH0_ID_TOKEN_EXPIRY)
                 token.save()
 
-                cache.set(cache_key, True, settings.AUTH0_ID_TOKEN_EXPIRY)
+                cache.set(cache_key, True, app_settings.AUTH0_ID_TOKEN_EXPIRY)
                 return
 
             # If we don't have a new id_token, then it's not valid anymore. We log the user
@@ -134,4 +134,4 @@ class ValidateIdToken(object):
                 fail_silently=True
             )
             logout(request)
-            return HttpResponseRedirect(reverse(settings.AUTH0_SIGNIN_VIEW))
+            return HttpResponseRedirect(reverse(app_settings.AUTH0_SIGNIN_VIEW))

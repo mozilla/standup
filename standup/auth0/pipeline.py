@@ -2,7 +2,6 @@ from collections import OrderedDict
 from datetime import datetime, timedelta
 import logging
 
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model, login
 from django.core.urlresolvers import reverse
@@ -10,6 +9,7 @@ from django.http import HttpResponseRedirect
 from django.utils.module_loading import import_string
 
 from standup.auth0.models import IdToken
+from standup.auth0.settings import app_settings
 
 
 logger = logging.getLogger(__name__)
@@ -109,7 +109,7 @@ def reject_unverified_email(request, user_info, **kwargs):
             'The email address associated with this account is not verified.',
             fail_silently=True
         )
-        return HttpResponseRedirect(reverse(settings.AUTH0_SIGNIN_VIEW))
+        return HttpResponseRedirect(reverse(app_settings.AUTH0_SIGNIN_VIEW))
 
 
 def reject_inactive_user(request, user, is_new, **kwargs):
@@ -121,7 +121,7 @@ def reject_inactive_user(request, user, is_new, **kwargs):
             'This user account is inactive.',
             fail_silently=True
         )
-        return HttpResponseRedirect(reverse(settings.AUTH0_SIGNIN_VIEW))
+        return HttpResponseRedirect(reverse(app_settings.AUTH0_SIGNIN_VIEW))
 
 
 def login_user(request, user, **kwargs):
@@ -144,7 +144,7 @@ def require_id_token(request, user, user_info, token_info, **kwargs):
     # Pull the domain and if it's in the list of domains we need an id_token for, do the id_token
     # work.
     domain = user_info['email'].lower().split('@', 1)[1]
-    if domain in settings.AUTH0_ID_TOKEN_DOMAINS:
+    if domain in app_settings.AUTH0_ID_TOKEN_DOMAINS:
         if token_info.get('id_token'):
             # We have an id_token, so persist it.
             try:
@@ -153,7 +153,7 @@ def require_id_token(request, user, user_info, token_info, **kwargs):
                 token = IdToken(user=user)
 
             token.id_token = token_info['id_token']
-            token.expire = datetime.utcnow() + timedelta(seconds=settings.AUTH0_ID_TOKEN_EXPIRY)
+            token.expire = datetime.utcnow() + timedelta(seconds=app_settings.AUTH0_ID_TOKEN_EXPIRY)
             token.save()
 
         else:
@@ -164,7 +164,7 @@ def require_id_token(request, user, user_info, token_info, **kwargs):
                 'used. Please log in with the Oauth2 provider.',
                 fail_silently=True
             )
-            return HttpResponseRedirect(reverse(settings.AUTH0_SIGNIN_VIEW))
+            return HttpResponseRedirect(reverse(app_settings.AUTH0_SIGNIN_VIEW))
 
 
 def mozilla_auth0_pipeline(**kwargs):
