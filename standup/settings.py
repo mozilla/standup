@@ -1,4 +1,3 @@
-import sys
 from pathlib import Path
 
 from everett.manager import ConfigManager, ConfigEnvFileEnv, ConfigOSEnv, ListOf
@@ -291,7 +290,7 @@ if CSP_REPORT_ENABLE:
 
 STATIC_ROOT = path('staticfiles')
 STATIC_URL = '/static/'
-STATICFILES_STORAGE = 'standup.status.storage.StandupStorage'
+STATICFILES_STORAGE = config('STATICFILES_STORAGE', default='standup.status.storage.StandupStorage')
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'pipeline.finders.PipelineFinder',
@@ -376,9 +375,3 @@ LOGGING = {
         },
     },
 }
-
-
-if sys.argv[0].endswith('py.test'):
-    # won't barf if staticfiles are missing
-    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
-    CACHES['default'] = django_cache_url.parse('dummy:')

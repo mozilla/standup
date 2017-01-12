@@ -1,3 +1,19 @@
+# database
+psycopg2==2.6.2 --hash=sha256:70490e12ed9c5c818ecd85d185d363335cc8a8cbf7212e3c185431c79ff8c05c
+
+# static files
+whitenoise==3.2.2 \
+    --hash=sha256:90a576ecb938cfef3fd1dba0c82d10e8e9ff0acb6079d7edba64822db0e4384d \
+    --hash=sha256:e4c77cdde3f7a1cd2c1d985d6a3d7dc8aff5f3d18c2f331e7171933aacaeb440
+
+# configuration
+configobj==5.0.6 \
+    --hash=sha256:a2f5650770e1c87fb335af19a9b7eb73fc05ccf22144eb68db7d00cd2bcb0902
+everett==0.7 \
+    --hash=sha256:980f0b3e2048866f42ae6b3e61261a249c971dbe8bd540b4eeba797b23a2ed50 \
+    --hash=sha256:94c67f362a4f86ca2f249d17fd82a4dc5c3be534261d63d6b8e07ba63a756421
+dj-database-url==0.4.1 --hash=sha256:7f4c78d2a090df8dfaf56d5d3ff7bbee17360436e4879558317e2314424864cd
+
 # base
 Django==1.8.17 \
     --hash=sha256:87618c1011712faf7400e2a73315f4f4c3a6e68ab6309c3e642d5fef73d66d9e \
@@ -25,22 +41,6 @@ django-pipeline==1.6.9 \
     --hash=sha256:3ed7e5913c521a568ab3a9866d83b239b8c8c2e03a4d99689a87788aec3fa256
 https://github.com/pmac/django-gravatar/archive/5f88e14fb6dd3134a46e2a961ab2782591e85f28.tar.gz#egg=django-gravatar2==1.4.0 \
     --hash=sha256:45ff4567de125c16b718c1b1829a2e000e6f7901149e0a05a1f65cdc3076aa62
-
-# database
-psycopg2==2.6.2 --hash=sha256:70490e12ed9c5c818ecd85d185d363335cc8a8cbf7212e3c185431c79ff8c05c
-
-# static files
-whitenoise==3.2.2 \
-    --hash=sha256:90a576ecb938cfef3fd1dba0c82d10e8e9ff0acb6079d7edba64822db0e4384d \
-    --hash=sha256:e4c77cdde3f7a1cd2c1d985d6a3d7dc8aff5f3d18c2f331e7171933aacaeb440
-
-# configuration
-configobj==5.0.6 \
-    --hash=sha256:a2f5650770e1c87fb335af19a9b7eb73fc05ccf22144eb68db7d00cd2bcb0902
-everett==0.7 \
-    --hash=sha256:980f0b3e2048866f42ae6b3e61261a249c971dbe8bd540b4eeba797b23a2ed50 \
-    --hash=sha256:94c67f362a4f86ca2f249d17fd82a4dc5c3be534261d63d6b8e07ba63a756421
-dj-database-url==0.4.1 --hash=sha256:7f4c78d2a090df8dfaf56d5d3ff7bbee17360436e4879558317e2314424864cd
 PyJWT==1.4.2 \
     --hash=sha256:99fe612dbe5f41e07124d9002c118c14f3ee703574ffa9779fee78135b8b94b6 \
     --hash=sha256:87a831b7a3bfa8351511961469ed0462a769724d4da48a501cb8c96d1e17f570
