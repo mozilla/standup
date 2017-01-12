@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from collections.abc import Sequence
 from textwrap import dedent
 
 from django.conf import settings
@@ -21,6 +22,22 @@ class Option:
         self.key = key
         self.default = default
         self.parser = parser
+
+
+def list_of_str(val):
+    """Returns a list of strings"""
+    val = val or []
+    if isinstance(val, str):
+        val = val.split(',')
+
+    # Assert it's a sequence
+    assert isinstance(val, Sequence), 'Not a sequence'
+    val = list(val)
+
+    # Assert it's a sequence of strings
+    non_strings = [item for item in val if not isinstance(item, str)]
+    assert not non_strings, 'Some values are not strings %r' % non_strings
+    return val
 
 
 class AppSettings:
@@ -87,12 +104,34 @@ class AppSettings:
             """)
         ),
         Option(
+            'AUTH0_PIPELINE', parser=list_of_str,
+            help_text=dedent("""\
+
+            This is the list of transforms that get executed in order after the user has
+            authenticated with Auth0. This pipeline is responsible for associating the Auth0
+            identity with a Django user, rejecting certain users (inactive? no email address?),
+            adding any metadata, logging the user in, creating profiles, etc.
+
+            Pipeline transform functions are defined in ``standup/auth0/pipeline.py``.
+
+            The order of the pipeline is important. For example, you can't have transforms that need
+            to look at a user instance occur in the pipeline before the user instance has been
+            acquired--it'll throw an error.
+
+            We have a Mozilla meta pipeline that you can use:
+            ``standup.auth0.pipeline.mozilla_auth0_pipeline``.
+            """)
+        ),
+        Option(
             'AUTH0_SIGNIN_VIEW',
             help_text=dedent("""\
             The Django view name for the view of your signin page.
 
             For example, on Standup, we have a separate page for signing in and the
             Django view name is ``users.loginform``.
+
+            If you have a signin link on every page in the navbar or something like
+            that, then you could use the view name for the home page.
 
             This is used every time we need to logout a user and redirect them to a
             signin form.

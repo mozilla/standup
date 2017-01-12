@@ -1,11 +1,12 @@
 from collections import OrderedDict
-from datetime import datetime, timedelta
+from datetime import timedelta
 import logging
 
 from django.contrib import messages
 from django.contrib.auth import get_user_model, login
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
+from django.utils import timezone
 from django.utils.module_loading import import_string
 
 from standup.auth0.models import IdToken
@@ -153,7 +154,7 @@ def require_id_token(request, user, user_info, token_info, **kwargs):
                 token = IdToken(user=user)
 
             token.id_token = token_info['id_token']
-            token.expire = datetime.utcnow() + timedelta(seconds=app_settings.AUTH0_ID_TOKEN_EXPIRY)
+            token.expire = timezone.now() + timedelta(seconds=app_settings.AUTH0_ID_TOKEN_EXPIRY)
             token.save()
 
         else:

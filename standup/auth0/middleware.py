@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 from urllib.parse import urlparse
 
 import requests
@@ -10,6 +10,7 @@ from django.contrib.auth import logout
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
+from django.utils import timezone
 
 from standup.auth0.settings import app_settings
 from standup.auth0.models import IdToken
@@ -96,7 +97,7 @@ class ValidateIdToken(object):
                     'used. Please log in with the Oauth2 provider.',
                     fail_silently=True
                 )
-                logout(request.user)
+                logout(request)
                 return HttpResponseRedirect(reverse(app_settings.AUTH0_SIGNIN_VIEW))
 
             try:
@@ -118,7 +119,7 @@ class ValidateIdToken(object):
             if new_id_token:
                 # Save new token and re-up it in cache--all set!
                 token.id_token = new_id_token
-                token.expire = datetime.utcnow() + timedelta(seconds=app_settings.AUTH0_ID_TOKEN_EXPIRY)
+                token.expire = timezone.now() + timedelta(seconds=app_settings.AUTH0_ID_TOKEN_EXPIRY)
                 token.save()
 
                 cache.set(cache_key, True, app_settings.AUTH0_ID_TOKEN_EXPIRY)
