@@ -79,7 +79,7 @@ class StandupUser(models.Model):
         max_length=100, blank=True, null=True, unique=True,
         help_text='IRC nick for this particular user'
     )
-    github_handle = models.CharField(max_length=100, blank=True, null=True, unique=True)
+    github_handle = models.CharField(max_length=100, blank=True, null=True)
     teams = models.ManyToManyField(Team, related_name='users', through='TeamUser')
 
     class Meta:

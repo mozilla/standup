@@ -13,8 +13,9 @@ from django.http import Http404
 from django.http import (HttpResponse, HttpResponseBadRequest,
                          HttpResponseForbidden, HttpResponseRedirect)
 from django.shortcuts import render
+from django.utils.decorators import method_decorator
 from django.utils.feedgenerator import Atom1Feed
-from django.views.decorators.cache import cache_page
+from django.views.decorators.cache import cache_page, never_cache
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.views.generic import DetailView, TemplateView, UpdateView
@@ -131,6 +132,7 @@ class ProfileView(UpdateView):
     success_url = '/profile/'
     new_profile = False
 
+    @method_decorator(never_cache)
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated():
             messages.error(request, 'You must be signed in to view your profile. '
