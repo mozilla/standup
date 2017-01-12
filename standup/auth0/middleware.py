@@ -93,8 +93,9 @@ class ValidateIdToken(object):
                 # log them out and tell them to sign in
                 messages.error(
                     request,
+                    # FIXME(willkg): This is Mozilla specific.
                     'You can\'t log in with that email address using the provider you '
-                    'used. Please log in with the Oauth2 provider.',
+                    'used. Please log in with the Mozilla LDAP provider.',
                     fail_silently=True
                 )
                 logout(request)
@@ -108,9 +109,8 @@ class ValidateIdToken(object):
                 # home page
                 messages.error(
                     request,
-                    'Unable to validate your authentication with Auth0. '
-                    'This can happen when there is temporary network '
-                    'problem. Please sign in again.',
+                    'Unable to validate your authentication with Auth0. This can happen when '
+                    'there is temporary network problem. Please sign in again.',
                     fail_silently=True
                 )
                 logout(request)
@@ -129,9 +129,8 @@ class ValidateIdToken(object):
             # out and send them to the home page
             messages.error(
                 request,
-                'Unable to validate your authentication with Auth0. '
-                'This is most likely due to an expired authentication '
-                'session. You have to sign in again.',
+                'Unable to validate your authentication with Auth0. This is most likely due '
+                'to an expired authentication session. Please sign in again.',
                 fail_silently=True
             )
             logout(request)

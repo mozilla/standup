@@ -161,8 +161,9 @@ def require_id_token(request, user, user_info, token_info, **kwargs):
             # We don't have an id_token, but should, so return a message and eject.
             messages.error(
                 request,
+                # FIXME(willkg): This is Mozilla-specific.
                 'You can\'t log in with that email address using the provider you '
-                'used. Please log in with the Oauth2 provider.',
+                'used. Please log in with the Mozilla LDAP provider.',
                 fail_silently=True
             )
             return HttpResponseRedirect(reverse(app_settings.AUTH0_SIGNIN_VIEW))
