@@ -46,7 +46,7 @@ class Auth0LoginCallback(View):
         }
 
         # https://tools.ietf.org/html/rfc6749#section-5.1
-        token_url = 'https://{domain}/oauth/token'.format(domain=app_settings.AUTH0_DOMAIN)
+        token_url = 'https://%s/oauth/token' % app_settings.AUTH0_DOMAIN
         token_payload = {
             'client_id': app_settings.AUTH0_CLIENT_ID,
             'client_secret': app_settings.AUTH0_CLIENT_SECRET,
@@ -84,8 +84,8 @@ class Auth0LoginCallback(View):
         except (ConnectTimeout, ReadTimeout):
             messages.error(
                 request,
-                'Unable to authenticate with Auth0 at this time. Please wait a bit '
-                'and try again.'
+                'Unable to authenticate with Auth0 at this time. Please refresh to '
+                'try again.'
             )
             return HttpResponseRedirect(reverse(app_settings.AUTH0_SIGNIN_VIEW))
 
