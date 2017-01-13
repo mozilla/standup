@@ -17,8 +17,7 @@ additional metadata, etc.
 Specs
 =====
 
-* (public): https://wiki.mozilla.org/Security/Guidelines/OpenID_Connect
-* (public, session handling): https://wiki.mozilla.org/Security/Guidelines/OpenID_Connect#Implement_authentication_with_OpenID_Connect_.28OIDC.29_securely_in_my_web_applications_.28RP.29
+* https://wiki.mozilla.org/Security/Guidelines/OpenID_Connect
 
 
 Requirements
@@ -33,7 +32,7 @@ Requirements
 Configuration
 =============
 
-See ``standup.auth0.settings``.
+See ``standup/auth0/settings.py``.
 
 
 Setup
@@ -60,9 +59,10 @@ Setup
 
 4. Add the signin link to your template.
 
-   For Standup, we have a link to a sign in page in the navbar of our base template.
+   For Standup, we have a link to a signin page in the navbar of our base
+   template.
 
-   Then the sign in page has this::
+   Then the signin page has this::
 
        {% if request.user.is_active %}
          <p>
@@ -93,6 +93,9 @@ Flow
 The user is happily bouncing around your site. Then the user clicks on a
 ``AUTH0_LOGIN_URL`` link.
 
+This is a successful authentication flow. Generally if something goes
+wrong, the user is redirected to the ``AUTH0_SIGNIN_VIEW``.
+
 ::
 
     Browser                       Your app               Auth0 server
@@ -112,9 +115,20 @@ The user is happily bouncing around your site. Then the user clicks on a
     |                             | GET /userinfo -----> |
     |                             | < user_info -------- |
     |                             |   has id_token       |
-    | < Redirect to / ----------- |                      |
     |                             |                      |
-    | ... time passes             |                      |
+    |                     pipeline executes              |
+    |                             |                      |
+    | < Redirect to / ----------- |                      |
+
+
+Every ``AUTH0_ID_TOKEN_EXPIRY`` seconds, the ``id_token`` needs to get
+renewed if the account has one. This is a successful ``id_token``
+renewal flow. Generally, if anything goes wrong, the user is logged
+out and redirected to the ``AUTH0_SIGNIN_VIEW``.
+
+::
+
+    Browser                       Your app               Auth0 server
     |                             |                      |
     | GET something ------------> |                      |
     |                             | GET /delegation ---> |
@@ -122,5 +136,3 @@ The user is happily bouncing around your site. Then the user clicks on a
     |                             | < id_token --------- |
     | < Stuff from something ---- |                      |
 
-
-This shows both the authentication flow as well as a successful renewal flow.
