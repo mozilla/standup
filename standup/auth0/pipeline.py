@@ -47,8 +47,8 @@ def log_info(**kwargs):
     # First, sort it so things aren't jumping around from call to call
     new_kwargs = OrderedDict(sorted(kwargs.items()))
     # Log it--doing keys first and separately to make debugging pipeline func args easier
-    logger.info('LOG_INFO KEYS: %r', new_kwargs.keys())
-    logger.info('LOG_INFO: %r', new_kwargs)
+    logger.debug('LOG_INFO KEYS: %r', new_kwargs.keys())
+    logger.debug('LOG_INFO: %r', new_kwargs)
 
 
 def get_user_by_username(user_info, **kwargs):
@@ -72,7 +72,16 @@ def get_user_by_username(user_info, **kwargs):
 def get_user_by_email(user_info, **kwargs):
     """Retrieves the user if there is one available matching on email
 
+    .. Warning::
+
+       Be careful using this. The email field in the Django User model is not required to be filled
+       in or unique. If you let your users edit their email address and don't notify the email
+       address that it's changed and don't verify the new email address, then anyone can use someone
+       else's email address and potentially log in as them.
+
     :arg user_info: the ``user_info`` data from auth0
+
+    :returns: ``{'user': User, 'is_new': False}`` or ``{'is_new': True}``
 
     """
     User = get_user_model()
@@ -86,7 +95,13 @@ def get_user_by_email(user_info, **kwargs):
 
 
 def create_user(user_info, is_new, **kwargs):
-    """Creates a new User using nickname and email from user_info"""
+    """Creates a new User using nickname and email from user_info
+
+    :arg user_info: the ``user_info`` data from auth0
+
+    :returns: ``{'user': User}`` of the created user
+
+    """
     if not is_new:
         return
 
@@ -102,7 +117,14 @@ def create_user(user_info, is_new, **kwargs):
 
 
 def reject_unverified_email(request, user_info, **kwargs):
-    """Rejects users with unverified email addresses"""
+    """Rejects users with unverified email addresses
+
+    :arg request: the HTTP request
+    :arg user_info: the ``user_info`` data from auth0
+
+    :returns: ``HttpResponseRedirect`` or None
+
+    """
     if not user_info['email_verified']:
         # If inactive, add message and redirect to login page
         messages.error(
@@ -114,7 +136,15 @@ def reject_unverified_email(request, user_info, **kwargs):
 
 
 def reject_inactive_user(request, user, is_new, **kwargs):
-    """Rejects existing but inactive users"""
+    """Rejects existing but inactive users
+
+    :arg request: the HTTP request
+    :arg user: the User associated with the Auth0 identity
+    :arg is_new: whether or not the User is new
+
+    :returns: ``HttpResponseRedirect`` or None
+
+    """
     if not is_new and user and not user.is_active:
         # If inactive, add message and redirect to login page
         messages.error(
@@ -126,7 +156,14 @@ def reject_inactive_user(request, user, is_new, **kwargs):
 
 
 def login_user(request, user, **kwargs):
-    """Logs in the user"""
+    """Logs in the user
+
+    :arg request: the HTTP request
+    :arg user: the User associated with the Auth0 identity
+
+    :returns: None
+
+    """
     # FIXME(willkg): This is sort of a lie--should we have our own backend?
     user.backend = 'django.contrib.auth.backends.ModelBackend'
     login(request, user)
@@ -140,6 +177,13 @@ def require_id_token(request, user, user_info, token_info, **kwargs):
 
     If they logged in using the correct provider, then we capture the ``id_token`` so we can
     periodically renew it and log them out if it goes bad.
+
+    :arg request: the HTTP request
+    :arg user: the User associated with this auth0 identity
+    :arg user_info: the ``user_info`` data from auth0
+    :arg token_info: the ``token_info`` data from auth0
+
+    :returns: ``HttpResponseRedirect`` or None
 
     """
     # Pull the domain and if it's in the list of domains we need an id_token for, do the id_token

@@ -6,6 +6,12 @@ from django.conf import settings
 
 
 class NoValue:
+    def __nonzero__(self):
+        return False
+
+    def __bool__(self):
+        return False
+
     def __repr__(self):
         return 'NO VALUE'
 
@@ -22,6 +28,7 @@ class Option:
         self.key = key
         self.default = default
         self.parser = parser
+        self.help_text = help_text
 
 
 def list_of_str(val):

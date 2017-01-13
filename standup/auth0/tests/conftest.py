@@ -65,6 +65,9 @@ class MessagesCatcher:
             raise Exception('Already in a context.')
 
         self.messages = []
+        # Monkeypatch django.contrib.messages.add_message as well as
+        # django.contrib.messages.api.add_message since both get used depending on how you add the
+        # message.
         self._add_message = messages.add_message
         messages.add_message = self.add_message
         self._api_add_message = messages_api.add_message

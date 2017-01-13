@@ -29,8 +29,8 @@ class Auth0LoginCallback(View):
             if request.GET.get('error'):
                 messages.error(
                     request,
-                    'Unable to sign in because of an error from Auth0. ({msg})'.format(
-                        msg=request.GET.get('error_description', request.GET['error'])
+                    'Unable to sign in because of an error from Auth0. (%s)' % (
+                        request.GET.get('error_description', request.GET['error'])
                     ),
                     fail_silently=True
                 )
@@ -74,9 +74,9 @@ class Auth0LoginCallback(View):
                 )
                 return HttpResponseRedirect(reverse(app_settings.AUTH0_SIGNIN_VIEW))
 
-            user_url = 'https://{domain}/userinfo?{querystring}'.format(
-                domain=app_settings.AUTH0_DOMAIN,
-                querystring=urlencode({'access_token': token_info['access_token']})
+            user_url = 'https://%s/userinfo?%s' % (
+                app_settings.AUTH0_DOMAIN,
+                urlencode({'access_token': token_info['access_token']})
             )
 
             user_info = requests.get(user_url).json()

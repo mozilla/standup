@@ -25,7 +25,7 @@ def renew_id_token(id_token):
 
     :arg str id_token: the id token to renew
 
-    :returns: delegation result (dict) ``None``
+    :returns: delegation result (dict) or ``None``
 
     """
     url = 'https://%s/delegation' % app_settings.AUTH0_DOMAIN
@@ -53,7 +53,8 @@ class ValidateIdToken(object):
 
     We do this using cache.
 
-    # FIXME(willkg): Rework this so that the cache parts are methods that can be overridden.
+    # FIXME(willkg): Maybe rework this so that the cache parts are methods that can be
+    # overridden.
 
     """
 
