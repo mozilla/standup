@@ -37,3 +37,6 @@ pycodestyle==2.0.0 \
 pyflakes==1.2.3 \
     --hash=sha256:e87bac26c62ea5b45067cc89e4a12f56e1483f1f2cda17e7c9b375b9fd2f40da \
     --hash=sha256:2e4a1b636d8809d8f0a69f341acf15b2e401a3221ede11be439911d23ce2139e
+requests_mock==1.2.0 \
+    --hash=sha256:8c89d8db3a5ddbce6121bdeb665891ca27bb37d18bbadd96c6c11fb472f07df1 \
+    --hash=sha256:7e49e8b896d0dd72405bdae913cacc0593e6f6c505083fc2ff479a0e0c0262ba

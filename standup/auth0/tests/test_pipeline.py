@@ -1,17 +1,12 @@
-from django.contrib.auth import get_user_model
-from django.test import TestCase
-from django.test.client import RequestFactory
+from django.http import HttpResponseRedirect
 
 from standup.auth0 import pipeline
+from standup.auth0.models import IdToken
 
 
-class RunPipelineTestCase(TestCase):
-    def setUp(self):
-        self.factory = RequestFactory()
-
-    def test_run_pipeline(self):
-        User = get_user_model()
-        user = User.objects.create_user(
+class TestRunPipeline:
+    def test_run_pipeline(self, db, django_user_model, request_factory):
+        user = django_user_model.objects.create_user(
             username='foo',
             password='foo',
             email='foo@example.com'
@@ -26,75 +21,95 @@ class RunPipelineTestCase(TestCase):
             'user_info': {
                 'nickname': 'foo',
             },
-            'request': self.factory.get('/')
+            'request': request_factory.get('/')
         }
         ret = pipeline.run_pipeline(pl, **kwargs)
         assert ret['is_new'] is False
         assert ret['user'].id == user.id
 
 
-class GetUserByUsernameTestCase(TestCase):
-    def test_user_exists(self):
-        User = get_user_model()
-        user = User.objects.create_user(
+class TestGetUserByUsername:
+    def test_user_exists(self, db, django_user_model):
+        user = django_user_model.objects.create_user(
             username='foo',
             password='foo',
             email='foo@example.com'
         )
 
-        ret = pipeline.get_user_by_username({'nickname': 'foo'})
+        ret = pipeline.get_user_by_username(
+            user_info={'nickname': 'foo'},
+            junk=123
+        )
         assert ret['user'].id == user.id
         assert ret['is_new'] is False
 
-        ret = pipeline.get_user_by_username({'nickname': 'FOO'})
+        ret = pipeline.get_user_by_username(
+            user_info={'nickname': 'FOO'},
+            junk=123
+        )
         assert ret['user'].id == user.id
         assert ret['is_new'] is False
 
-    def test_user_doesnt_exist(self):
-        ret = pipeline.get_user_by_username({'nickname': 'foo'})
+    def test_user_doesnt_exist(self, db):
+        ret = pipeline.get_user_by_username(
+            user_info={'nickname': 'foo'},
+            junk=123
+        )
         assert ret['is_new'] is True
 
 
-class GetUserByEmailTestCase(TestCase):
-    def test_user_exists(self):
-        User = get_user_model()
-        user = User.objects.create_user(
+class TestGetUserByEmail:
+    def test_user_exists(self, db, django_user_model):
+        user = django_user_model.objects.create_user(
             username='foo',
             password='foo',
             email='foo@example.com'
         )
 
-        ret = pipeline.get_user_by_email({'email': 'foo@example.com'})
+        ret = pipeline.get_user_by_email(
+            user_info={'email': 'foo@example.com'},
+            junk=123
+        )
         assert ret['user'].id == user.id
         assert ret['is_new'] is False
 
-        ret = pipeline.get_user_by_email({'email': 'FOO@example.com'})
+        ret = pipeline.get_user_by_email(
+            user_info={'email': 'FOO@example.com'},
+            junk=123
+        )
         assert ret['user'].id == user.id
         assert ret['is_new'] is False
 
-    def test_user_doesnt_exist(self):
-        ret = pipeline.get_user_by_email({'email': 'foo@example.com'})
+    def test_user_doesnt_exist(self, db):
+        ret = pipeline.get_user_by_email(
+            user_info={'email': 'foo@example.com'},
+            junk=123
+        )
         assert ret['is_new'] is True
 
 
-class CreateUserTestCase(TestCase):
-    def test_create_user_is_new(self):
-        ret = pipeline.create_user({'nickname': 'foo', 'email': 'foo@example.com'}, is_new=True)
+class TestCreateUser:
+    def test_create_user_is_new(self, db):
+        ret = pipeline.create_user(
+            user_info={'nickname': 'foo', 'email': 'foo@example.com'},
+            is_new=True,
+            junk=123
+        )
         assert ret['user'].username == 'foo'
         assert ret['user'].email == 'foo@example.com'
 
-    def test_create_user_not_is_new(self):
-        ret = pipeline.create_user({'nickname': 'foo', 'email': 'foo@example.com'}, is_new=False)
+    def test_create_user_not_is_new(self, db):
+        ret = pipeline.create_user(
+            user_info={'nickname': 'foo', 'email': 'foo@example.com'},
+            is_new=False,
+            junk=123
+        )
         assert ret is None
 
 
-class RejectInactiveUserTestCase(TestCase):
-    def setUp(self):
-        self.factory = RequestFactory()
-
-    def test_inactive(self):
-        User = get_user_model()
-        user = User.objects.create_user(
+class TestRejectInactiveUser:
+    def test_inactive(self, db, django_user_model, request_factory):
+        user = django_user_model.objects.create_user(
             username='foo',
             password='foo',
             email='foo@example.com'
@@ -102,20 +117,115 @@ class RejectInactiveUserTestCase(TestCase):
         user.is_active = False
         user.save()
 
-        request = self.factory.get('/')
+        request = request_factory.get('/')
 
-        ret = pipeline.reject_inactive_user(request, user)
-        assert ret is not None
+        ret = pipeline.reject_inactive_user(
+            request=request,
+            user=user,
+            is_new=False,
+            junk=123
+        )
+        assert isinstance(ret, HttpResponseRedirect)
 
-    def test_active(self):
-        User = get_user_model()
-        user = User.objects.create_user(
+    def test_active(self, db, django_user_model, request_factory):
+        user = django_user_model.objects.create_user(
             username='foo',
             password='foo',
             email='foo@example.com'
         )
 
-        request = self.factory.get('/')
+        request = request_factory.get('/')
 
-        ret = pipeline.reject_inactive_user(request, user)
+        ret = pipeline.reject_inactive_user(
+            request=request,
+            user=user,
+            is_new=False,
+            junk=123
+        )
         assert ret is None
+
+
+class TestRejectUnverifiedEmail:
+    def test_verified(self, db, request_factory):
+        request = request_factory.get('/')
+        ret = pipeline.reject_unverified_email(
+            request=request,
+            user_info={'email_verified': True, 'email': 'foo@example.com'},
+            junk=123
+        )
+        assert ret is None
+
+    def test_not_verified(self, db, request_factory):
+        request = request_factory.get('/')
+        ret = pipeline.reject_unverified_email(
+            request=request,
+            user_info={'email_verified': False, 'email': 'foo@example.com'},
+            junk=123
+        )
+        assert isinstance(ret, HttpResponseRedirect)
+
+
+class TestRequireIdToken:
+    def test_not_required(self, db, django_user_model, request_factory, settings):
+        settings.AUTH0_ID_TOKEN_DOMAINS = ['mozilla.com']
+
+        user = django_user_model.objects.create_user(
+            username='foo',
+            password='foo',
+            email='foo@example.com'
+        )
+
+        request = request_factory.get('/')
+
+        ret = pipeline.require_id_token(
+            request=request,
+            user=user,
+            user_info={'email': 'foo@example.com'},
+            token_info={'id_token': 'foo'},
+            junk=123
+        )
+        assert ret is None
+
+    def test_required_but_no_id_token(self, db, django_user_model, request_factory, settings):
+        settings.AUTH0_ID_TOKEN_DOMAINS = ['mozilla.com']
+
+        user = django_user_model.objects.create_user(
+            username='foo',
+            password='foo',
+            email='foo@mozilla.com'
+        )
+
+        request = request_factory.get('/')
+
+        ret = pipeline.require_id_token(
+            request=request,
+            user=user,
+            user_info={'email': 'foo@mozilla.com'},
+            token_info={},
+            junk=123
+        )
+        assert isinstance(ret, HttpResponseRedirect)
+
+    def test_required_and_id_token(self, db, django_user_model, request_factory, settings):
+        settings.AUTH0_ID_TOKEN_DOMAINS = ['mozilla.com']
+
+        user = django_user_model.objects.create_user(
+            username='foo',
+            password='foo',
+            email='foo@mozilla.com'
+        )
+
+        request = request_factory.get('/')
+
+        ret = pipeline.require_id_token(
+            request=request,
+            user=user,
+            user_info={'email': 'foo@mozilla.com'},
+            token_info={'id_token': 'foo'},
+            junk=123
+        )
+        assert ret is None
+        assert IdToken.objects.get(user=user).id_token == 'foo'
+
+# FIXME(willkg): LoginUserTestCase: This requires a session which we can't (easily) fake with a
+# RequestFactory.
