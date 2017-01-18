@@ -189,6 +189,7 @@ def require_id_token(request, user, user_info, token_info, **kwargs):
     # Pull the domain and if it's in the list of domains we need an id_token for, do the id_token
     # work.
     domain = user_info['email'].lower().split('@', 1)[1]
+    logger.debug('require_id_token: %r %r %r', user_info['email'], domain, app_settings.AUTH0_ID_TOKEN_DOMAINS)
     if domain in app_settings.AUTH0_ID_TOKEN_DOMAINS:
         if token_info.get('id_token'):
             # We have an id_token, so persist it.
