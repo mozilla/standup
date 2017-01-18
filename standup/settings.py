@@ -1,8 +1,10 @@
+import os
 from pathlib import Path
 
 from everett.manager import ConfigManager, ConfigEnvFileEnv, ConfigOSEnv, ListOf
 import dj_database_url
 import django_cache_url
+from memcacheify import memcacheify
 
 
 ROOT_PATH = Path(__file__).resolve().parents[1]
@@ -144,34 +146,15 @@ DATABASES = {
                       default='sqlite:///db.sqlite3')
 }
 
-memcachier_servers = config('MEMCACHIER_SERVERS', raise_error=False)
-if memcachier_servers:
-    # use django-pylibmc
-    CACHES = {
-        'default': {
-            'BACKEND': 'django_pylibmc.memcached.PyLibMCCache',
-            'LOCATION': memcachier_servers,
-            'TIMEOUT': 500,
-            'BINARY': True,
-            'USERNAME': config('MEMCACHIER_USERNAME'),
-            'PASSWORD': config('MEMCACHIER_PASSWORD'),
-            'OPTIONS': {  # Maps to pylibmc "behaviors"
-                'tcp_nodelay': True,
-                'ketama': True
-            }
-        }
-    }
+if os.environ.get('MEMCACHIER_SERVERS', ''):
+    # If MEMCACHIER_SERVERS is in the os.environ, then let the memcacheify lib
+    # configure everything. It's probably good enough.
+    CACHES = memcacheify()
     SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 else:
     CACHES = {
         'default': config('CACHE_URL', parser=django_cache_url.parse, default='locmem:default')
     }
-
-if CACHES['default'].get('BACKEND', '') == 'django.core.cache.backends.locmem.LocMemCache':
-    # If we're using locmem, set timeout for 60 seconds and restrict
-    # cache to 100 things so as to not run rampant with memory usage.
-    CACHES['default']['timeout'] = 60
-    CACHES['default'].setdefault('OPTIONS', {})['MAX_ENTRIES'] = 100
 
 CACHE_MIDDLEWARE_SECONDS = config('CACHE_MIDDLEWARE_SECONDS', default='30', parser=int)
 CACHE_FEEDS_SECONDS = config('CACHE_FEEDS_SECONDS', default='1800', parser=int)  # 30 min
