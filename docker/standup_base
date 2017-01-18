@@ -20,7 +20,7 @@ RUN update-alternatives --install /bin/sh sh /bin/bash 10
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-                    build-essential python3-{dev,pip,setuptools,pylibmc} nodejs-legacy \
+                    build-essential python3-{dev,pip,setuptools} libmemcached-dev nodejs-legacy \
                     npm gettext libpq-dev postgresql-client supervisor && \
     rm -rf /var/lib/apt/lists/*
 

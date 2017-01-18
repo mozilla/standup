@@ -93,3 +93,5 @@ simplejson==3.10.0 \
 django-heroku-memcacheify==1.0.0 \
     --hash=sha256:76811edb1521bd22b2bf8147afc47685ec8317adf2f7e5f4feccb975409883a1 \
     --hash=sha256:971c63f9af5bee2884bbfd308457b6675b35b89a33cf42c1c4f0a554c324a563
+pylibmc==1.5.1 \
+    --hash=sha256:ecba261859c3e1ba3365389cb4f4dfffb7e02120a9f57a288cacf2f42c45cdd6
