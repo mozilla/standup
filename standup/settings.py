@@ -150,7 +150,6 @@ if os.environ.get('MEMCACHIER_SERVERS', ''):
     # If MEMCACHIER_SERVERS is in the os.environ, then let the memcacheify lib
     # configure everything. It's probably good enough.
     CACHES = memcacheify()
-    SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 else:
     CACHES = {
         'default': config('CACHE_URL', parser=django_cache_url.parse, default='locmem:default')
