@@ -1,4 +1,5 @@
 from datetime import timedelta
+import logging
 from urllib.parse import urlparse
 
 import requests
@@ -14,6 +15,9 @@ from django.utils import timezone
 
 from standup.auth0.models import IdToken
 from standup.auth0.settings import app_settings
+
+
+logger = logging.getLogger(__name__)
 
 
 class Auth0LookupError(Exception):
@@ -147,6 +151,7 @@ class ValidateIdToken(object):
                 token.save()
 
                 self.update_expiration(request)
+                logger.debug('ValidateIdToken: token renewed for %s' % request.user)
                 return
 
             # If we don't have a new id_token, then it's not valid anymore. We log the user
