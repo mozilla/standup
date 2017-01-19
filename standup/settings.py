@@ -1,10 +1,8 @@
-import os
 from pathlib import Path
 
 from everett.manager import ConfigManager, ConfigEnvFileEnv, ConfigOSEnv, ListOf
 import dj_database_url
 import django_cache_url
-from memcacheify import memcacheify
 
 
 ROOT_PATH = Path(__file__).resolve().parents[1]
@@ -59,7 +57,6 @@ INSTALLED_APPS = (
 )
 
 MIDDLEWARE_CLASSES = (
-    'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.security.SecurityMiddleware',
 
     'standup.status.middleware.EnforceHostnameMiddleware',
@@ -74,7 +71,6 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.cache.FetchFromCacheMiddleware',
 
     'standup.auth0.middleware.ValidateIdToken',
     'standup.status.middleware.NewUserProfileMiddleware',
@@ -146,18 +142,9 @@ DATABASES = {
                       default='sqlite:///db.sqlite3')
 }
 
-if os.environ.get('MEMCACHIER_SERVERS', ''):
-    # If MEMCACHIER_SERVERS is in the os.environ, then let the memcacheify lib
-    # configure everything. It's probably good enough.
-    CACHES = memcacheify()
-else:
-    CACHES = {
-        'default': config('CACHE_URL', parser=django_cache_url.parse, default='locmem:default')
-    }
-
-CACHE_MIDDLEWARE_SECONDS = config('CACHE_MIDDLEWARE_SECONDS', default='30', parser=int)
-CACHE_FEEDS_SECONDS = config('CACHE_FEEDS_SECONDS', default='1800', parser=int)  # 30 min
-
+CACHES = {
+    'default': config('CACHE_URL', parser=django_cache_url.parse, default='locmem:default')
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/

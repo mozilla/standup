@@ -1,4 +1,5 @@
 from datetime import timedelta
+import logging
 from urllib.parse import urlparse
 
 import requests
@@ -12,8 +13,11 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.utils import timezone
 
-from standup.auth0.settings import app_settings
 from standup.auth0.models import IdToken
+from standup.auth0.settings import app_settings
+
+
+logger = logging.getLogger(__name__)
 
 
 class Auth0LookupError(Exception):
@@ -51,17 +55,44 @@ class ValidateIdToken(object):
     example, the user could have been blocked (e.g. leaving the company) if so we need to ask the
     user to log in again.
 
-    We do this using cache.
-
-    # FIXME(willkg): Maybe rework this so that the cache parts are methods that can be
-    # overridden.
-
     """
 
     exception_paths = (
         # Exclude the AUTH0_CALLBACK_URL path, otherwise this can loop
         urlparse(app_settings.AUTH0_CALLBACK_URL).path,
     )
+
+    def is_expired(self, request):
+        """Returns whether or not the id_token is expired
+
+        For simplicity purposes, this returns False if there is a token and it's
+        not expired and True in all other cases.
+
+        :arg request: the Django Request object which has a ``.user`` property with
+            the user in question
+
+        :returns: bool--False if not expired and True in all other cases
+
+        """
+        try:
+            token = IdToken.objects.get(user=request.user)
+        except IdToken.DoesNotExist:
+            # If there's no id_token, then we treat it as expired.
+            return True
+
+        # Return whether the id_token expiration has passed
+        return bool(token.expire < timezone.now())
+
+    def update_expiration(self, request):
+        """Updates any bookkeeping related to checking expiration
+
+        :arg request: the Django Request object which has a ``.user`` property with
+            the user in question
+
+        """
+        # Prior to this getting called, the middleware code updates the db record, so this is a
+        # no-op
+        pass
 
     def process_request(self, request):
         if (
@@ -78,11 +109,7 @@ class ValidateIdToken(object):
             if domain not in app_settings.AUTH0_ID_TOKEN_DOMAINS:
                 return
 
-            cache_key = 'auth0:renew_id_token:%s' % request.user.id
-
-            # Look up expiration in cache to see if id_token needs to be renewed
-            # FIXME(willkg): Try named cache and if that doesn't exist, fall back to default.
-            if cache.get(cache_key):
+            if not self.is_expired(request):
                 return
 
             # The id_token has expired, so we renew it now
@@ -118,12 +145,13 @@ class ValidateIdToken(object):
                 return HttpResponseRedirect(reverse(app_settings.AUTH0_SIGNIN_VIEW))
 
             if new_id_token:
-                # Save new token and re-up it in cache--all set!
+                # Save new token and we're all set
                 token.id_token = new_id_token
                 token.expire = timezone.now() + timedelta(seconds=app_settings.AUTH0_ID_TOKEN_EXPIRY)
                 token.save()
 
-                cache.set(cache_key, True, app_settings.AUTH0_ID_TOKEN_EXPIRY)
+                self.update_expiration(request)
+                logger.debug('ValidateIdToken: token renewed for %s' % request.user)
                 return
 
             # If we don't have a new id_token, then it's not valid anymore. We log the user
@@ -136,3 +164,18 @@ class ValidateIdToken(object):
             )
             logout(request)
             return HttpResponseRedirect(reverse(app_settings.AUTH0_SIGNIN_VIEW))
+
+
+class ValidateIdTokenUsingCache(ValidateIdToken):
+    """Uses cache to check id_token expiration"""
+    def is_expired(self, request):
+        cache_key = 'auth0:renew_id_token:%s' % request.user.id
+
+        # Look up expiration in cache to see if id_token needs to be renewed
+        # FIXME(willkg): Try named cache and if that doesn't exist, fall back to default.
+        return bool(cache.get(cache_key))
+
+    def update_expiration(self, request):
+        cache_key = 'auth0:renew_id_token:%s' % request.user.id
+
+        cache.set(cache_key, True, app_settings.AUTH0_ID_TOKEN_EXPIRY)

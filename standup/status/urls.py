@@ -1,12 +1,10 @@
 from django.conf import settings
 from django.conf.urls import url
-from django.views.decorators.cache import cache_page
 
 from . import views
 
 
 SLUG_RE = r'(?P<slug>[-a-zA-Z0-9_@]+)'
-cache_feed = cache_page(settings.CACHE_FEEDS_SECONDS)
 
 urlpatterns = [
     url(r'^$', views.HomeView.as_view(), name='status.index'),
@@ -24,10 +22,10 @@ urlpatterns = [
     url(r'^login-form/$', views.LoginView.as_view(), name='users.loginform'),
 
     # feeds
-    url(r'^statuses.xml$', cache_feed(views.MainFeed()), name='status.index_feed'),
-    url(r'^user/{}.xml$'.format(SLUG_RE), cache_feed(views.UserFeed()), name='status.user_feed'),
-    url(r'^team/{}.xml$'.format(SLUG_RE), cache_feed(views.TeamFeed()), name='status.team_feed'),
-    url(r'^project/{}.xml$'.format(SLUG_RE), cache_feed(views.ProjectFeed()),
+    url(r'^statuses.xml$', views.MainFeed(), name='status.index_feed'),
+    url(r'^user/{}.xml$'.format(SLUG_RE), views.UserFeed(), name='status.user_feed'),
+    url(r'^team/{}.xml$'.format(SLUG_RE), views.TeamFeed(), name='status.team_feed'),
+    url(r'^project/{}.xml$'.format(SLUG_RE), views.ProjectFeed(),
         name='status.project_feed'),
     url(r'^statistics/$', views.statistics, name='status.statistics'),
 
