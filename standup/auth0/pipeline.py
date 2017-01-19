@@ -5,6 +5,7 @@ import logging
 from django.contrib import messages
 from django.contrib.auth import get_user_model, login
 from django.core.urlresolvers import reverse
+from django.db import IntegrityError
 from django.http import HttpResponseRedirect
 from django.utils import timezone
 from django.utils.module_loading import import_string
@@ -14,6 +15,22 @@ from standup.auth0.settings import app_settings
 
 
 logger = logging.getLogger(__name__)
+
+
+class Exhausted(Exception):
+    pass
+
+
+def unique_string_generator(base, max_count=50):
+    """Generates strings using a base plus some count"""
+    yield base
+
+    count = 2
+    while count < max_count:
+        yield '%s%d' % (base, count)
+        count += 1
+
+    raise Exhausted('No more slots available for generation. Base was "%s"' % base)
 
 
 def run_pipeline(pipeline, **kwargs):
@@ -108,11 +125,18 @@ def create_user(user_info, is_new, **kwargs):
     User = get_user_model()
 
     password = User.objects.make_random_password()
-    user = User.objects.create_user(
-        username=user_info['nickname'],
-        password=password,
-        email=user_info['email'],
-    )
+    # Auth0 returns nicknames that may not be unique across identities, so we add a sequence to the
+    # end where necessary.
+    for username in unique_string_generator(user_info['nickname']):
+        try:
+            user = User.objects.create_user(
+                username=username,
+                password=password,
+                email=user_info['email'],
+            )
+            break
+        except IntegrityError:
+            pass
     return {'user': user}
 
 
