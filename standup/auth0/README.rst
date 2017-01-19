@@ -23,8 +23,14 @@ Specs
 Requirements
 ============
 
+You'll need:
+
 * Python 3
 * Django 1.8+
+
+If you want to use the cache-based ``id_token`` expiration checking, you'll also
+need:
+
 * A caching backend (locmem if you've got only one node and one process,
   memcached or something real otherwise)
 
@@ -135,4 +141,3 @@ out and redirected to the ``AUTH0_SIGNIN_VIEW``.
     |                             | sends id_token       |
     |                             | < id_token --------- |
     | < Stuff from something ---- |                      |
-

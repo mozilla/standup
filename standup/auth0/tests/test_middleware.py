@@ -4,6 +4,7 @@ from urllib.parse import urlparse
 from django import http
 from django.contrib.auth.models import AnonymousUser
 from django.core.urlresolvers import reverse
+from django.utils import timezone
 
 from requests.exceptions import ReadTimeout
 import requests_mock
@@ -20,10 +21,11 @@ class TestMiddleware:
         settings.AUTH0_ID_TOKEN_DOMAINS = ['example.com']
 
         user = django_user_model.objects.create(email='test@example.com')
+        # Create a token that expired 100 seconds ago to force a renew
         id_token = IdToken.objects.create(
             user=user,
             id_token='12345.6789.01234',
-            expire=datetime.utcnow() + timedelta(seconds=900)
+            expire=timezone.now() - timedelta(seconds=100)
         )
         request = request_factory.get('/')
         request.user = user
@@ -67,11 +69,7 @@ class TestMiddleware:
         settings.AUTH0_ID_TOKEN_DOMAINS = ['example.com']
 
         user = django_user_model.objects.create(email='test@example.com')
-        IdToken.objects.create(
-            user=user,
-            id_token='12345.6789.01234',
-            expire=datetime.utcnow() + timedelta(seconds=900)
-        )
+        # Note: Don't need a token here, because we want to force a renewal that will fail.
         request = request_factory.get('/')
         request.user = user
 
@@ -175,11 +173,7 @@ class TestMiddleware:
         settings.AUTH0_ID_TOKEN_DOMAINS = ['example.com']
 
         user = django_user_model.objects.create(email='test@example.com')
-        IdToken.objects.create(
-            user=user,
-            id_token='12345.6789.01234',
-            expire=datetime.utcnow() + timedelta(seconds=900)
-        )
+        # Note: Don't need a token here because we want to force a renewal that times out.
 
         def json_callback(*args, **kwargs):
             raise ReadTimeout('too long')
