@@ -1,10 +1,12 @@
 from django.core.management import call_command
 from django.utils.six import StringIO
 
-from standup.status.tests.factories import UserFactory, StandupUserFactory
+import pytest
+
+from standup.status.tests.factories import UserFactory, StandupUserFactory, StatusFactory
 
 
-def test_find_user(db, django_user_model):
+def test_find_user(db):
     user = UserFactory.create(username='jimbob', email='j@example.com')
     StandupUserFactory.create(user=user, irc_nick='jimbobbaz')
 
@@ -32,3 +34,73 @@ def test_find_user(db, django_user_model):
     ]):
         print((i, output[i], starter))
         assert output[i].startswith(starter)
+
+
+class TestMergeUser:
+    def test_no_standupuser(self, db, django_user_model):
+        """Test when keep and delete have no standup user"""
+        user_keep = UserFactory.create(username='jimbob', email='jimbob@example.com')
+        user_delete = UserFactory.create(username='jane', email='jane@example.com')
+
+        stdout = StringIO()
+        call_command('mergeuser', keep=user_keep.id, delete=user_delete.id, assume_yes=True, stdout=stdout)
+        output = stdout.getvalue()
+        print(output)
+
+        # Verify email address was copied from delete to keep
+        user_keep = django_user_model.objects.get(id=user_keep.id)
+        assert user_keep.email == 'jane@example.com'
+
+        # Verify delete no longer exists
+        with pytest.raises(django_user_model.DoesNotExist):
+            django_user_model.objects.get(id=user_delete.id)
+
+    def test_keep_no_standupuser_but_delete_has_standupuser(self, db, django_user_model):
+        """Test when keep has no standup user, but delete does"""
+        user_keep = UserFactory.create(username='jimbob', email='jimbob@example.com')
+        user_delete = UserFactory.create(username='jane', email='jane@example.com')
+        standupuser_delete = StandupUserFactory.create(user=user_delete)
+
+        stdout = StringIO()
+        call_command('mergeuser', keep=user_keep.id, delete=user_delete.id, assume_yes=True, stdout=stdout)
+        output = stdout.getvalue()
+        print(output)
+
+        # Verify profile was transfered from delete to keep
+        user_keep = django_user_model.objects.get(id=user_keep.id)
+        assert user_keep.profile.id == standupuser_delete.id
+
+        # Verify delete no longer exists
+        with pytest.raises(django_user_model.DoesNotExist):
+            django_user_model.objects.get(id=user_delete.id)
+
+    def test_keep_and_delete_have_standupser(self, db, django_user_model):
+        """Test when keep and delete both have standup users"""
+        user_keep = UserFactory.create(username='jimbob', email='jimbob@example.com')
+        standupuser_keep = StandupUserFactory.create(user=user_keep)
+        StatusFactory.create(user=standupuser_keep, content='1'),
+        StatusFactory.create(user=standupuser_keep, content='2'),
+        StatusFactory.create(user=standupuser_keep, content='3'),
+
+        user_delete = UserFactory.create(username='jane', email='jane@example.com')
+        standupuser_delete = StandupUserFactory.create(user=user_delete)
+        StatusFactory.create(user=standupuser_delete, content='4'),
+        StatusFactory.create(user=standupuser_delete, content='5'),
+        StatusFactory.create(user=standupuser_delete, content='6'),
+
+        stdout = StringIO()
+        call_command('mergeuser', keep=user_keep.id, delete=user_delete.id, assume_yes=True, stdout=stdout)
+        output = stdout.getvalue()
+        print(output)
+
+        # Verify all statuses were transfered from delete to keep
+        user_keep = django_user_model.objects.get(id=user_keep.id)
+        statuses = [status.content for status in user_keep.profile.statuses.all()]
+        assert sorted(statuses) == ['1', '2', '3', '4', '5', '6']
+
+        # Verify email address was transferred from delete -> keep
+        assert user_keep.email == 'jane@example.com'
+
+        # Verify delete no longer exists
+        with pytest.raises(django_user_model.DoesNotExist):
+            django_user_model.objects.get(id=user_delete.id)
