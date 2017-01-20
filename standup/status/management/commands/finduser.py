@@ -16,7 +16,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         text = options['text']
 
-        print('Searching for: %s' % text)
+        self.stdout.write('Searching for: %s' % text)
 
         rows = [
             ['user_id', 'username', 'email', 'name', 'slug', 'irc', 'github', '# statuses', 'last login', 'created']
@@ -35,7 +35,6 @@ class Command(BaseCommand):
 
         for user in users:
             id_to_data[user.id] = [
-                user.id,
                 user.username,
                 user.email,
                 '',
@@ -61,7 +60,6 @@ class Command(BaseCommand):
 
         for user in standup_users:
             id_to_data[user.user.id] = [
-                user.user.id,
                 user.user.username,
                 user.user.email,
                 user.name,
@@ -76,4 +74,4 @@ class Command(BaseCommand):
         for user_id, data in sorted(id_to_data.items()):
             rows.append([user_id] + data)
 
-        print(tabulate.tabulate(rows))
+        self.stdout.write(tabulate.tabulate(rows))
