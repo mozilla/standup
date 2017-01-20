@@ -16,14 +16,6 @@
 {% block content %}
   <div class="grid_12 banner">
     <h1>{{ title }}</h1>
-    {% if auth0_configured %}
-      {% if settings.HELP_FAQ_URL %}
-      <p>
-        If you have problems logging in, please check out
-        <a href="{{ settings.HELP_FAQ_URL }}">our FAQ</a>.
-      </p>
-      {% endif %}
-    {% endif %}
   </div>
 
   <div class="grid_6 prefix_3 suffix_3">
@@ -39,6 +31,15 @@
       {% else %}
         <p>
           Signin is not configured so it is disabled.
+        </p>
+      {% endif %}
+    {% endif %}
+
+    {% if auth0configured %}
+      {% if settings.HELP_FAQ_URL %}
+        <p>
+          If you have problems signing in, please check out
+          <a href="{{ settings.HELP_FAQ_URL }}">our FAQ</a>.
         </p>
       {% endif %}
     {% endif %}
