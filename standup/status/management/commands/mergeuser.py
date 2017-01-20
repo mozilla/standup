@@ -48,7 +48,7 @@ class Command(BaseCommand):
         self.stdout.write('')
 
         if not options['assume_yes']:
-            self.stdout.write('Continue?: Y/n')
+            self.stdout.write('Continue?: y/N')
             cont = input()
             if cont.strip().lower() != 'y':
                 self.stdout.write('Exiting.')
