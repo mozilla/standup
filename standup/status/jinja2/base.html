@@ -87,6 +87,10 @@
 
     <div id="main-content" class="container_12 cf">
       <div id="main-notices" class="grid_12">
+        <div class="notice success">
+          We've switched the way we use Auth0. If you have problems, see
+          <a href="{{ settings.HELP_FAQ_URL }}">our FAQ</a>.
+        </div>
         {% if messages %}
           {% for message in messages %}
             <div class="notice {{ message.tags }}">{{ message }}</div>
