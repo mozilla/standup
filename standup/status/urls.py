@@ -14,6 +14,7 @@ urlpatterns = [
     url(r'^status/(?P<pk>\d{1,8})/$', views.StatusView.as_view(), name='status.status'),
     url(r'^weekly/$', views.WeeklyView.as_view(), name='status.weekly'),
     url(r'^statusize/$', views.statusize, name='status.statusize'),
+    url(r'^search/$', views.SearchView.as_view(), name='status.search'),
 
     # profile and signin
     url(r'^profile/$', views.ProfileView.as_view(), name='users.profile'),

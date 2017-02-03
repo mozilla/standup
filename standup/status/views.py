@@ -22,6 +22,7 @@ from raven.contrib.django.models import client
 
 from standup.status.forms import StatusizeForm, ProfileForm
 from standup.status.models import Status, Team, Project, StandupUser
+from standup.status.search import generate_query
 from standup.status.utils import enddate, startdate
 
 
@@ -122,6 +123,22 @@ def statusize(request):
 
     referrer = request.META.get('HTTP_REFERER', '/')
     return HttpResponseRedirect(data.get('redirect_to', referrer))
+
+
+class SearchView(PaginateStatusesMixin, TemplateView):
+    template_name = 'status/search.html'
+
+    def get_status_queryset(self):
+        query = self.request.GET.get('query')
+        if not query:
+            return []
+
+        return Status.objects.filter(generate_query('content', query))
+
+    def get_context_data(self, **kwargs):
+        cxt = super().get_context_data(**kwargs)
+        cxt['query'] = self.request.GET.get('query', '')
+        return cxt
 
 
 class ProfileView(UpdateView):
