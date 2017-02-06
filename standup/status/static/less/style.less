@@ -774,3 +774,36 @@ input[type='text'],
     color: #fff;
   }
 }
+
+#search {
+  form {
+    margin: 0 auto;
+    width: 90%;
+
+    input[type=text][name=query] {
+      border: 0;
+      .border-radius(4px);
+      .box-sizing(border-box);
+      color: #666;
+      font-family: Helvetica, Arial, sans-serif;
+      height: 2.5em;
+      margin: 12px auto;
+      padding: 4px 20px;
+      resize: none;
+      width: 80%;
+      font-size: 1em;
+
+      &::-webkit-input-placeholder {
+        color: #aaa;
+      }
+
+      &:-moz-placeholder {
+        color: #aaa;
+      }
+    }
+    input[type=submit] {
+      width: 19%;
+
+    }
+  }
+}
