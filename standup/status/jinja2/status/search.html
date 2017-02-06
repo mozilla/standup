@@ -5,7 +5,7 @@
 {% block content %}
   <div id="search" class="grid_12">
     <form method="GET" action="{{ url('status.search') }}">
-      <input type="text" name="query" value="{{ query }}">
+      <input type="text" name="query" value="{{ query }}" autofocus>
       <input class="btn" type="submit" value="Search">
     </form>
   </div>
