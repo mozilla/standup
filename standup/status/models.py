@@ -70,8 +70,7 @@ class Team(models.Model):
 
 class StandupUser(models.Model):
     """A standup participant--tied to Django's User model."""
-    # Note: User provides "username", "name", "is_superuser", "is_staff" and
-    # "email"
+    # Note: User provides "username", "is_superuser", "is_staff" and "email"
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     name = models.CharField(max_length=100, blank=True, null=True)
     slug = models.SlugField(max_length=100, blank=True, null=True, unique=True)
