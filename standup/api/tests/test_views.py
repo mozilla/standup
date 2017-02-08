@@ -342,21 +342,6 @@ class TestUpdateUser(APITestCase):
         standupuser = StandupUser.objects.get(pk=standupuser.id)
         assert standupuser.email == 'lor@example.com'
 
-    def test_update_github_handle(self):
-        token = SystemTokenFactory.create()
-        standupuser = StandupUserFactory.create(github_handle='data')
-
-        resp = self.client.post_json(
-            reverse('api.user-update', kwargs={'username': standupuser.irc_nick}),
-            payload={
-                'api_key': token.token,
-                'github_handle': 'lor',
-            }
-        )
-        assert resp.status_code == 200
-        standupuser = StandupUser.objects.get(pk=standupuser.id)
-        assert standupuser.github_handle == 'lor'
-
     def test_user_does_not_exist(self):
         token = SystemTokenFactory.create()
 

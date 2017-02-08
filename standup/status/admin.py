@@ -21,6 +21,6 @@ class TeamAdmin(admin.ModelAdmin):
 
 @admin.register(StandupUser)
 class StandupUserAdmin(admin.ModelAdmin):
-    list_display = ['name', 'slug', 'github_handle']
-    search_fields = ['name', 'slug', 'github_handle']
+    list_display = ['name', 'slug', 'irc_nick']
+    search_fields = ['name', 'slug', 'irc_nick']
     filter_horizontal = ['teams']

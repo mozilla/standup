@@ -235,8 +235,6 @@ class UpdateUser(AuthenticatedAPIView):
             user.name = request.json_body['name']
         if 'email' in request.json_body:
             user.user.email = request.json_body['email']
-        if 'github_handle' in request.json_body:
-            user.github_handle = request.json_body['github_handle']
 
         user.save()
         user.user.save()
