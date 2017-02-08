@@ -218,6 +218,8 @@ class StatusDelete(AuthenticatedAPIView):
         return HttpResponseJSON({'id': status_id})
 
 
+# FIXME(willkg): This should get rewritten to re-use the ProfileForm so they're
+# in lockstep.
 class UpdateUser(AuthenticatedAPIView):
     def post(self, request, username):
         # token = request.auth_token

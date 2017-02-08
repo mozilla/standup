@@ -4,6 +4,8 @@ from django.core.urlresolvers import reverse
 from django.utils.encoding import force_bytes
 from django.test import Client, TestCase
 
+import pytest
+
 from standup.api.tests.factories import SystemTokenFactory
 from standup.status.models import (
     Project,
@@ -308,6 +310,7 @@ class TestStatusDelete(APITestCase):
         assert resp.content == b'{"error": "You cannot delete this status."}'
 
 
+@pytest.mark.xfail(reason='Update is disabled until we reimplement it')
 class TestUpdateUser(APITestCase):
     def test_update_name(self):
         token = SystemTokenFactory.create()
