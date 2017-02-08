@@ -78,7 +78,6 @@ class StandupUser(models.Model):
         max_length=100, blank=True, null=True, unique=True,
         help_text='IRC nick for this particular user'
     )
-    github_handle = models.CharField(max_length=100, blank=True, null=True)
     teams = models.ManyToManyField(Team, related_name='users', through='TeamUser')
 
     class Meta:
@@ -114,7 +113,6 @@ class StandupUser(models.Model):
         data['irc_nick'] = self.irc_nick
         # FIXME: Should we be providing email addresses publicly via the api?
         # data['email'] = self.user.email
-        data['github_handle'] = self.github_handle
         data['is_staff'] = self.user.is_staff
         return data
 

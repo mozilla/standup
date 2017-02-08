@@ -18,8 +18,10 @@ class Command(BaseCommand):
 
         self.stdout.write('Searching for: %s' % text)
 
+        # FIXME(willkg): Redo this so that it's easier to keep the row headers in lockstep with row
+        # contents without doing it by hand.
         rows = [
-            ['user_id', 'username', 'email', 'name', 'slug', 'irc', 'github', '# statuses', 'last login', 'created']
+            ['user_id', 'username', 'email', 'name', 'slug', 'irc', '# statuses', 'last login', 'created']
         ]
 
         id_to_data = {}
@@ -41,7 +43,6 @@ class Command(BaseCommand):
                 '',
                 '',
                 '',
-                '',
                 user.last_login,
                 user.date_joined
             ]
@@ -52,8 +53,7 @@ class Command(BaseCommand):
             StandupUser.objects.filter(
                 Q(name__icontains=text) |
                 Q(slug__icontains=text) |
-                Q(irc_nick__icontains=text) |
-                Q(github_handle__icontains=text)
+                Q(irc_nick__icontains=text)
             )
             .order_by('id')
         )
@@ -65,7 +65,6 @@ class Command(BaseCommand):
                 user.name,
                 user.slug,
                 user.irc_nick,
-                user.github_handle,
                 user.statuses.count(),
                 user.user.last_login,
                 user.user.date_joined
