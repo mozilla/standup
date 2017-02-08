@@ -45,7 +45,7 @@ To set up a local dev environment for hacking:
      $ make run
 
 
-Then connect to it at http://localhost:8000/ .
+Then connect to it at `<http://localhost:8000/>`_.
 
 Oh, but wait--what can you do with it? Well, for testing purposes, you
 can use the included ``bin/standup-cmd`` which is a command-line
