@@ -1,4 +1,5 @@
 from django.db import IntegrityError
+from django.util.text import slugify
 
 from standup.status.models import StandupUser
 
@@ -38,13 +39,13 @@ def create_profile(user, is_new, **kwargs):
     except StandupUser.DoesNotExist:
         pass
 
-    for slug in unique_string_generator(user.username):
-        # FIXME: run slugify on slug
+    email_name = user.email.split('@', 1)[0]
+    for possible_slug in unique_string_generator(email_name):
         try:
             return {
                 'profile': StandupUser.objects.create(
                     user=user,
-                    slug=slug
+                    slug=slugify(possible_slug)
                 )
             }
         except IntegrityError:
