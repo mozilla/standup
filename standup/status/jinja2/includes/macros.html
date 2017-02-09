@@ -9,7 +9,7 @@
             <a href="{{ status.user.get_absolute_url() }}">
               {% if status.user.email %}{{ gravatar(status.user.email, 22) }}{% else %}{{ gravatar('None', 60) }}{% endif %}
             </a>
-            <a href="{{ status.user.get_absolute_url() }}">{{ status.user.name }} (@{{ status.user.username }})</a>
+            <a href="{{ status.user.get_absolute_url() }}">{{ status.user.name }} (@{{ status.user.slug }})</a>
             {{ status.created|dateformat('%A, {S} %B %Y at %-I:%M %p') }}
           </div>
         </li>
@@ -24,7 +24,7 @@
   <div class="status-block cf">
     <div class="user-meta grid_3 alpha">
       <h4><a href="{{ status.user.get_absolute_url() }}">{{ status.user.name }}</a></h4>
-      <a href="{{ status.user.get_absolute_url() }}">@{{ status.user.username }}</a>
+      <a href="{{ status.user.get_absolute_url() }}">@{{ status.user.slug }}</a>
     </div>
     <div class="grid_1">
       <a href="{{ status.user.get_absolute_url() }}">
@@ -86,7 +86,7 @@
 
 {% macro status_updates(statuses, url='/') %}
   {% for status in statuses %}
-    {% if (status.user.username != last_user or last_date != status.created.date()) and not loop.first %}
+    {% if (status.user.id != last_user or last_date != status.created.date()) and not loop.first %}
       {{ end_user_statuses(status) }}
     {% endif %}
 
@@ -108,8 +108,8 @@
       </div>
     {% endif %}
 
-    {% if status.user.username != last_user %}
-      {% set last_user = status.user.username %}
+    {% if status.user.id != last_user %}
+      {% set last_user = status.user.id %}
       {{ begin_user_statuses(status) }}
     {% endif %}
     {{ display_one_status(status) }}
@@ -122,7 +122,7 @@
 
 {% macro weekly_updates(statuses, url='/weekly') %}
   {% for status in statuses %}
-    {% if (status.user.username != last_user or last_date != status.week_start.date()) and not loop.first %}
+    {% if (status.user.id != last_user or last_date != status.week_start.date()) and not loop.first %}
       {{ end_user_statuses(status) }}
     {% endif %}
 
@@ -138,8 +138,8 @@
       </div>
     {% endif %}
 
-    {% if status.user.username != last_user %}
-      {% set last_user = status.user.username %}
+    {% if status.user.id != last_user %}
+      {% set last_user = status.user.id %}
       {{ begin_user_statuses(status) }}
     {% endif %}
     {{ display_one_status(status, True) }}

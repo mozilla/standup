@@ -4,8 +4,6 @@ from collections import OrderedDict
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 from django.utils.timezone import now
 
 import bleach
@@ -97,10 +95,6 @@ class StandupUser(models.Model):
             return ''
 
     @property
-    def username(self):
-        return self.user.username
-
-    @property
     def email(self):
         return self.user.email
 
@@ -177,10 +171,10 @@ class Status(models.Model):
         ordering = ('-created',)
 
     def __str__(self):
-        return 'Status from %s' % self.user.username
+        return 'Status from %s' % self.user.slug
 
     def __repr__(self):
-        return '<Status: %s: %s>' % (self.user.username, self.content)
+        return '<Status: %s: %s>' % (self.user.slug, self.content)
 
     def get_absolute_url(self):
         try:
@@ -263,7 +257,7 @@ class Status(models.Model):
         """Returns an OrderedDict of model attributes"""
         if self.reply_to:
             reply_to_user_id = self.reply_to.user.id
-            reply_to_username = self.reply_to.user.username
+            reply_to_username = self.reply_to.user.slug
         else:
             reply_to_user_id = None
             reply_to_username = None
@@ -290,12 +284,3 @@ class Status(models.Model):
         # data['week_end'] = self.week_end.strftime("%Y-%m-%d")
 
         return data
-
-
-@receiver(post_save, sender=User)
-def create_profile(sender, instance, created, **kwargs):
-    if created:
-        StandupUser.objects.get_or_create(
-            user=instance,
-            slug=instance.username,
-        )

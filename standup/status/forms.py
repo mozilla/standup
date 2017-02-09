@@ -22,8 +22,9 @@ class ProfileForm(forms.ModelForm):
     # as them.
     class Meta:
         model = StandupUser
-        fields = ['name', 'irc_nick']
+        fields = ['name', 'slug', 'irc_nick']
         labels = {
-            'name': 'Full name',
+            'name': 'Full Name',
+            'slug': 'URL slug and also name for @ mentions',
             'irc_nick': 'IRC Handle',
         }
