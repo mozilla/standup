@@ -1,13 +1,15 @@
+import base64
 from collections import OrderedDict
 from datetime import timedelta
+import hashlib
 import logging
 
 from django.contrib import messages
 from django.contrib.auth import get_user_model, login
 from django.core.urlresolvers import reverse
-from django.db import IntegrityError
 from django.http import HttpResponseRedirect
 from django.utils import timezone
+from django.utils.encoding import smart_bytes
 from django.utils.module_loading import import_string
 
 from standup.auth0.models import IdToken
@@ -21,16 +23,12 @@ class Exhausted(Exception):
     pass
 
 
-def unique_string_generator(base, max_count=50):
-    """Generates strings using a base plus some count"""
-    yield base
-
-    count = 2
-    while count < max_count:
-        yield '%s%d' % (base, count)
-        count += 1
-
-    raise Exhausted('No more slots available for generation. Base was "%s"' % base)
+def email_to_username(email):
+    """Takes an email address and converts it to a unidentifyable hash"""
+    email = email.lower()
+    return base64.urlsafe_b64encode(
+        hashlib.sha1(smart_bytes(email)).digest()
+    ).rstrip(b'=')
 
 
 def run_pipeline(pipeline, **kwargs):
@@ -78,8 +76,9 @@ def get_user_by_username(user_info, **kwargs):
     """
     User = get_user_model()
     try:
+        username = email_to_username(user_info['email'])
         return {
-            'user': User.objects.get(username__iexact=user_info['nickname']),
+            'user': User.objects.get(username=username),
             'is_new': False
         }
     except User.DoesNotExist:
@@ -125,18 +124,12 @@ def create_user(user_info, is_new, **kwargs):
     User = get_user_model()
 
     password = User.objects.make_random_password()
-    # Auth0 returns nicknames that may not be unique across identities, so we add a sequence to the
-    # end where necessary.
-    for username in unique_string_generator(user_info['nickname']):
-        try:
-            user = User.objects.create_user(
-                username=username,
-                password=password,
-                email=user_info['email'],
-            )
-            break
-        except IntegrityError:
-            pass
+    user = User.objects.create_user(
+        username=email_to_username(user_info['email']),
+        password=password,
+        email=user_info['email'],
+    )
+
     return {'user': user}
 
 

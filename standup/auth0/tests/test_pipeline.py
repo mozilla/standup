@@ -6,10 +6,11 @@ from standup.auth0.models import IdToken
 
 class TestRunPipeline:
     def test_run_pipeline(self, db, django_user_model, request_factory):
+        email_address = 'foo@example.com'
         user = django_user_model.objects.create_user(
-            username='foo',
+            username=pipeline.email_to_username(email_address),
             password='foo',
-            email='foo@example.com'
+            email=email_address
         )
 
         pl = [
@@ -20,6 +21,7 @@ class TestRunPipeline:
         kwargs = {
             'user_info': {
                 'nickname': 'foo',
+                'email': email_address,
             },
             'request': request_factory.get('/')
         }
@@ -30,21 +32,28 @@ class TestRunPipeline:
 
 class TestGetUserByUsername:
     def test_user_exists(self, db, django_user_model):
+        email_address = 'foo@example.com'
         user = django_user_model.objects.create_user(
-            username='foo',
+            username=pipeline.email_to_username(email_address),
             password='foo',
-            email='foo@example.com'
+            email=email_address,
         )
 
         ret = pipeline.get_user_by_username(
-            user_info={'nickname': 'foo'},
+            user_info={
+                'nickname': 'foo',
+                'email': email_address,
+            },
             junk=123
         )
         assert ret['user'].id == user.id
         assert ret['is_new'] is False
 
         ret = pipeline.get_user_by_username(
-            user_info={'nickname': 'FOO'},
+            user_info={
+                'nickname': 'FOO',
+                'email': email_address.upper(),
+            },
             junk=123
         )
         assert ret['user'].id == user.id
@@ -52,7 +61,10 @@ class TestGetUserByUsername:
 
     def test_user_doesnt_exist(self, db):
         ret = pipeline.get_user_by_username(
-            user_info={'nickname': 'foo'},
+            user_info={
+                'nickname': 'foo',
+                'email': 'rob@example.com',
+            },
             junk=123
         )
         assert ret['is_new'] is True
@@ -90,13 +102,19 @@ class TestGetUserByEmail:
 
 class TestCreateUser:
     def test_create_user_is_new(self, db):
+        email_address = 'foo@example.com'
         ret = pipeline.create_user(
-            user_info={'nickname': 'foo', 'email': 'foo@example.com'},
+            user_info={
+                'nickname': 'foo',
+                'email': email_address
+            },
             is_new=True,
             junk=123
         )
-        assert ret['user'].username == 'foo'
-        assert ret['user'].email == 'foo@example.com'
+        # The system we use for generating usernames is stable and will always return the same
+        # result.
+        assert ret['user'].username == b'dn506rcIHEHguDYwURE50TAklmY'
+        assert ret['user'].email == email_address
 
     def test_create_user_not_is_new(self, db):
         ret = pipeline.create_user(
