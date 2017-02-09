@@ -2,7 +2,7 @@
 {% from 'includes/macros.html' import status_updates with context %}
 
 {% block title %}
-  @{{ suser.username }} | {{ super() }}
+  @{{ suser.slug }} | {{ super() }}
 {% endblock %}
 
 {% block content %}
@@ -12,5 +12,5 @@
 {% endblock %}
 
 {% block atom_feed %}
-  <link rel="alternate" type="application/atom+xml" href="{{ url('status.user_feed', slug=suser.slug) }}" title="{{ settings.SITE_TITLE }} Feed for {{ suser.username }}" />
+  <link rel="alternate" type="application/atom+xml" href="{{ url('status.user_feed', slug=suser.slug) }}" title="{{ settings.SITE_TITLE }} Feed for {{ suser.slug }}" />
 {% endblock atom_feed %}
