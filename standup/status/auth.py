@@ -1,5 +1,5 @@
 from django.db import IntegrityError
-from django.util.text import slugify
+from django.utils.text import slugify
 
 from standup.status.models import StandupUser
 
