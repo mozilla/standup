@@ -16,7 +16,7 @@ services:
     environment:
       - DATABASE_URL=postgres://postgres@db/postgres
       - DEBUG=True
-      - ALLOWED_HOSTS=localhost,127.0.0.1
+      - ALLOWED_HOSTS=localhost,127.0.0.1,web
       - SECRET_KEY=itsasekrit
     command: ./bin/run-supervisor.sh dev
 

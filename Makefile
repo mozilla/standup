@@ -1,5 +1,6 @@
 DOCKERCOMPOSE = $(shell which docker-compose)
 PG_DUMP_FILE ?= standup.dump
+SERVER_URL ?= "http://web:8000"
 
 default: help
 	@echo ""
@@ -15,7 +16,7 @@ help:
 	@echo "lint          - check style with flake8"
 	@echo "test          - run tests against local files"
 	@echo "test-image    - run tests against files in docker image"
-	@echo "test-coverage - run tests and generate coverage report in cover/"
+	@echo "test-smoketest- run smoke tests against SERVER_URL"
 	@echo "build-base    - (re)build base docker image"
 	@echo "docs          - generate Sphinx HTML documentation, including API docs"
 
@@ -78,8 +79,11 @@ test: .docker-build
 test-image: .docker-build
 	${DOCKERCOMPOSE} run test-image
 
+test-smoketest: .docker-build
+	${DOCKERCOMPOSE} run -e SERVER_URL=${SERVER_URL} test python3 tests/smoketest.py
+
 docs: .docker-build
 	${DOCKERCOMPOSE} run web $(MAKE) -C docs/ clean
 	${DOCKERCOMPOSE} run web $(MAKE) -C docs/ html
 
-.PHONY: default clean build-base build docs lint run shell test test-coverage restore-db rebuild
+.PHONY: default clean build-base build docs lint run shell test test-image test-smoketest restore-db rebuild
