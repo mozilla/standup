@@ -169,6 +169,7 @@ class Status(models.Model):
     class Meta:
         db_table = 'status'
         ordering = ('-created',)
+        verbose_name_plural = 'statuses'
 
     def __str__(self):
         return 'Status from %s' % self.user.slug
