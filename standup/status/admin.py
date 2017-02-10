@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from standup.status.models import Project, Team, StandupUser
+from standup.status.models import Project, Team, StandupUser, Status
 
 
 @admin.register(Project)
@@ -24,3 +24,12 @@ class StandupUserAdmin(admin.ModelAdmin):
     list_display = ['name', 'slug', 'irc_nick']
     search_fields = ['name', 'slug', 'irc_nick']
     filter_horizontal = ['teams']
+
+
+@admin.register(Status)
+class StatusAdmin(admin.ModelAdmin):
+    list_display = ['id', 'user', 'project', 'content']
+    search_fields = ['content']
+    # FIXME(willkg): We want to make this go away and having it causes the page to load *all* the
+    # statuses in the db which is insane.
+    exclude = ['reply_to']
