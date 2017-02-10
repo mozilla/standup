@@ -30,6 +30,7 @@ class StandupUserAdmin(admin.ModelAdmin):
 class StatusAdmin(admin.ModelAdmin):
     list_display = ['id', 'user', 'project', 'content']
     search_fields = ['content']
-    # FIXME(willkg): We want to make this go away and having it causes the page to load *all* the
-    # statuses in the db which is insane.
-    exclude = ['reply_to']
+    # FIXME(willkg): We want to make reply_to go away and having it causes the page to
+    # load *all* the statuses in the db which is insane. We exclude content_html because
+    # it's not used plus if we were using it, it'd be generated from content.
+    exclude = ['reply_to', 'content_html']
