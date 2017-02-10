@@ -161,7 +161,6 @@ class Status(models.Model):
     user = models.ForeignKey(StandupUser, related_name='statuses')
     project = models.ForeignKey('Project', related_name='statuses', null=True, blank=True)
     content = models.TextField()
-    content_html = models.TextField()
     reply_to = models.ForeignKey(
         'self', blank=True, null=True, default=None,
         on_delete=models.SET_DEFAULT)
