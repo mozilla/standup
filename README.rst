@@ -72,6 +72,23 @@ We use pytest for testing. To run the tests, do::
 
 Remember to run tests before submitting pull requests!
 
+We also have a set of smoketests.
+
+To run them against your local dev environment:
+
+1. To start up Standup in one terminal, run::
+
+     $ make run
+
+2. In another terminal, run::
+
+     $ make test-smoketest
+
+To run the tests against another server, use the ``SERVER_URL`` environment
+variable::
+
+     $ SERVER_URL=http://example.com make test-smoketest
+
 
 To run on Heroku
 ================
