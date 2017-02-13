@@ -22,7 +22,7 @@ class TeamFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = 'status.Team'
     name = factory.Faker('name')
-    slug = factory.LazyAttribute(lambda obj: slugify(obj))
+    slug = factory.LazyAttribute(lambda obj: slugify(obj.name))
 
 
 @factory.django.mute_signals(post_save)

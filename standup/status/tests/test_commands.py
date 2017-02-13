@@ -3,7 +3,13 @@ from django.utils.six import StringIO
 
 import pytest
 
-from standup.status.tests.factories import UserFactory, StandupUserFactory, StatusFactory
+from standup.status.models import TeamUser
+from standup.status.tests.factories import (
+    StandupUserFactory,
+    StatusFactory,
+    TeamFactory,
+    UserFactory,
+)
 
 
 def test_find_user(db):
@@ -104,3 +110,28 @@ class TestMergeUser:
         # Verify delete no longer exists
         with pytest.raises(django_user_model.DoesNotExist):
             django_user_model.objects.get(id=user_delete.id)
+
+    def test_teams(self, db, django_user_model):
+        """Verify teams get carried over"""
+        team1 = TeamFactory.create()
+        team2 = TeamFactory.create()
+        team3 = TeamFactory.create()
+
+        user_keep = UserFactory.create(username='jimbob', email='jimbob@example.com')
+        standupuser_keep = StandupUserFactory.create(user=user_keep)
+        TeamUser.objects.create(user=standupuser_keep, team=team1)
+        TeamUser.objects.create(user=standupuser_keep, team=team3)
+
+        user_delete = UserFactory.create(username='jane', email='jane@example.com')
+        standupuser_delete = StandupUserFactory.create(user=user_delete)
+        TeamUser.objects.create(user=standupuser_delete, team=team1)
+        TeamUser.objects.create(user=standupuser_delete, team=team2)
+
+        stdout = StringIO()
+        call_command('mergeuser', keep=user_keep.id, delete=user_delete.id, assume_yes=True, stdout=stdout)
+        output = stdout.getvalue()
+        print(output)
+
+        user_keep = django_user_model.objects.get(id=user_keep.id)
+        teams = [team.name for team in user_keep.profile.teams.all()]
+        assert sorted(teams) == sorted([team1.name, team2.name, team3.name])
