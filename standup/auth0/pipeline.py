@@ -142,7 +142,7 @@ def reject_unverified_email(request, user_info, **kwargs):
     :returns: ``HttpResponseRedirect`` or None
 
     """
-    if not user_info['email_verified']:
+    if not user_info.get('email_verified', False):
         # If inactive, add message and redirect to login page
         messages.error(
             request,
