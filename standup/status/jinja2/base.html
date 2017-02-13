@@ -131,9 +131,11 @@
       </div>
     </div>
   </footer>
-  <form id="logout-form" method="POST" action="{{ url('auth0.logout') }}">
-    {% csrf_token %}
-  </form>
+  {% if user.is_authenticated() %}
+    <form id="logout-form" method="POST" action="{{ url('auth0.logout') }}">
+      {% csrf_token %}
+    </form>
+  {% endif %}
   {% block javascript %}
     {% javascript 'common' %}
   {% endblock %}
