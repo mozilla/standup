@@ -6,6 +6,18 @@
 {% endblock %}
 
 {% block content %}
+  <div>
+    <div class="grid_4 alpha"></div>
+    <div class="grid_7 middle" >
+      <h2>Team: {{ team.name }}</h2>
+      <p>
+        Members:
+        {% for u in team.users.all() %}
+          <a href="{{ u.get_absolute_url() }}">{{ u.name }}</a>
+        {% endfor %}
+      </p>
+    </div>
+  </div>
   <div class="grid_12">
     {{ status_updates(statuses, url=url('status.team', slug=team.slug)) }}
   </div>
