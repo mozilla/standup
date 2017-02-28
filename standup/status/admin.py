@@ -14,16 +14,15 @@ class ProjectAdmin(admin.ModelAdmin):
 
 @admin.register(Team)
 class TeamAdmin(admin.ModelAdmin):
-    fields = ['name', 'slug']
     list_display = ['name', 'slug']
     prepopulated_fields = {'slug': ['name']}
+    filter_horizontal = ['users']
 
 
 @admin.register(StandupUser)
 class StandupUserAdmin(admin.ModelAdmin):
     list_display = ['name', 'slug', 'irc_nick']
     search_fields = ['name', 'slug', 'irc_nick']
-    filter_horizontal = ['teams']
 
 
 @admin.register(Status)

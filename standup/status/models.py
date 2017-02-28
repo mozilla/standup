@@ -30,42 +30,6 @@ MD = Markdown(output_format='html5', extensions=[
 ])
 
 
-class Team(models.Model):
-    """A team of users in the organization."""
-    name = models.CharField(
-        max_length=100,
-        help_text='Name of the team'
-    )
-    slug = models.SlugField(unique=True, max_length=100)
-
-    class Meta:
-        db_table = 'team'
-        ordering = ('name',)
-
-    def __str__(self):
-        return self.name
-
-    def __repr__(self):
-        return '<Team: [%s]>' % (self.name,)
-
-    def get_absolute_url(self):
-        try:
-            return reverse('status.team', kwargs={'slug': self.slug})
-        except NoReverseMatch:
-            return ''
-
-    def statuses(self):
-        user_ids = self.users.values_list('id', flat=True)
-        return Status.objects.filter(user__pk__in=user_ids, reply_to=None)
-
-    def dictify(self):
-        data = OrderedDict()
-        data['id'] = self.id
-        data['name'] = self.name
-        data['slug'] = self.slug
-        return data
-
-
 class StandupUser(models.Model):
     """A standup participant--tied to Django's User model."""
     # Note: User provides "username", "is_superuser", "is_staff" and "email"
@@ -76,7 +40,6 @@ class StandupUser(models.Model):
         max_length=100, blank=True, null=True, unique=True,
         help_text='IRC nick for this particular user'
     )
-    teams = models.ManyToManyField(Team, related_name='users', through='TeamUser')
 
     class Meta:
         # ordering = ('user__username',)
@@ -111,13 +74,46 @@ class StandupUser(models.Model):
         return data
 
 
-class TeamUser(models.Model):
-    team = models.ForeignKey(Team)
-    user = models.ForeignKey(StandupUser)
+class Team(models.Model):
+    """A team of users in the organization."""
+    name = models.CharField(
+        max_length=100,
+        help_text='Name of the team'
+    )
+    slug = models.SlugField(unique=True, max_length=100)
+    users = models.ManyToManyField(StandupUser, related_name='teams')
 
     class Meta:
-        db_table = 'team_users'
-        unique_together = (('team', 'user'),)
+        db_table = 'team'
+        ordering = ('name',)
+
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return '<Team: [%s]>' % (self.name,)
+
+    def get_absolute_url(self):
+        try:
+            return reverse('status.team', kwargs={'slug': self.slug})
+        except NoReverseMatch:
+            return ''
+
+    def statuses(self):
+        user_ids = self.users.values_list('id', flat=True)
+        return Status.objects.filter(user__pk__in=user_ids, reply_to=None)
+
+    def dictify(self):
+        data = OrderedDict()
+        data['id'] = self.id
+        data['name'] = self.name
+        data['slug'] = self.slug
+        return data
+
+
+class TeamUserCopy(models.Model):
+    team_id = models.IntegerField()
+    user_id = models.IntegerField()
 
 
 class Project(models.Model):
