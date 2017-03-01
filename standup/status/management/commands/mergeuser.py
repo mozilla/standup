@@ -1,8 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
-from django.db import IntegrityError, transaction
 
-from standup.status.models import StandupUser, TeamUser
+from standup.status.models import StandupUser
 
 
 User = get_user_model()
@@ -92,13 +91,8 @@ class Command(BaseCommand):
         self.stdout.write('Copying teams from delete -> keep')
         if hasattr(user_delete, 'profile'):
             for team in user_delete.profile.teams.all():
-                try:
-                    with transaction.atomic():
-                        TeamUser.objects.create(user=user_keep.profile, team=team)
-                except IntegrityError:
-                    # NOTE(willkg): An integrity error here means that user_keep is already on that
-                    # team, so we don't need to add it.
-                    pass
+                user_keep.profile.teams.add(team)
+            user_keep.save()
 
         # Delete
         self.stdout.write('Deleting delete')

@@ -40,3 +40,6 @@ pyflakes==1.2.3 \
 requests_mock==1.2.0 \
     --hash=sha256:8c89d8db3a5ddbce6121bdeb665891ca27bb37d18bbadd96c6c11fb472f07df1 \
     --hash=sha256:7e49e8b896d0dd72405bdae913cacc0593e6f6c505083fc2ff479a0e0c0262ba
+pytest-wholenodeid==0.2 \
+    --hash=sha256:6bc4edaf560c8b45ac4669bb8b99d8fbbb7f6e5af8dc7727200cd4d3ef4668c2 \
+    --hash=sha256:bdcb4df88ca182a19752ef95150c0881deaafc2c593ef67c61515894e5309206

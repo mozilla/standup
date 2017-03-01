@@ -3,7 +3,6 @@ from django.utils.six import StringIO
 
 import pytest
 
-from standup.status.models import TeamUser
 from standup.status.tests.factories import (
     StandupUserFactory,
     StatusFactory,
@@ -119,13 +118,17 @@ class TestMergeUser:
 
         user_keep = UserFactory.create(username='jimbob', email='jimbob@example.com')
         standupuser_keep = StandupUserFactory.create(user=user_keep)
-        TeamUser.objects.create(user=standupuser_keep, team=team1)
-        TeamUser.objects.create(user=standupuser_keep, team=team3)
+        team1.users.add(standupuser_keep)
+        team1.save()
+        team3.users.add(standupuser_keep)
+        team3.save()
 
         user_delete = UserFactory.create(username='jane', email='jane@example.com')
         standupuser_delete = StandupUserFactory.create(user=user_delete)
-        TeamUser.objects.create(user=standupuser_delete, team=team1)
-        TeamUser.objects.create(user=standupuser_delete, team=team2)
+        team1.users.add(standupuser_delete)
+        team1.save()
+        team2.users.add(standupuser_delete)
+        team2.save()
 
         stdout = StringIO()
         call_command('mergeuser', keep=user_keep.id, delete=user_delete.id, assume_yes=True, stdout=stdout)
