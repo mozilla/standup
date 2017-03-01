@@ -46,7 +46,11 @@ class StandupUser(models.Model):
         db_table = 'user'
 
     def __str__(self):
-        return self.name or self.slug
+        akas = [aka for aka in [self.slug, self.irc_nick] if aka]
+        return '%s (%s)' % (
+            self.name,
+            ', '.join([':%s' % aka for aka in akas])
+        )
 
     def __repr__(self):
         return '<StandupUser: [{}]>'.format(self.slug)
