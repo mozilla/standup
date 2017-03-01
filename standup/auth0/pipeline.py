@@ -26,9 +26,13 @@ class Exhausted(Exception):
 def email_to_username(email):
     """Takes an email address and converts it to a unidentifyable hash"""
     email = email.lower()
-    return base64.urlsafe_b64encode(
-        hashlib.sha1(smart_bytes(email)).digest()
-    ).rstrip(b'=')
+    return (
+        base64.urlsafe_b64encode(
+            hashlib.sha1(smart_bytes(email)).digest()
+        )
+        .rstrip(b'=')
+        .decode('utf-8')
+    )
 
 
 def run_pipeline(pipeline, **kwargs):

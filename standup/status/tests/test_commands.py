@@ -35,7 +35,7 @@ def test_find_user(db):
             'Searching for: jimbob',
             '-----',
             'user_id  username',
-            '1        jimbob',
+            '%-5d    jimbob' % user.id,
     ]):
         print((i, output[i], starter))
         assert output[i].startswith(starter)

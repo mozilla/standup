@@ -2,9 +2,9 @@
 psycopg2==2.6.2 --hash=sha256:70490e12ed9c5c818ecd85d185d363335cc8a8cbf7212e3c185431c79ff8c05c
 
 # static files
-whitenoise==3.2.2 \
-    --hash=sha256:90a576ecb938cfef3fd1dba0c82d10e8e9ff0acb6079d7edba64822db0e4384d \
-    --hash=sha256:e4c77cdde3f7a1cd2c1d985d6a3d7dc8aff5f3d18c2f331e7171933aacaeb440
+whitenoise==3.3.0 \
+    --hash=sha256:1d62a003a0ab747de96da45c831cbb512dcb7f69c1ef0bd20b1cd4ae45d8a0c4 \
+    --hash=sha256:d098327276de6fd189398a7bcb95789d1bb2d41b3e011eeae4562f6b1a107dd4
 
 # configuration
 configobj==5.0.6 \
@@ -15,9 +15,9 @@ everett==0.7 \
 dj-database-url==0.4.1 --hash=sha256:7f4c78d2a090df8dfaf56d5d3ff7bbee17360436e4879558317e2314424864cd
 
 # base
-Django==1.8.17 \
-    --hash=sha256:87618c1011712faf7400e2a73315f4f4c3a6e68ab6309c3e642d5fef73d66d9e \
-    --hash=sha256:021bd648fcf454027063187e63a1ab4136c6929430ef5dfbe36235f60015eb07
+django==1.10.6 \
+    --hash=sha256:2cfb83859bfaa10e2bd586340bead27c69fdcaa21fa683a008cc712482c26726 \
+    --hash=sha256:7a6ebe254ab126510da143628d019ca8d6da2de49d7682bf046c03713a3c2c61
 bleach==1.5.0 \
     --hash=sha256:e67f46adcec78dbc3c04462f3aba3213a673d5652eba2609ed1ef15492a44b8d \
     --hash=sha256:978e758599b54cd3caa2e160d74102879b230ea8dc93871d0783721eef58bc65

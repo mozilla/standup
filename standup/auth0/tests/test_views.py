@@ -12,7 +12,7 @@ def is_redirect_to(resp, expected_url):
     )
 
 
-SIGNIN_VIEW = 'http://testserver' + reverse(app_settings.AUTH0_SIGNIN_VIEW)
+SIGNIN_VIEW = reverse(app_settings.AUTH0_SIGNIN_VIEW)
 
 
 class TestAuth0LoginCallback:
@@ -113,4 +113,4 @@ class TestAuth0LoginCallback:
             )
 
             # Assert we get redirected to the front page
-            assert is_redirect_to(resp, 'http://testserver/')
+            assert is_redirect_to(resp, '/')

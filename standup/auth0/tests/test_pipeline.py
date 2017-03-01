@@ -113,7 +113,7 @@ class TestCreateUser:
         )
         # The system we use for generating usernames is stable and will always return the same
         # result.
-        assert ret['user'].username == b'dn506rcIHEHguDYwURE50TAklmY'
+        assert ret['user'].username == 'dn506rcIHEHguDYwURE50TAklmY'
         assert ret['user'].email == email_address
 
     def test_create_user_not_is_new(self, db):
