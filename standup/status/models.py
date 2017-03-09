@@ -6,7 +6,9 @@ from django.core.urlresolvers import reverse, NoReverseMatch
 from django.db import models
 from django.utils.timezone import now
 
-import bleach
+from bleach.callbacks import nofollow
+from bleach.linkifier import Linker
+from bleach.sanitizer import Cleaner
 from jinja2 import Markup
 from markdown import Markdown
 
@@ -28,6 +30,10 @@ MD = Markdown(output_format='html5', extensions=[
     'nl2br',
     'smart_strong'
 ])
+
+
+CLEANER = Cleaner(tags=[])
+LINKER = Linker(callbacks=[trim_urls, nofollow])
 
 
 class StandupUser(models.Model):
@@ -203,7 +209,7 @@ class Status(models.Model):
 
     def htmlify(self):
         # Remove icky stuff.
-        formatted = bleach.clean(self.content, tags=[])
+        formatted = CLEANER.clean(self.content)
 
         # Linkify "bug #n" and "bug n" text.
         formatted = BUG_RE.sub(
@@ -250,7 +256,7 @@ class Status(models.Model):
         formatted = MD.reset().convert(formatted)
 
         # Linkify bare urls
-        formatted = bleach.linkify(formatted, [trim_urls])
+        formatted = LINKER.linkify(formatted)
         return Markup(formatted)
 
     def dictify(self):
