@@ -17,4 +17,4 @@ export DATABASE_URL=sqlite://
 # export AUTH0_DOMAIN=foo
 # export AUTH0_CALLBACK_URL=foo
 
-python3 manage.py $@
+python manage.py $@

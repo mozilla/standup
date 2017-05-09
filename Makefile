@@ -41,14 +41,14 @@ run: .docker-build
 	${DOCKERCOMPOSE} up web
 
 shell: .docker-build
-	${DOCKERCOMPOSE} run web python3 manage.py shell
+	${DOCKERCOMPOSE} run web python manage.py shell
 
 restore-db: .docker-build
 	-${DOCKERCOMPOSE} run web dropdb -h db -U postgres -w postgres
 	${DOCKERCOMPOSE} run web createdb -h db -U postgres -w postgres
 	-${DOCKERCOMPOSE} run web pg_restore -d "postgres://postgres@db/postgres" < ${PG_DUMP_FILE}
-	${DOCKERCOMPOSE} run web python3 manage.py migrate --fake-initial
-	${DOCKERCOMPOSE} run web python3 manage.py createsuperuser
+	${DOCKERCOMPOSE} run web python manage.py migrate --fake-initial
+	${DOCKERCOMPOSE} run web python manage.py createsuperuser
 
 clean:
 	# python related things
@@ -80,7 +80,7 @@ test-image: .docker-build
 	${DOCKERCOMPOSE} run test-image
 
 test-smoketest: .docker-build
-	${DOCKERCOMPOSE} run -e SERVER_URL=${SERVER_URL} test python3 tests/smoketest.py
+	${DOCKERCOMPOSE} run -e SERVER_URL=${SERVER_URL} test python tests/smoketest.py
 
 docs: .docker-build
 	${DOCKERCOMPOSE} run web $(MAKE) -C docs/ clean

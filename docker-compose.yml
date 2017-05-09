@@ -18,7 +18,7 @@ services:
       - DEBUG=True
       - ALLOWED_HOSTS=localhost,127.0.0.1,web
       - SECRET_KEY=itsasekrit
-    command: ./bin/run-supervisor.sh dev
+    command: ./bin/run.sh dev
 
   # run the site in a prod-like environment
   prod:
@@ -34,7 +34,7 @@ services:
       - DEBUG=False
       - ALLOWED_HOSTS=localhost,127.0.0.1
       - SECRET_KEY=itsasekrit
-    command: ./bin/run-supervisor.sh prod
+    command: ./bin/run.sh prod
 
   # run the tests
   test:
