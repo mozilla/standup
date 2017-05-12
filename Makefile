@@ -1,6 +1,7 @@
 DOCKERCOMPOSE = $(shell which docker-compose)
 PG_DUMP_FILE ?= standup.dump
 SERVER_URL ?= "http://web:8000"
+CURRENT_USER := $(shell id -u)
 
 default: help
 	@echo ""
@@ -32,7 +33,9 @@ build-base:
 	touch .docker-build-base
 
 build: .docker-build-base
-	${DOCKERCOMPOSE} -f docker-compose.build.yml build web
+	${DOCKERCOMPOSE} -f docker-compose.build.yml build base builder web
+	${DOCKERCOMPOSE} run -u $(CURRENT_USER) assets
+	${DOCKERCOMPOSE} -f docker-compose.build.yml build code
 	touch .docker-build
 
 rebuild: clean .docker-build

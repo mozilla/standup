@@ -1,6 +1,6 @@
 FROM mozmeao/base:python-3.6-alpine
 
-RUN apk add --update --no-cache nodejs postgresql-dev
+RUN apk add --update --no-cache postgresql-dev
 
 ENV PATH=/usr/lib/node_modules/standup/node_modules/.bin:$PATH
 ENV PIPELINE_LESS_BINARY=lessc
@@ -14,14 +14,6 @@ EXPOSE 8000
 CMD ["./bin/run.sh", "prod"]
 WORKDIR /app
 
-# First copy requirements.txt so we can take advantage of docker caching.
-COPY package.json ./
-RUN npm install -g
-
 COPY requirements.txt ./
 RUN pip install --require-hashes --no-cache-dir -r requirements.txt
 
-COPY . /app
-
-# process static files
-RUN bin/phb-manage.sh collectstatic --noinput

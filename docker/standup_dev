@@ -1,6 +1,8 @@
-FROM local/standup_base
+FROM local/standup_builder
+
+CMD ["./bin/run.sh", "dev"]
 
 COPY requirements-dev.txt ./
 RUN pip install --require-hashes --no-cache-dir -r requirements-dev.txt
 
-CMD ["./bin/run.sh", "dev"]
+COPY . /app

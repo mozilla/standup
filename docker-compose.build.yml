@@ -7,10 +7,26 @@ services:
       dockerfile: docker/standup_base
     image: local/standup_base
 
+  builder:
+    build:
+      context: .
+      dockerfile: docker/standup_builder
+    image: local/standup_builder
+    depends_on:
+      - base
+
+  code:
+    build:
+      context: .
+      dockerfile: docker/standup_code
+    image: local/standup_code
+    depends_on:
+      - base
+
   web:
     build:
       context: .
       dockerfile: docker/standup_dev
     image: local/standup_dev
     depends_on:
-      - base
+      - builder

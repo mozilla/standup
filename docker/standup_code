@@ -1,0 +1,3 @@
+FROM local/standup_base
+
+COPY . /app
