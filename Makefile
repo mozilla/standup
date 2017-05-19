@@ -47,11 +47,7 @@ shell: .docker-build
 	${DOCKERCOMPOSE} run web python manage.py shell
 
 restore-db: .docker-build
-	-${DOCKERCOMPOSE} run web dropdb -h db -U postgres -w postgres
-	${DOCKERCOMPOSE} run web createdb -h db -U postgres -w postgres
-	-${DOCKERCOMPOSE} run web pg_restore -d "postgres://postgres@db/postgres" < ${PG_DUMP_FILE}
-	${DOCKERCOMPOSE} run web python manage.py migrate --fake-initial
-	${DOCKERCOMPOSE} run web python manage.py createsuperuser
+	./bin/restoredb.sh ${PG_DUMP_FILE}
 
 clean:
 	# python related things
