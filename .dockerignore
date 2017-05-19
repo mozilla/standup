@@ -7,5 +7,7 @@
 *.swp
 .coverage
 .cache
+.idea
+.env
 local_settings.py
 node_modules

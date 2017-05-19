@@ -18,11 +18,11 @@ services:
       - DEBUG=True
       - ALLOWED_HOSTS=localhost,127.0.0.1,web
       - SECRET_KEY=itsasekrit
-    command: ./bin/run-supervisor.sh dev
+    command: ./bin/run.sh dev
 
   # run the site in a prod-like environment
   prod:
-    image: local/standup_base
+    image: local/standup_code
     ports:
       - "8000:8000"
     volumes:
@@ -34,7 +34,18 @@ services:
       - DEBUG=False
       - ALLOWED_HOSTS=localhost,127.0.0.1
       - SECRET_KEY=itsasekrit
-    command: ./bin/run-supervisor.sh prod
+    command: ./bin/run.sh prod
+
+  # build static files
+  assets:
+    image: local/standup_builder
+    environment:
+      - DEBUG=False
+      - SECRET_KEY=foo
+      - DATABASE_URL=sqlite://
+    volumes:
+      - .:/app
+    command: python manage.py collectstatic --noinput
 
   # run the tests
   test:
