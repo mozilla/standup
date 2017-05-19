@@ -74,7 +74,7 @@ clean:
 	-rm -f .docker-build*
 
 lint: .docker-build
-	${DOCKERCOMPOSE} run web flake8 --statistics collector
+	${DOCKERCOMPOSE} run test flake8 --statistics collector
 
 test: .docker-build
 	${DOCKERCOMPOSE} run test
