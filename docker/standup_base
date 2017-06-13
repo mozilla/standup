@@ -11,8 +11,8 @@ ENV PIPELINE_CLEANCSS_BINARY=cleancss
 ENV DJANGO_SETTINGS_MODULE standup.settings
 
 EXPOSE 8000
-CMD ["./bin/run.sh", "prod"]
 WORKDIR /app
+CMD ["/app/bin/run.sh", "prod"]
 
 COPY requirements.txt ./
 RUN pip install --require-hashes --no-cache-dir -r requirements.txt
