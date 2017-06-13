@@ -1,3 +1,7 @@
 FROM local/standup_base
 
 COPY . /app
+
+RUN adduser -D webdev
+RUN chown webdev.webdev -R .
+USER webdev
