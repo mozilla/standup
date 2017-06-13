@@ -79,7 +79,7 @@
                   <li><a id="logout-link" href="#">Logout</a></li>
                 </ul>
               {% else %}
-                <a href="{{ url('users.loginform') }}"">Sign in</a>
+                <a href="{{ url('users.loginform') }}">Sign in</a>
               {% endif %}
             </li>
           </ul>
@@ -132,7 +132,7 @@
     </div>
   </footer>
   {% if user.is_authenticated() %}
-    <form id="logout-form" method="POST" action="{{ url('auth0.logout') }}">
+    <form id="logout-form" method="POST" action="{{ url('oidc_logout') }}">
       {% csrf_token %}
     </form>
   {% endif %}

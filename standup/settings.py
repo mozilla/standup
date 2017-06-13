@@ -47,12 +47,12 @@ INSTALLED_APPS = (
     'django_jinja',
     'django_jinja.contrib._humanize',
     'django_jinja_markdown',
+    'mozilla_django_oidc',
     'pipeline',
     'django_gravatar',
     'raven.contrib.django.raven_compat',
 
     'standup.api',
-    'standup.auth0',
     'standup.status',
 )
 
@@ -72,8 +72,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
-    'standup.auth0.middleware.ValidateIdToken',
-    'standup.status.middleware.NewUserProfileMiddleware',
+    'mozilla_django_oidc.middleware.RefreshIDToken',
 )
 
 ROOT_URLCONF = 'standup.urls'
@@ -85,7 +84,6 @@ _CONTEXT_PROCESSORS = [
     'django.contrib.auth.context_processors.auth',
     'django.contrib.messages.context_processors.messages',
 
-    'standup.auth0.context_processors.auth0',
     'standup.status.context_processors.status',
 ]
 
@@ -182,39 +180,21 @@ HELP_FAQ_URL = config('HELP_FAQ_URL', raise_error=False)
 # auth
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
+    'standup.status.auth.StandupOIDCAuthBackend',
 )
 
-# auth0 thing--if these are not set, then signin will be disabled
-AUTH0_CLIENT_ID = config('AUTH0_CLIENT_ID', raise_error=False)
-AUTH0_CLIENT_SECRET = config('AUTH0_CLIENT_SECRET', raise_error=False)
-AUTH0_SIGNIN_VIEW = 'users.loginform'
-AUTH0_PIPELINE = [
-    # FIXME(willkg): Remove this after we have things working.
-    'standup.auth0.pipeline.log_info',
+# mozilla-django-oidc things
+OIDC_RP_CLIENT_ID = config('OIDC_RP_CLIENT_ID', raise_error=False)
+OIDC_RP_CLIENT_SECRET = config('OIDC_RP_CLIENT_SECRET', raise_error=False)
 
-    # Run the Mozilla auth0 meta-pipeline
-    'standup.auth0.pipeline.mozilla_auth0_pipeline',
+OIDC_OP_AUTHORIZATION_ENDPOINT = config('OIDC_OP_AUTHORIZATION_ENDPOINT', raise_error=False)
+OIDC_OP_TOKEN_ENDPOINT = config('OIDC_OP_TOKEN_ENDPOINT', raise_error=False)
+OIDC_OP_USER_ENDPOINT = config('OIDC_OP_USER_ENDPOINT', raise_error=False)
+OIDC_OP_DOMAIN = config('OIDC_OP_DOMAIN', raise_error=False)
 
-    # Create a Standup profile
-    'standup.status.auth.create_profile',
-]
-AUTH0_LOGIN_URL = config(
-    'AUTH0_LOGIN_URL',
-    default=(
-        'https://{AUTH0_DOMAIN}/authorize?'
-        'response_type=code'
-        '&client_id={AUTH0_CLIENT_ID}'
-        '&redirect_uri={AUTH0_CALLBACK_URL}'
-        '&state={STATE}'
-    )
-)
-AUTH0_DOMAIN = config('AUTH0_DOMAIN', raise_error=False)
-AUTH0_CALLBACK_URL = config('AUTH0_CALLBACK_URL', raise_error=False)
-AUTH0_ID_TOKEN_DOMAINS = config(
-    'AUTH0_ID_TOKEN_DOMAINS',
-    default='mozilla.com,mozillafoundation.org,mozilla-japan.org',
-    parser=ListOf(str)
-)
+OIDC_STORE_ACCESS_TOKEN = True
+
+LOGOUT_REDIRECT_URL = '/'
 
 # CSP
 CSP_DEFAULT_SRC = (
@@ -235,8 +215,10 @@ CSP_STYLE_SRC = (
 CSP_FONT_SRC = (
     "'self'",
 )
-CSP_FORM_ACTION = ("'self'", AUTH0_DOMAIN) if AUTH0_DOMAIN else ("'self'",)
-CSP_CONNECT_SRC = ("'self'", AUTH0_DOMAIN) if AUTH0_DOMAIN else ("'self'",)
+CSP_FORM_ACTION = (
+)
+CSP_CONNECT_SRC = (
+)
 CSP_SCRIPT_SRC = (
     "'self'",
 )
@@ -244,7 +226,6 @@ CSP_IMG_SRC = (
     "'self'",
     'data:',
     gravatar_domain,
-    'cdn.auth0.com',
 )
 # should really just be child-src as frame-src is deprecated,
 # but certain browsers (eyes safari) don't support connect-src.
@@ -343,6 +324,10 @@ LOGGING = {
             'level': config('DJANGO_LOG_LEVEL', default='INFO'),
         },
         'standup': {
+            'handlers': ['console'],
+            'level': config('DJANGO_LOG_LEVEL', default='DEBUG'),
+        },
+        'mozilla_django_oidc': {
             'handlers': ['console'],
             'level': config('DJANGO_LOG_LEVEL', default='DEBUG'),
         },

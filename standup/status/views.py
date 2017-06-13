@@ -136,15 +136,15 @@ class SearchView(PaginateStatusesMixin, TemplateView):
         return Status.objects.filter(generate_query('content', query))
 
     def get_context_data(self, **kwargs):
-        cxt = super().get_context_data(**kwargs)
-        cxt['query'] = self.request.GET.get('query', '')
-        return cxt
+        ctx = super().get_context_data(**kwargs)
+        ctx['query'] = self.request.GET.get('query', '')
+        return ctx
 
 
 class ProfileView(UpdateView):
     template_name = 'users/profile.html'
     form_class = ProfileForm
-    success_url = '/profile/'
+    success_url = '/accounts/profile/'
     new_profile = False
 
     def dispatch(self, request, *args, **kwargs):
@@ -156,7 +156,9 @@ class ProfileView(UpdateView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx['new_profile'] = self.new_profile
+        # Mark that this is a new profile if the profile has no name
+        if not self.request.user.profile.name:
+            ctx['new_profile'] = True
         return ctx
 
     def get_object(self, queryset=None):

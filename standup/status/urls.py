@@ -17,10 +17,8 @@ urlpatterns = [
     url(r'^search/$', views.SearchView.as_view(), name='status.search'),
 
     # profile and signin
-    url(r'^profile/$', views.ProfileView.as_view(), name='users.profile'),
-    url(r'^new-profile/$', views.ProfileView.as_view(new_profile=True),
-        name='users.new_profile'),
-    url(r'^login-form/$', views.LoginView.as_view(), name='users.loginform'),
+    url(r'^accounts/profile/$', views.ProfileView.as_view(), name='users.profile'),
+    url(r'^accounts/login/$', views.LoginView.as_view(), name='users.loginform'),
 
     # feeds
     url(r'^statuses.xml$', views.MainFeed(), name='status.index_feed'),

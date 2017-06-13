@@ -24,24 +24,16 @@
         You are currently signed in as <b>{{ request.user.email }}</b>.
       </p>
     {% else %}
-      {% if auth0configured %}
-        <div class="signin-link">
-          <a href="{{ auth0loginurl }}"><button class="btn login-button">Sign in to Standup</button></a>
-        </div>
-      {% else %}
-        <p>
-          Signin is not configured so it is disabled.
-        </p>
-      {% endif %}
+      <div class="signin-link">
+        <a href="{{ url('oidc_authentication_init') }}"><button class="btn login-button">Sign in to Standup</button></a>
+      </div>
     {% endif %}
 
-    {% if auth0configured %}
-      {% if settings.HELP_FAQ_URL %}
-        <p>
-          If you have problems signing in, please check out
-          <a href="{{ settings.HELP_FAQ_URL }}">our FAQ</a>.
-        </p>
-      {% endif %}
+    {% if settings.HELP_FAQ_URL %}
+      <p>
+        If you have problems signing in, please check out
+        <a href="{{ settings.HELP_FAQ_URL }}">our FAQ</a>.
+      </p>
     {% endif %}
   </div>
 {% endblock %}

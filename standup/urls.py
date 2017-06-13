@@ -14,5 +14,6 @@ urlpatterns = [
     url(r'^api/', include('standup.api.urls')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'', include('standup.status.urls')),
-    url(r'', include('standup.auth0.urls')),
+
+    url(r'oidc/', include('mozilla_django_oidc.urls')),
 ]

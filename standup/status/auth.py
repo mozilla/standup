@@ -1,6 +1,8 @@
 from django.db import IntegrityError
 from django.utils.text import slugify
 
+from mozilla_django_oidc.auth import OIDCAuthenticationBackend
+
 from standup.status.models import StandupUser
 
 
@@ -20,33 +22,20 @@ def unique_string_generator(base, max_count=50):
     raise Exhausted('No more slots available for generation. Base was "%s"' % base)
 
 
-def create_profile(user, is_new, **kwargs):
-    """Creates a profile if the user is new
+class StandupOIDCAuthBackend(OIDCAuthenticationBackend):
+    """Override the OIDCAuthenticationBackend to also create a StandupUser"""
+    def create_user(self, claims):
+        user = super().create_user(claims)
+        self.create_profile(user)
+        return user
 
-    :arg User user: a User instance
-    :arg bool is_new: whether or not the user instance is new
-
-    :returns: ``{'profile': StandupUser}``
-
-    """
-    if not is_new:
-        return
-
-    try:
-        # If we can access .profile, then it has a profile and we can return here.
-        user.profile
-        return
-    except StandupUser.DoesNotExist:
-        pass
-
-    email_name = user.email.split('@', 1)[0]
-    for possible_slug in unique_string_generator(email_name):
-        try:
-            return {
-                'profile': StandupUser.objects.create(
+    def create_profile(self, user):
+        email_name = user.email.split('@', 1)[0]
+        for possible_slug in unique_string_generator(email_name):
+            try:
+                return StandupUser.objects.create(
                     user=user,
                     slug=slugify(possible_slug)
                 )
-            }
-        except IntegrityError:
-            pass
+            except IntegrityError:
+                pass
