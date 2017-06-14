@@ -216,8 +216,10 @@ CSP_FONT_SRC = (
     "'self'",
 )
 CSP_FORM_ACTION = (
+    "'self'",
 )
 CSP_CONNECT_SRC = (
+    "'self'",
 )
 CSP_SCRIPT_SRC = (
     "'self'",

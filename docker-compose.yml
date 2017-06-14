@@ -17,7 +17,6 @@ services:
       - DATABASE_URL=postgres://postgres@db/postgres
       - DEBUG=True
       - ALLOWED_HOSTS=localhost,127.0.0.1,web
-      - SITE_URL=http://localhost:8000/
       - SECRET_KEY=itsasekrit
     command: ./bin/run.sh dev
 
@@ -41,7 +40,6 @@ services:
   assets:
     image: local/standup_base
     environment:
-      - SITE_URL=http://localhost:8000/
       - DEBUG=False
       - SECRET_KEY=foo
       - DATABASE_URL=sqlite://

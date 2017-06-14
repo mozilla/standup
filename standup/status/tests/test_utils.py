@@ -28,8 +28,6 @@ def test_gravatar_url():
             'http://www.gravatar.com/avatar/'
             '55502f40dc8b7c769880b10874abc9d0?d=mm')
 
-        app.config['SITE_URL'] = 'http://www.site.com'
-
         url = gravatar_url('test@example.com')
         eq_(url,
             'http://www.gravatar.com/avatar/'
