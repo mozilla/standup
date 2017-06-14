@@ -23,11 +23,11 @@ services:
 
   # run the site in a prod-like environment
   prod:
-    image: local/standup_code
+    image: local/standup_base
     ports:
       - "8000:8000"
-    volumes:
-      - .:/app
+    # volumes:
+    #   - .:/app
     links:
       - db
     environment:
@@ -39,7 +39,7 @@ services:
 
   # build static files
   assets:
-    image: local/standup_builder
+    image: local/standup_base
     environment:
       - SITE_URL=http://localhost:8000/
       - DEBUG=False

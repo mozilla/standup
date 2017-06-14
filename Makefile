@@ -33,9 +33,7 @@ build-base:
 	touch .docker-build-base
 
 build: .docker-build-base
-	${DOCKERCOMPOSE} -f docker-compose.build.yml build base builder web
-	${DOCKERCOMPOSE} run -u $(CURRENT_USER) assets
-	${DOCKERCOMPOSE} -f docker-compose.build.yml build code
+	${DOCKERCOMPOSE} -f docker-compose.build.yml build web
 	touch .docker-build
 
 rebuild: clean .docker-build
