@@ -21,7 +21,7 @@ fi
 DOCKER_TAG="$DOCKER_REGISTRY/$HEROKU_APP/$HEROKU_PROC_TYPE"
 echo "Pushing $DOCKER_TAG"
 docker login -u "$HEROKU_EMAIL" -p "$HEROKU_API_KEY" "$DOCKER_REGISTRY"
-docker tag local/standup_code "$DOCKER_TAG"
+docker tag local/standup_base "$DOCKER_TAG"
 docker push "$DOCKER_TAG"
 
 if [[ "$1" == "prod" && -n "$NEWRELIC_API_KEY" ]]; then
