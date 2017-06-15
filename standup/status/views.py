@@ -18,6 +18,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.views.generic import DetailView, TemplateView, UpdateView
 
+import pytz
 from raven.contrib.django.models import client
 
 from standup.status.forms import StatusizeForm, ProfileForm
@@ -306,8 +307,8 @@ def errormenow(request):
 
 def statistics(request):
     """Show health statistics for the system"""
-    hours_24 = datetime.datetime.now() - datetime.timedelta(hours=24)
-    week = datetime.datetime.now() - datetime.timedelta(days=7)
+    hours_24 = datetime.datetime.now(tz=pytz.UTC) - datetime.timedelta(hours=24)
+    week = datetime.datetime.now(tz=pytz.UTC) - datetime.timedelta(days=7)
 
     groups = collections.OrderedDict()
 
