@@ -2,7 +2,7 @@
 # see https://pyup.io/docs/configuration/ for all available options
 
 # Once a month, pyup will create a PR with all the updates
-schedule: every month
+schedule: "every month"
 
 # Check the master branch
 branch: master
