@@ -82,9 +82,9 @@ django-pipeline==1.6.13 \
     --hash=sha256:d67ac0fc2556e3c5b5080ee96f8e661bda9a1e4b46b8fffbef3fb5524b6ef11e
 https://github.com/pmac/django-gravatar/archive/5f88e14fb6dd3134a46e2a961ab2782591e85f28.tar.gz#egg=django-gravatar2==1.4.0 \
     --hash=sha256:45ff4567de125c16b718c1b1829a2e000e6f7901149e0a05a1f65cdc3076aa62
-PyJWT==1.5.0 \
-    --hash=sha256:ad60a3fb9b393667864ed4b8abc9c3b570747f80bf77a113ead2fbaf0f0cedf3 \
-    --hash=sha256:fd182b728d13f04c289d9b2623d09256d356c9b4a6778018001454a954d7c54b
+PyJWT==1.5.1 \
+    --hash=sha256:715813107a3e75c4479a32dfae4b3fbdb617e5037400e53a1c5a6bcb53c07795 \
+    --hash=sha256:d6b363d2015c33afd63dfd961d38ae40e97f7abd3db50c87ac626238bc1039a0
 defusedxml==0.5.0 \
     --hash=sha256:702a91ade2968a82beb0db1e0766a6a273f33d4616a6ce8cde475d8e09853b20 \
     --hash=sha256:24d7f2f94f7f3cb6061acb215685e5125fbcdc40a857eff9de22518820b0a4f4
