@@ -9,10 +9,10 @@ branch: master
 
 # Look at these requirements files
 requirements:
-  - requirements.txt
+  - requirements.txt:
       updates: all
       pin: True
-  - requirements-dev.txt
+  - requirements-dev.txt:
       updates: all
       pin: True
 
