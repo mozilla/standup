@@ -53,7 +53,6 @@ INSTALLED_APPS = (
     'raven.contrib.django.raven_compat',
 
     'standup.api',
-    'standup.auth0',
     'standup.status',
 )
 
