@@ -60,9 +60,8 @@ gunicorn==19.7.1 \
 Jinja2==2.9.6 \
     --hash=sha256:2231bace0dfd8d2bf1e5d7e41239c06c9e0ded46e70cc1094a0aa64b0afeb054 \
     --hash=sha256:ddaa01a212cd6d641401cb01b605f4a4d9f37bfc93043d7f760ec70fb99ff9ff
-django-jinja==2.3.1 \
-    --hash=sha256:ebfde44cb716e57a9cdff6c1a4935fc49c7419ea4cd0b2b89bcecc696b9c0c86 \
-    --hash=sha256:5e826a0cce967f40e6fdc037ea23667a2d3cd072807c4c87ffcc010b3c59121f
+django-jinja==2.4.0 \
+    --hash=sha256:67d0c77da305013c09f5bc6a45deda8dd66936b94d6548fd893d7ac2dfcafe6e
 Unidecode==0.04.21 \
     --hash=sha256:61f807220eda0203a774a09f84b4304a3f93b5944110cc132af29ddb81366883 \
     --hash=sha256:280a6ab88e1f2eb5af79edff450021a0d3f0448952847cd79677e55e58bad051
