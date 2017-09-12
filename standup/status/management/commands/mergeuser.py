@@ -11,9 +11,25 @@ class Command(BaseCommand):
     help = 'Merge two user accounts'
 
     def add_arguments(self, parser):
-        parser.add_argument('--keep', type=int)
-        parser.add_argument('--delete', type=int)
-        parser.add_argument('-y', '--yes', dest='assume_yes', action='store_true')
+        parser.add_argument(
+            '--keep', type=int,
+            help='the id of the user record to keep and merge all data into'
+        )
+        parser.add_argument(
+            '--delete', type=int,
+            help='the id of the user record to delete'
+        )
+        parser.add_argument(
+            '--keep-email', dest='keep_email', action='store_true',
+            help=(
+                'whether to keep the email address of the --keep record; otherwise the '
+                'email address is stomped on by the email address in the --delete record'
+            )
+        )
+        parser.add_argument(
+            '-y', '--yes', dest='assume_yes', action='store_true',
+            help='whether to skip prompts'
+        )
 
     def handle(self, *args, **options):
         try:
@@ -83,8 +99,13 @@ class Command(BaseCommand):
                     status.save()
 
         # Copy email address from delete -> keep
-        self.stdout.write('Copying email from delete -> keep')
-        user_keep.email = user_delete.email
+        if not options['keep_email']:
+            self.stdout.write('Copying email from delete -> keep')
+            user_keep.email = user_delete.email
+        else:
+            self.stdout.write('Keeping email address')
+
+        # Save user data
         user_keep.save()
 
         # Copy teams from delete -> keep
