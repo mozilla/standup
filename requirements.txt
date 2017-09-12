@@ -166,8 +166,8 @@ urllib3==1.22 \
 certifi==2017.7.27.1 \
     --hash=sha256:54a07c09c586b0e4c619f02a5e94e36619da8e2b053e20f594348c0611803704 \
     --hash=sha256:40523d2efb60523e113b44602298f0960e900388cf3bb6043f645cf57ea9e3f5
-email_validator==1.0.2 \
-    --hash=sha256:669eaae98d86dbd0ab62ab2f5fbc95d01cb28f8e038aa30ab165b244130949c9
+email_validator==1.0.3 \
+    --hash=sha256:ddc4b5b59fa699bb10127adcf7ad4de78fde4ec539a072b104b8bb16da666ae5
 UkPostcodeParser==1.1.1 \
     --hash=sha256:b7a7ac19d48897637c7aaa2f2970288f1c260e4a99140bf04c6086cf65576c6b
 dnspython==1.15.0 \
