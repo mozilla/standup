@@ -36,16 +36,28 @@ class Command(BaseCommand):
         )
 
         for user in users:
-            id_to_data[user.id] = [
-                user.username,
-                user.email,
-                '',
-                '',
-                '',
-                '',
-                user.last_login,
-                user.date_joined
-            ]
+            if hasattr(user, 'profile'):
+                id_to_data[user.id] = [
+                    user.username,
+                    user.email,
+                    user.profile.name,
+                    user.profile.slug,
+                    user.profile.irc_nick,
+                    user.profile.statuses.count(),
+                    user.last_login,
+                    user.date_joined
+                ]
+            else:
+                id_to_data[user.id] = [
+                    user.username,
+                    user.email,
+                    '',
+                    '',
+                    '',
+                    '',
+                    user.last_login,
+                    user.date_joined
+                ]
 
         # Search through StandupUser accounts which have a User--these will stomp on exist items in
         # id_to_data where the user id is the same
