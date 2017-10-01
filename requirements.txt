@@ -101,9 +101,8 @@ newrelic==2.94.0.79 \
 django-cache-url==2.0.0 \
     --hash=sha256:d7e7d3f3fadaa38ab7c655afafc85c2a1b06a3ddc0002af4ae021c1948307f8b \
     --hash=sha256:f0009452c4d63468714c7ff59266085947f3f3cc0947b3b2e87121bb27538d6c
-tabulate==0.7.7 \
-    --hash=sha256:1f07f6252b20cdc4ed744b598b5fa8362638988b50a62f3e2ad76c97fc02eef2 \
-    --hash=sha256:83a0b8e17c09f012090a50e1e97ae897300a72b35e0c86c0b53d3bd2ae86d8c6
+tabulate==0.8.0 \
+    --hash=sha256:682d903555bcf24b881835c0bcbec1841d156aacacd29cf050d8ce9c522ac343
 simplejson==3.11.1 \
     --hash=sha256:38c2b563cd03363e7cb2bbba6c20ae4eaafd853a83954c8c8dd345ee391787bf \
     --hash=sha256:8d73b96a6ee7c81fd49dac7225e3846fd60b54a0b5b93a0aaea04c5a5d2e7bf2 \
