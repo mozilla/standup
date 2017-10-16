@@ -11,7 +11,10 @@ from django.http import (
 from django.utils.encoding import force_str
 from django.utils.text import slugify
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_safe
 from django.views.generic import View
+
+from soapbox.models import Message
 
 from .models import SystemToken
 from standup.status.models import Project, Status, StandupUser
@@ -68,6 +71,12 @@ class HttpResponseJSON(HttpResponse):
 
         if cors:
             self['Access-Control-Allow-Origin'] = '*'
+
+
+@require_safe
+def site_messages(request):
+    messages = [m.message for m in Message.objects.match('/api/')]
+    return HttpResponseJSON(messages, cors=True)
 
 
 class APIView(View):
