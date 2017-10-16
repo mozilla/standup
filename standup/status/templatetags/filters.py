@@ -1,6 +1,15 @@
 from urllib.parse import urlencode
 
 from django_jinja import library
+from soapbox.models import Message
+
+
+@library.global_function
+def get_messages_for_page(request):
+    if request.path_info:
+        return Message.objects.match(request.path_info)
+
+    return []
 
 
 @library.global_function
