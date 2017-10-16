@@ -70,9 +70,10 @@
             </li>
             <li>
               {% if user.is_authenticated() %}
-                <a href="{{ url('users.profile') }}" id="user-menu">{{ gravatar(user, 22) }}</a>
+                <a href="{{ user.profile.get_absolute_url() }}" id="user-menu">{{ gravatar(user, 22) }}</a>
                 <ul>
-                  <li><a href="{{ url('users.profile') }}">Profile</a></li>
+                  <li><a href="{{ user.profile.get_absolute_url() }}">My statuses</a></li>
+                  <li><a href="{{ url('users.profile') }}">Edit profile</a></li>
                   {% if user.is_staff -%}
                     <li><a href="{{ url('admin:index') }}">Admin</a></li>
                   {%- endif %}
