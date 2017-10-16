@@ -1,25 +1,3 @@
-{% macro comments(status, url='/') %}
-  {% set statuses=status.replies() %}
-  {% if statuses %}
-    <ul class="comments cf">
-      {% for status in statuses %}
-        <li class="cf">
-          {{ status.content }}
-          <div class="meta">
-            <a href="{{ status.user.get_absolute_url() }}">
-              {% if status.user.email %}{{ gravatar(status.user.email, 22) }}{% else %}{{ gravatar('None', 60) }}{% endif %}
-            </a>
-            <a href="{{ status.user.get_absolute_url() }}">{{ status.user.name }} (@{{ status.user.slug }})</a>
-            {{ status.created|dateformat('%A, {S} %B %Y at %-I:%M %p') }}
-          </div>
-        </li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <div class="notice">There are no comments.</div>
-  {% endif %}
-{% endmacro %}
-
 {% macro begin_user_statuses(status) %}
   <div class="status-block cf">
     <div class="user-meta grid_3 alpha">
@@ -55,7 +33,7 @@
         </div>
       </a>
 
-      <a href="{{ status.get_absolute_url() }}" class="comment-count">{{ status.replies()|length }}</a>
+      <a href="{{ status.get_absolute_url() }}">Status</a>
 
       {% if status.project %}
         <a class="project-name"

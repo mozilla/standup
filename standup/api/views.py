@@ -150,30 +150,19 @@ class StatusCreate(AuthenticatedAPIView):
         irc_nick = request.json_body.get('user')
         project_slug = request.json_body.get('project')
         content = request.json_body.get('content')
-        reply_to = request.json_body.get('reply_to')
         project = None
-        replied = None
 
         # Validate we have the required fields.
         if not (irc_nick and content):
             return HttpResponseBadRequest('Missing required fields.')
-
-        # If this is a reply make sure that the status being replied to
-        # exists and is not itself a reply
-        if reply_to:
-            replied = Status.objects.filter(id=reply_to).first()
-            if not replied:
-                return HttpResponseBadRequest('Status does not exist.')
-            elif replied.reply_to:
-                return HttpResponseBadRequest('Cannot reply to a reply.')
 
         # Get the user
         user = StandupUser.objects.filter(irc_nick=irc_nick).first()
         if not user:
             return HttpResponseBadRequest('User does not exist.')
 
-        # Get or create the project (but not if this is a reply)
-        if project_slug and not replied:
+        # Get or create the project
+        if project_slug:
             # This forces the slug to be slug-like.
             project_slug = slugify(project_slug)
             project = Project.objects.filter(slug=project_slug).first()
@@ -185,8 +174,6 @@ class StatusCreate(AuthenticatedAPIView):
         status = Status(user=user, content=content)
         if project_slug and project:
             status.project = project
-        if replied:
-            status.reply_to = replied
 
         status.save()
 

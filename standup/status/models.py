@@ -111,7 +111,7 @@ class Team(models.Model):
 
     def statuses(self):
         user_ids = self.users.values_list('id', flat=True)
-        return Status.objects.filter(user__pk__in=user_ids, reply_to=None)
+        return Status.objects.filter(user__pk__in=user_ids)
 
     def dictify(self):
         data = OrderedDict()
@@ -167,9 +167,6 @@ class Status(models.Model):
     user = models.ForeignKey(StandupUser, related_name='statuses')
     project = models.ForeignKey('Project', related_name='statuses', null=True, blank=True)
     content = models.TextField()
-    reply_to = models.ForeignKey(
-        'self', blank=True, null=True, default=None,
-        on_delete=models.SET_DEFAULT)
 
     class Meta:
         db_table = 'status'
@@ -187,13 +184,6 @@ class Status(models.Model):
             return reverse('status.status', kwargs={'pk': self.pk})
         except NoReverseMatch:
             return ''
-
-    def replies(self):
-        return Status.objects.filter(reply_to=self).order_by('-created')
-
-    @property
-    def reply_count(self):
-        return self.replies().count()
 
     @property
     def week_start(self):
@@ -261,12 +251,6 @@ class Status(models.Model):
 
     def dictify(self):
         """Returns an OrderedDict of model attributes"""
-        if self.reply_to:
-            reply_to_user_id = self.reply_to.user.id
-            reply_to_username = self.reply_to.user.slug
-        else:
-            reply_to_user_id = None
-            reply_to_username = None
 
         data = OrderedDict()
         data['id'] = self.id
@@ -280,10 +264,6 @@ class Status(models.Model):
         else:
             data['project'] = None
         data['content'] = self.htmlify()
-        data['reply_to_id'] = self.reply_to.id
-        data['reply_to_user_id'] = reply_to_user_id
-        data['reply_to_username'] = reply_to_username
-        data['reply_count'] = self.reply_count
 
         # FIXME: What do we need these for?
         # data['week_start'] = self.week_start.strftime("%Y-%m-%d")

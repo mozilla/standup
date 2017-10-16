@@ -61,4 +61,3 @@ class StatusFactory(factory.django.DjangoModelFactory):
     user = factory.SubFactory(StandupUserFactory)
     project = factory.SubFactory(ProjectFactory)
     content = factory.Faker('sentence')
-    reply_to = None

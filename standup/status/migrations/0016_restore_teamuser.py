@@ -19,6 +19,10 @@ def teamusercopy_to_teams(apps, schema_editor):
         print('Adding %s to team %s' % (suser.id, team.id))
 
 
+def noop(apps, schema_editor):
+    return
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -26,5 +30,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(teamusercopy_to_teams, lambda apps, schema_editor: None)
+        migrations.RunPython(teamusercopy_to_teams, noop)
     ]

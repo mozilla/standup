@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% from 'includes/macros.html' import comments, status_updates with context %}
+{% from 'includes/macros.html' import status_updates with context %}
 
 {% block title %}Status: {{ statuses[0].id }} | {{ super() }}{% endblock %}
 
@@ -8,10 +8,5 @@
 {% block content %}
   <div class="grid_12">
     {{ status_updates(statuses) }}
-  </div>
-  <div class="grid_8 prefix_4">
-    <hr>
-    <h2>Comments</h2>
-    {{ comments(statuses[0]) }}
   </div>
 {% endblock %}
