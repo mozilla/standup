@@ -51,6 +51,7 @@ INSTALLED_APPS = (
     'pipeline',
     'django_gravatar',
     'raven.contrib.django.raven_compat',
+    'soapbox',
 
     'standup.api',
     'standup.status',
