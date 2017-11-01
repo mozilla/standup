@@ -13,9 +13,9 @@ factory-boy==2.9.2 \
 python-dateutil==2.6.1 \
     --hash=sha256:95511bae634d69bc7329ba55e646499a842bc4ec342ad54a8cdb65645a0aad3c \
     --hash=sha256:891c38b2a02f5bb1be3e4793866c8df49c7d19baabf9c1bad62547e0b4866aca
-Sphinx==1.6.4 \
-    --hash=sha256:3e70eb94f7e81b47e0545ebc26b758193b6c8b222e152ded99b9c972e971c731 \
-    --hash=sha256:f101efd87fbffed8d8aca6ef307fec57693334f39d32efcbc2fc96ed129f4a3e
+Sphinx==1.6.5 \
+    --hash=sha256:fdf77f4f30d84a314c797d67fe7d1b46665e6c48a25699d7bf0610e05a2221d4 \
+    --hash=sha256:c6de5dbdbb7a0d7d2757f4389cc00e8f6eb3c49e1772378967a12cfcf2cfe098
 pbr==3.1.1 \
     --hash=sha256:60c25b7dfd054ef9bb0ae327af949dd4676aa09ac3a9471cdc871d8a9213f9ac \
     --hash=sha256:05f61c71aaefc02d8e37c0a3eeb9815ff526ea28b3b76324769e6158d7f95be1
