@@ -24,6 +24,19 @@
         You are currently signed in as <b>{{ request.user.email }}</b>.
       </p>
     {% else %}
+      <p>
+        When you sign in, sign in using the identity you used last time.
+      </p>
+      <p>
+        If you're a Mozilla employee and have an LDAP account, you need to sign
+        in using that.
+      </p>
+      <p>
+        If you accidentally create a second account on Standups, we can merge it.
+        {% if settings.HELP_FAQ_URL %}
+          See our <a href="{{ settings.HELP_FAQ_URL }}">FAQ</a> for more details.
+        {% endif %}
+      </p>
       <div class="signin-link">
         <a href="{{ url('oidc_authentication_init') }}"><button class="btn login-button">Sign in to Standup</button></a>
       </div>
