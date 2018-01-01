@@ -69,8 +69,8 @@ Unidecode==0.04.21 \
 MarkupSafe==1.0 \
     --hash=sha256:a6be69091dac236ea9c6bc7d012beab42010fa914c459791d627dad4910eb665
 django-jinja-markdown==1.0.1 --hash=sha256:233dcde5d6895416f5613e4ca030e88f18a163e4b676e7aa815d191754f53085
-Markdown==2.6.9 \
-    --hash=sha256:73af797238b95768b3a9b6fe6270e250e5c09d988b8e5b223fd5efa4e06faf81
+Markdown==2.6.10 \
+    --hash=sha256:cfa536d1ee8984007fcecc5a38a493ff05c174cb74cb2341dafd175e6bc30851
 six==1.11.0 \
     --hash=sha256:832dc0e10feb1aa2c68dcc57dbb658f1c7e65b9b61af69048abc87a2db00a0eb \
     --hash=sha256:70e8a77beed4562e7f14fe23a786b54f6296e34344c23bc42f07b15018ff98e9
