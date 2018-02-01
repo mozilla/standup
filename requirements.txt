@@ -143,9 +143,9 @@ pytz==2017.3 \
 mozilla-django-oidc==0.5.0 \
     --hash=sha256:ab6dcccf4841472c1e82244d66503e87ffae0ad7d38d6187fcca54810eceb7a6 \
     --hash=sha256:56d72b3a35cbe9b313e4ec19a01943d4ca698562476d3387c3ab30e66d33bcf8
-python-jose==1.4.0 \
-    --hash=sha256:fed56224664af0ebc3947853f1bed23b5609f90c7b02e3dce5ef5757d0301664 \
-    --hash=sha256:18e19f200f37a8ee6247921572807cc63ee034abdbf6854df1ae7c1f505cabcc
+python-jose==2.0.2 \
+    --hash=sha256:3b35cdb0e55a88581ff6d3f12de753aa459e940b50fe7ca5aa25149bc94cb37b \
+    --hash=sha256:391f860dbe274223d73dd87de25e4117bf09e8fe5f93a417663b1f2d7b591165
 pycrypto==2.6.1 \
     --hash=sha256:f2ce1e989b272cfcb677616763e0a2e7ec659effa67a88aa92b3a65528f60a3c
 ecdsa==0.13 \
