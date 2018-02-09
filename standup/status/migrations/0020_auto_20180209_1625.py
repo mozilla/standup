@@ -7,8 +7,10 @@ def fwds(apps, schema_editor):
     ContentType = apps.get_model('contenttypes', 'ContentType')
     Permission = apps.get_model('auth', 'Permission')
 
-    Permission.objects.filter(app_label='soapbox').delete()
-    ContentType.objects.filter(app_label='soapbox').delete()
+    content_types = ContentType.objects.filter(app_label='soapbox')
+    for ct in content_types:
+        Permission.objects.filter(content_type=ct).delete()
+        ct.delete()
 
 
 def bkwds(apps, schema_editor):
