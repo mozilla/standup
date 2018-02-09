@@ -2,9 +2,9 @@ import re
 from collections import OrderedDict
 
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse, NoReverseMatch
 from django.db import models
 from django.utils.timezone import now
+from django.urls import reverse, NoReverseMatch
 
 from bleach.callbacks import nofollow
 from bleach.linkifier import Linker
@@ -164,8 +164,11 @@ class Status(models.Model):
     """A standup update for a user on a given project."""
 
     created = models.DateTimeField(default=now)
-    user = models.ForeignKey(StandupUser, related_name='statuses')
-    project = models.ForeignKey('Project', related_name='statuses', null=True, blank=True)
+    user = models.ForeignKey(StandupUser, on_delete=models.CASCADE, related_name='statuses')
+    project = models.ForeignKey(
+        'Project', related_name='statuses', on_delete=models.SET_DEFAULT, default=None,
+        null=True, blank=True
+    )
     content = models.TextField()
 
     class Meta:

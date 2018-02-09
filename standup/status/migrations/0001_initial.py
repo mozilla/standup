@@ -48,10 +48,12 @@ class Migration(migrations.Migration):
                 ('created', models.DateTimeField(default=django.utils.timezone.now)),
                 ('content', models.TextField()),
                 ('content_html', models.TextField()),
-                ('project', models.ForeignKey(to='status.Project', null=True, blank=True, related_name='statuses')),
+                ('project', models.ForeignKey(to='status.Project', null=True, blank=True,
+                                              on_delete=models.SET_DEFAULT, related_name='statuses')),
                 ('reply_to', models.ForeignKey(to='status.Status', null=True, blank=True,
-                                               on_delete=django.db.models.deletion.SET_DEFAULT, default=None)),
-                ('user', models.ForeignKey(to='status.StandupUser', related_name='statuses')),
+                                               on_delete=models.SET_DEFAULT, default=None)),
+                ('user', models.ForeignKey(to='status.StandupUser', on_delete=models.SET_DEFAULT,
+                                           related_name='statuses')),
             ],
             options={
                 'db_table': 'status',
@@ -74,8 +76,8 @@ class Migration(migrations.Migration):
             name='TeamUser',
             fields=[
                 ('id', models.AutoField(serialize=False, auto_created=True, verbose_name='ID', primary_key=True)),
-                ('team', models.ForeignKey(to='status.Team')),
-                ('user', models.ForeignKey(to='status.StandupUser')),
+                ('team', models.ForeignKey(to='status.Team', on_delete=models.SET_DEFAULT)),
+                ('user', models.ForeignKey(to='status.StandupUser', on_delete=models.SET_DEFAULT)),
             ],
             options={
                 'db_table': 'team_users',
