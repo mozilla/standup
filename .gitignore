@@ -10,3 +10,4 @@ local_settings.py
 *.dump
 .cache
 node_modules
+.pytest_cache

@@ -8,11 +8,11 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.syndication.views import Feed
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.http import (HttpResponse, HttpResponseBadRequest,
                          HttpResponseForbidden, HttpResponseRedirect)
 from django.shortcuts import render
+from django.urls import reverse
 from django.utils.feedgenerator import Atom1Feed
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
@@ -30,6 +30,7 @@ from standup.status.utils import enddate, startdate
 class PaginateStatusesMixin(object):
     def paginate_statuses(self, per_page=20):
         qs = self.get_status_queryset()
+        qs = qs.all()
         page = self.request.GET.get('page')
         paginator = Paginator(qs, per_page)
         try:
@@ -130,11 +131,11 @@ class SearchView(PaginateStatusesMixin, TemplateView):
     template_name = 'status/search.html'
 
     def get_status_queryset(self):
+        obs = Status.objects.all()
         query = self.request.GET.get('query')
-        if not query:
-            return []
-
-        return Status.objects.filter(generate_query('content', query))
+        if query:
+            obs = obs.filter(generate_query('content', query))
+        return obs
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)

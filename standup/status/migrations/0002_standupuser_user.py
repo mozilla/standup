@@ -16,6 +16,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='standupuser',
             name='user',
-            field=models.OneToOneField(null=True, to=settings.AUTH_USER_MODEL, related_name='profile'),
+            field=models.OneToOneField(
+                null=True,
+                to=settings.AUTH_USER_MODEL,
+                on_delete=models.CASCADE,
+                related_name='profile'
+            ),
         ),
     ]
