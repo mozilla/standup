@@ -1,7 +1,6 @@
 from pathlib import Path
 
 from everett.manager import ConfigManager, ConfigEnvFileEnv, ConfigOSEnv, ListOf
-import dj_database_url
 import django_cache_url
 
 
@@ -132,14 +131,9 @@ WSGI_APPLICATION = 'standup.wsgi.application'
 
 
 # Database
-# https://docs.djangoproject.com/en/1.8/ref/settings/#databases
+# Set by django-heroku
 
-DATABASES = {
-    'default': config('DATABASE_URL',
-                      parser=dj_database_url.parse,
-                      default='sqlite:///db.sqlite3')
-}
-
+# Caches
 CACHES = {
     'default': config('CACHE_URL', parser=django_cache_url.parse, default='locmem:default')
 }
@@ -242,11 +236,6 @@ if CSP_REPORT_ENABLE:
     CSP_REPORT_URI = config('CSP_REPORT_URI', default='/csp-violation-capture')
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.8/howto/static-files/
-
-STATIC_ROOT = path('staticfiles')
-STATIC_URL = '/static/'
-STATICFILES_STORAGE = config('STATICFILES_STORAGE', default='standup.status.storage.StandupStorage')
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'pipeline.finders.PipelineFinder',
@@ -305,33 +294,12 @@ RAVEN_CONFIG = {
     'release': config('GIT_SHA', raise_error=False),
 }
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '[%(asctime)s] %(levelname)s %(name)s: %(message)s',
-            'datefmt': '%d/%b/%Y %H:%M:%S',
-        },
-    },
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'verbose',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': config('DJANGO_LOG_LEVEL', default='INFO'),
-        },
-        'standup': {
-            'handlers': ['console'],
-            'level': config('DJANGO_LOG_LEVEL', default='DEBUG'),
-        },
-        'mozilla_django_oidc': {
-            'handlers': ['console'],
-            'level': config('DJANGO_LOG_LEVEL', default='DEBUG'),
-        },
-    },
-}
+
+# Configure Django App for Heroku. Sets up db, logging, static files, and some
+# other things.
+import django_heroku  # noqa
+django_heroku.settings(locals(), test_runner=False, allowed_hosts=False)
+
+
+# Stomp on some STATICFILES_STORAGE setting from django-heroku
+STATICFILES_STORAGE = config('STATICFILES_STORAGE', default='standup.status.storage.StandupStorage')
