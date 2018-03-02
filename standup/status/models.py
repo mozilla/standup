@@ -2,9 +2,9 @@ import re
 from collections import OrderedDict
 
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse, NoReverseMatch
 from django.db import models
 from django.utils.timezone import now
-from django.urls import reverse, NoReverseMatch
 
 from bleach.callbacks import nofollow
 from bleach.linkifier import Linker

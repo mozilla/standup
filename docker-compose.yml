@@ -3,8 +3,6 @@ version: "2"
 services:
   db:
     image: postgres:9.4
-    ports:
-      - "8574:5432"
 
   # run the site with the django dev-server
   web:
