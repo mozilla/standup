@@ -1,6 +1,6 @@
 import json
 
-from django.urls import reverse
+from django.core.urlresolvers import reverse
 from django.utils.encoding import force_bytes
 from django.test import Client, TestCase
 

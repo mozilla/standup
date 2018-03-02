@@ -1,5 +1,5 @@
+from django.conf.urls import include, url
 from django.contrib import admin
-from django.urls import include, path
 
 from django_jinja import views
 
@@ -11,9 +11,9 @@ handler404 = views.PageNotFound.as_view()
 handler500 = views.ServerError.as_view()
 
 urlpatterns = [
-    path('api/', include('standup.api.urls')),
-    path('admin/', admin.site.urls),
-    path('', include('standup.status.urls')),
+    url('^api/', include('standup.api.urls')),
+    url('^admin/', include(admin.site.urls)),
+    url('', include('standup.status.urls')),
 
-    path('oidc/', include('mozilla_django_oidc.urls')),
+    url('^oidc/', include('mozilla_django_oidc.urls')),
 ]
