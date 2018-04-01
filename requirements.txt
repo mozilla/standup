@@ -94,8 +94,8 @@ raven==6.6.0 \
 contextlib2==0.5.5 \
     --hash=sha256:f5260a6e679d2ff42ec91ec5252f4eeffdcf21053db9113bd0a8e4d953769c00 \
     --hash=sha256:509f9419ee91cdd00ba34443217d5ca51f5a364a404e1dce9e8979cea969ca48
-newrelic==2.106.0.87 \
-    --hash=sha256:8f66edadcf8db74836fa804fcdd19d3fcfe9e080a8db411af34f2a9148e29eac
+newrelic==3.0.0.89 \
+    --hash=sha256:fe010adbbaf16ac18583e5b8601e8c2811c7901b5f03a33ef065fb1b2f565444
 django-cache-url==2.0.0 \
     --hash=sha256:d7e7d3f3fadaa38ab7c655afafc85c2a1b06a3ddc0002af4ae021c1948307f8b \
     --hash=sha256:f0009452c4d63468714c7ff59266085947f3f3cc0947b3b2e87121bb27538d6c
