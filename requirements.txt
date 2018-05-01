@@ -210,9 +210,9 @@ cffi==1.11.5 \
 asn1crypto==0.24.0 \
     --hash=sha256:2f1adbb7546ed199e3c90ef23ec95c5cf3585bac7d11fb7eb562a3fe89c64e87 \
     --hash=sha256:9d5c20441baf0cb60a4ac34cc447c6c189024b6b4c6cd7877034f4965c464e49
-josepy==1.0.1 \
-    --hash=sha256:354a3513038a38bbcd27c97b7c68a8f3dfaff0a135b20a92c6db4cc4ea72915e \
-    --hash=sha256:9f48b88ca37f0244238b1cc77723989f7c54f7b90b2eee6294390bacfe870acc
+josepy==1.1.0 \
+    --hash=sha256:1309a25aac3caeff5239729c58ff9b583f7d022ffdb1553406ddfc8e5b52b76e \
+    --hash=sha256:fb5c62c77d26e04df29cb5ecd01b9ce69b6fcc9e521eb1ca193b7faa2afa7086
 pycparser==2.18 \
     --hash=sha256:99a8ca03e29851d96616ad0404b4aad7d9ee16f25c9f9708a11faf2810f7b226
 pyOpenSSL==17.5.0 \
