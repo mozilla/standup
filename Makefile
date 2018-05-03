@@ -1,7 +1,7 @@
-DOCKERCOMPOSE = $(shell which docker-compose)
+DC = $(shell which docker-compose)
 PG_DUMP_FILE ?= standup.dump
 SERVER_URL ?= "http://web:8000"
-CURRENT_USER := $(shell id -u)
+HOSTUSER := $(shell id -u)
 
 default: help
 	@echo ""
@@ -21,28 +21,29 @@ help:
 	@echo "build-base    - (re)build base docker image"
 	@echo "docs          - generate Sphinx HTML documentation, including API docs"
 
-.docker-build-base:
-	${MAKE} build-base
+.env:
+	@if [ ! -f .env ]; then \
+		echo "Copying .env-dist to .env..."; \
+		cp .env-dist .env; \
+	fi
 
 .docker-build:
 	${MAKE} build
 
-build-base:
-	${DOCKERCOMPOSE} -f docker-compose.build.yml build --pull base
-	-rm -f .docker-build
-	touch .docker-build-base
-
-build: .docker-build-base
-	${DOCKERCOMPOSE} -f docker-compose.build.yml build web
+build: .env
+	USERID=${HOSTUSER} ${DC} pull prod assets
+	USERID=${HOSTUSER} ${DC} build prod
+	USERID=${HOSTUSER} ${DC} build assets
+	USERID=${HOSTUSER} ${DC} build app
 	touch .docker-build
 
 rebuild: clean .docker-build
 
 run: .docker-build
-	${DOCKERCOMPOSE} up web
+	USERID=${HOSTUSER} ${DC} up assets app
 
 shell: .docker-build
-	${DOCKERCOMPOSE} run web python manage.py shell
+	USERID=${HOSTUSER} ${DC} run app python manage.py shell
 
 restore-db: .docker-build
 	./bin/restoredb.sh ${PG_DUMP_FILE}
@@ -64,23 +65,27 @@ clean:
 	# docs files
 	-rm -rf docs/_build/
 
+	# static files
+	-rm -rf static_build/
+	-rm -rf staticfiles/
+
 	# state files
 	-rm -f .docker-build*
 
 lint: .docker-build
-	${DOCKERCOMPOSE} run test flake8 --statistics collector
+	USERID=${HOSTUSER} ${DC} run test flake8 --statistics collector
 
 test: .docker-build
-	${DOCKERCOMPOSE} run test
+	USERID=${HOSTUSER} ${DC} run test
 
 test-image: .docker-build
-	${DOCKERCOMPOSE} run test-image
+	USERID=${HOSTUSER} ${DC} run test-image
 
 test-smoketest: .docker-build
-	${DOCKERCOMPOSE} run -e SERVER_URL=${SERVER_URL} test python tests/smoketest.py
+	USERID=${HOSTUSER} ${DC} run -e SERVER_URL=${SERVER_URL} test python tests/smoketest.py
 
 docs: .docker-build
-	${DOCKERCOMPOSE} run web $(MAKE) -C docs/ clean
-	${DOCKERCOMPOSE} run web $(MAKE) -C docs/ html
+	USERID=${HOSTUSER} ${DC} run app $(MAKE) -C docs/ clean
+	USERID=${HOSTUSER} ${DC} run app $(MAKE) -C docs/ html
 
-.PHONY: default clean build-base build docs lint run shell test test-image test-smoketest restore-db rebuild
+.PHONY: default clean build docs lint run shell test test-image test-smoketest restore-db rebuild

@@ -7,11 +7,12 @@
   <meta name="description" content="Daily standup updates for your projects.">
   {% block more_meta %}{% endblock %}
   <link rel="icon" type="image/png" href="{{ static('img/favicon.png') }}" />
-  {% stylesheet 'common' %}
+  <link href="{{ static('css/normalize.css') }}" rel="stylesheet" type="text/css" />
+  <link href="{{ static('css/style.css') }}" rel="stylesheet" type="text/css" />
   {% block more_styles %}{% endblock %}
   <link rel="alternate" type="application/atom+xml" href="{{ url('status.index_feed') }}" title="{{ settings.SITE_TITLE }} Feed" />
   {% block atom_feed %}{% endblock atom_feed %}
-  {% javascript 'modernizr' %}
+  <script type="text/javascript" src="{{ static('js/vendor/modernizr-2.6.1.js') }}" charset="utf-8"></script>
 </head>
 <body>
   <div class="page">
@@ -140,7 +141,8 @@
     </form>
   {% endif %}
   {% block javascript %}
-    {% javascript 'common' %}
+    <script type="text/javascript" src="{{ static('js/vendor/jquery-3.1.0.js') }}" charset="utf-8"></script>
+    <script type="text/javascript" src="{{ static('js/standup.js') }}" charset="utf-8"></script>
   {% endblock %}
 </body>
 </html>

@@ -21,7 +21,7 @@ fi
 DOCKER_TAG="$DOCKER_REGISTRY/$HEROKU_APP/$HEROKU_PROC_TYPE"
 echo "Pushing $DOCKER_TAG"
 docker login -u "$HEROKU_EMAIL" -p "$HEROKU_API_KEY" "$DOCKER_REGISTRY"
-docker tag local/standup_base "$DOCKER_TAG"
+docker tag mozmeao/standup:latest "$DOCKER_TAG"
 docker push "$DOCKER_TAG"
 
 if [[ "$1" == "prod" && -n "$NEWRELIC_API_KEY" ]]; then
@@ -30,4 +30,15 @@ if [[ "$1" == "prod" && -n "$NEWRELIC_API_KEY" ]]; then
        -d "deployment[revision]=$TRAVIS_COMMIT" \
        -d "deployment[user]=Travis-CI" \
        https://api.newrelic.com/deployments.xml
+
+  if [[ -n "$DOCKER_HUB_USER" ]]; then
+    # push to docker hub for better cache for local dev and deployment
+    docker login -u "$DOCKER_HUB_USER" -p "$DOCKER_HUB_PASS"
+    docker push mozmeao/standup:latest
+    docker tag mozmeao/standup:latest "mozmeao/standup:$TRAVIS_COMMIT"
+    docker push "mozmeao/standup:$TRAVIS_COMMIT"
+    docker push mozmeao/standup_assets:latest
+    docker tag mozmeao/standup_assets:latest "mozmeao/standup_assets:$TRAVIS_COMMIT"
+    docker push "mozmeao/standup_assets:$TRAVIS_COMMIT"
+  fi
 fi

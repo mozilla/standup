@@ -7,7 +7,7 @@
 {% endif %}
 
 {% block more_styles %}
-  {% stylesheet 'user' %}
+  <link href="{{ static('css/user.css') }}" rel="stylesheet" type="text/css" />
 {% endblock %}
 
 {% block title %}{{ title }} | {{ super() }}{% endblock %}

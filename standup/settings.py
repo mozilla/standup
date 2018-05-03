@@ -47,7 +47,6 @@ INSTALLED_APPS = (
     'django_jinja.contrib._humanize',
     'django_jinja_markdown',
     'mozilla_django_oidc',
-    'pipeline',
     'django_gravatar',
     'raven.contrib.django.raven_compat',
 
@@ -106,7 +105,6 @@ TEMPLATES = [
                 'jinja2.ext.loopcontrols',
                 'jinja2.ext.with_',
                 'jinja2.ext.autoescape',
-                'pipeline.jinja2.PipelineExtension',
                 'django_gravatar.jinja2.GravatarExtension',
                 'django_jinja.builtins.extensions.CsrfExtension',
                 'django_jinja.builtins.extensions.DjangoFiltersExtension',
@@ -230,6 +228,8 @@ CSP_FRAME_SRC = (
 CSP_FRAME_ANCESTORS = (
     '*.mozilla.org',
 )
+if DEBUG:
+    CSP_SCRIPT_SRC += ("'unsafe-inline'",)
 CSP_REPORT_ONLY = config('CSP_REPORT_ONLY', default='false', parser=bool)
 CSP_REPORT_ENABLE = config('CSP_REPORT_ENABLE', default='false', parser=bool)
 if CSP_REPORT_ENABLE:
@@ -238,62 +238,17 @@ if CSP_REPORT_ENABLE:
 # Static files (CSS, JavaScript, Images)
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'pipeline.finders.PipelineFinder',
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+)
+STATICFILES_DIRS = (
+    path('static_build'),
 )
 WHITENOISE_ROOT = path('root_files')
-
-PIPELINE = {
-    'STYLESHEETS': {
-        'common': {
-            'source_filenames': (
-                'css/normalize.css',
-                'less/style.less',
-            ),
-            'output_filename': 'css/common.min.css',
-        },
-        'user': {
-            'source_filenames': (
-                'less/user.less',
-            ),
-            'output_filename': 'css/user.min.css',
-        },
-    },
-    'JAVASCRIPT': {
-        'common': {
-            'source_filenames': (
-                'js/vendor/jquery-3.1.0.js',
-                'js/standup.js',
-            ),
-            'output_filename': 'js/common.min.js',
-        },
-        'modernizr': {
-            'source_filenames': (
-                'js/vendor/modernizr-2.6.1.js',
-            ),
-            'output_filename': 'js/modernizr.min.js',
-        },
-    },
-    'DISABLE_WRAPPER': True,
-    'SHOW_ERRORS_INLINE': False,
-    'COMPILERS': (
-        'pipeline.compilers.less.LessCompiler',
-    ),
-    'LESS_BINARY': config('PIPELINE_LESS_BINARY',
-                          default=path('node_modules', '.bin', 'lessc')),
-    # 'LESS_ARGUMENTS': config('PIPELINE_LESS_ARGUMENTS', default='-s'),
-    'JS_COMPRESSOR': 'pipeline.compressors.uglifyjs.UglifyJSCompressor',
-    'CSS_COMPRESSOR': 'standup.pipeline.CleanCSSCompressor',
-    'CLEANCSS_BINARY': config('PIPELINE_CLEANCSS_BINARY',
-                              default=path('node_modules', '.bin', 'cleancss')),
-    'UGLIFYJS_BINARY': config('PIPELINE_UGLIFYJS_BINARY',
-                              default=path('node_modules', '.bin', 'uglifyjs')),
-}
 
 RAVEN_CONFIG = {
     'dsn': config('SENTRY_DSN', raise_error=False),
     'release': config('GIT_SHA', raise_error=False),
 }
-
 
 # Configure Django App for Heroku. Sets up db, logging, static files, and some
 # other things.
@@ -302,4 +257,6 @@ django_heroku.settings(locals(), test_runner=False, allowed_hosts=False)
 
 
 # Stomp on some STATICFILES_STORAGE setting from django-heroku
-STATICFILES_STORAGE = config('STATICFILES_STORAGE', default='standup.status.storage.StandupStorage')
+DEFAULT_SF_STORAGE = ('django.contrib.staticfiles.storage.StaticFilesStorage' if DEBUG else
+                      'whitenoise.storage.CompressedManifestStaticFilesStorage')
+STATICFILES_STORAGE = config('STATICFILES_STORAGE', default=DEFAULT_SF_STORAGE)

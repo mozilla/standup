@@ -11,3 +11,4 @@ local_settings.py
 .cache
 node_modules
 .pytest_cache
+static_build

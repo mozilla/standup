@@ -7,8 +7,9 @@
     <title>{{ title }}</title>
     <meta name="description" content="Daily standup updates for your projects.">
     <link rel="icon" type="image/png" href="{{ static('img/favicon.png') }}" />
-    {% stylesheet 'common' %}
-    {% javascript 'modernizr' %}
+    <link href="{{ static('css/normalize.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ static('css/style.css') }}" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="{{ static('js/vendor/modernizr-2.6.1.js') }}" charset="utf-8"></script>
   </head>
   <body>
     <div class="page">
@@ -57,6 +58,7 @@
         </div>
       </footer>
     </div>
-    {% javascript 'common' %}
+    <script type="text/javascript" src="{{ static('js/vendor/jquery-3.1.0.js') }}" charset="utf-8"></script>
+    <script type="text/javascript" src="{{ static('js/standup.js') }}" charset="utf-8"></script>
   </body>
 </html>

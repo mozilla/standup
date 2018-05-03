@@ -1,6 +1,0 @@
-FROM local/standup_base
-
-RUN apk add --update --no-cache nodejs
-
-COPY package.json ./
-RUN npm install -g
