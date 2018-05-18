@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.conf.urls import url
 
 from . import views
@@ -26,7 +25,6 @@ urlpatterns = [
     url('^user/%s.xml$' % SLUG_RE, views.UserFeed(), name='status.user_feed'),
     url('^team/%s.xml$' % SLUG_RE, views.TeamFeed(), name='status.team_feed'),
     url('^project/%s.xml$' % SLUG_RE, views.ProjectFeed(), name='status.project_feed'),
-    url('^statistics/$', views.statistics, name='status.statistics'),
 
     # csp
     url('^csp-violation-capture$', views.csp_violation_capture),
@@ -34,7 +32,3 @@ urlpatterns = [
     # robots
     url('^robots\\.txt$', views.robots_txt),
 ]
-
-if getattr(settings, 'SITE_TITLE', '').endswith('-stage'):
-    # This is for debugging, so we only want it running in dev and in stage environments.
-    urlpatterns.append(url('^errormenow$', views.errormenow))

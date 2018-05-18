@@ -11,6 +11,8 @@ handler404 = views.PageNotFound.as_view()
 handler500 = views.ServerError.as_view()
 
 urlpatterns = [
+    url('^admin/', include('standup.manage.urls')),
+
     url('^api/', include('standup.api.urls')),
     url('^admin/', include(admin.site.urls)),
     url('', include('standup.status.urls')),
