@@ -36,7 +36,6 @@ SITE_TITLE = config('SITE_TITLE', default='Standup')
 # Application definition
 
 INSTALLED_APPS = (
-    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -51,7 +50,10 @@ INSTALLED_APPS = (
     'raven.contrib.django.raven_compat',
 
     'standup.api',
+    'standup.manage',
     'standup.status',
+
+    'django.contrib.admin',
 )
 
 MIDDLEWARE_CLASSES = (

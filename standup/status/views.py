@@ -1,6 +1,3 @@
-import collections
-import datetime
-import gc
 import json
 import logging
 
@@ -12,13 +9,11 @@ from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.http import (HttpResponse, HttpResponseBadRequest,
                          HttpResponseForbidden, HttpResponseRedirect)
-from django.shortcuts import render
 from django.utils.feedgenerator import Atom1Feed
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.views.generic import DetailView, TemplateView, UpdateView
 
-import pytz
 from raven.contrib.django.models import client
 
 from standup.status.forms import StatusizeForm, ProfileForm
@@ -298,40 +293,3 @@ def robots_txt(request):
         content = 'User-agent: *\nDisallow: /'
 
     return HttpResponse(content, content_type='text/plain')
-
-
-def errormenow(request):
-    # This is an intentional error designed to kick up the error page because otherwise it's
-    # difficult to test.
-    1 / 0  # noqa
-
-
-def statistics(request):
-    """Show health statistics for the system"""
-    hours_24 = datetime.datetime.now(tz=pytz.UTC) - datetime.timedelta(hours=24)
-    week = datetime.datetime.now(tz=pytz.UTC) - datetime.timedelta(days=7)
-
-    groups = collections.OrderedDict()
-
-    groups['Standup users'] = collections.OrderedDict([
-        ('Team count', Team.objects.count()),
-        ('User count', StandupUser.objects.count()),
-        ('New users in last 24 hours', StandupUser.objects.filter(user__date_joined__gte=hours_24).count()),
-        ('Active users (posted in last week)',
-         StandupUser.objects.filter(id__in=Status.objects.filter(created__gte=week).values('user__id')).count()),
-
-    ])
-
-    groups['Standup status'] = collections.OrderedDict([
-        ('Status count', Status.objects.count()),
-        ('Status in last 24 hours', Status.objects.filter(created__gte=hours_24).count()),
-        ('Status in last week', Status.objects.filter(created__gte=week).count()),
-    ])
-
-    groups['Infra'] = collections.OrderedDict([
-        ('Objects count', len(gc.get_objects())),
-    ])
-
-    return render(request, 'status/statistics.html', {
-        'statsitems': groups,
-    })
