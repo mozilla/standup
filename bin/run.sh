@@ -7,6 +7,8 @@ USERID="${USERID:-0}"
 if [[ "$USERID" == "0" ]]; then
     exec "bin/run-${SERVER_MODE}.sh"
 else
-    adduser --uid "$USERID" --disabled-password --gecos '' --no-create-home webdev
+    if ! id webdev >/dev/null 2>&1; then
+        adduser --uid "$USERID" --disabled-password --gecos '' --no-create-home webdev
+    fi
     gosu webdev "bin/run-${SERVER_MODE}.sh"
 fi

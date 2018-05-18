@@ -15,13 +15,13 @@ services:
       target: assets
     image: mozmeao/standup_assets:latest
     ports:
-      - "3000:3000"
-      - "3001:3001"
+      - "8000:8000"
+      - "8001:8001"
     volumes:
       - ./static/:/app/static:cached
       - ./standup/:/app/standup:cached
     environment:
-      BS_PROXY_URL: "app:8000"
+      BS_PROXY_URL: "app:3000"
       BS_OPEN_BROWSER: "false"
     command: npm run docker-start
 
@@ -36,13 +36,13 @@ services:
     environment:
       - DATABASE_URL=postgres://postgres@db/postgres
       - DEBUG=True
-      - ALLOWED_HOSTS=localhost,127.0.0.1,app
+      - ALLOWED_HOSTS=localhost,127.0.0.1
       - SECRET_KEY=itsasekrit
       - USERID=${USERID:-1000}
     depends_on:
       - db
     ports:
-      - "8000:8000"
+      - "3000:3000"
     volumes:
       - .:/app
 
