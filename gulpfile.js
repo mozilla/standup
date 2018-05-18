@@ -9,7 +9,7 @@ const cleanCSS = require('gulp-clean-css');
 const uglify = require('gulp-uglify');
 const sourcemaps = require('gulp-sourcemaps');
 const argv = require('yargs').argv;
-const browserSync = require('browser-sync');
+const browserSync = require('browser-sync').create();
 const del = require('del');
 
 const handleError = task => {
@@ -70,11 +70,24 @@ gulp.task('js:minify', ['assets'], () => {
  * Start the browser-sync daemon for local development.
  */
 gulp.task('browser-sync', ['assets', 'less'], () => {
-    const proxyURL = process.env.BS_PROXY_URL || 'localhost:8000';
+    const proxyURL = process.env.BS_PROXY_URL || 'localhost:3000';
     const openBrowser = !(process.env.BS_OPEN_BROWSER === 'false');
-    browserSync({
-        proxy: proxyURL,
+    return browserSync.init({
+        port: 8000,
         open: openBrowser,
+        notify: true,
+        reloadDelay: 300,
+        reloadDebounce: 500,
+        injectChanges: false,
+        proxy: {
+            target: proxyURL,
+            proxyOptions: {
+                changeOrigin: false
+            }
+        },
+        ui: {
+            port: 8001
+        },
         serveStatic: [{
             route: '/static',
             dir: buildDir
