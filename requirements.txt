@@ -76,9 +76,9 @@ html5lib==1.0.1 \
     --hash=sha256:66cb0dcfdbbc4f9c3ba1a63fdb511ffdbd4f513b2b6d81b80cd26ce6b3fb3736
 https://github.com/pmac/django-gravatar/archive/5f88e14fb6dd3134a46e2a961ab2782591e85f28.tar.gz#egg=django-gravatar2==1.4.0 \
     --hash=sha256:45ff4567de125c16b718c1b1829a2e000e6f7901149e0a05a1f65cdc3076aa62
-PyJWT==1.6.1 \
-    --hash=sha256:bca523ef95586d3a8a5be2da766fe6f82754acba27689c984e28e77a12174593 \
-    --hash=sha256:dacba5786fe3bf1a0ae8673874e29f9ac497860955c501289c63b15d3daae63a
+PyJWT==1.6.4 \
+    --hash=sha256:30b1380ff43b55441283cc2b2676b755cca45693ae3097325dea01f3d110628c \
+    --hash=sha256:4ee413b357d53fd3fb44704577afac88e72e878716116270d722723d65b42176
 defusedxml==0.5.0 \
     --hash=sha256:702a91ade2968a82beb0db1e0766a6a273f33d4616a6ce8cde475d8e09853b20 \
     --hash=sha256:24d7f2f94f7f3cb6061acb215685e5125fbcdc40a857eff9de22518820b0a4f4
