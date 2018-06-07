@@ -92,15 +92,11 @@
 
   <div id="main-content" class="container_12 cf">
     <div id="main-notices" class="grid_12">
-      {# FIXME(willkg): hard-coded messages #}
-        <div class="notice success">
-          We've switched the way we use Auth0. If you have problems, see
-          <a href="https://wiki.mozilla.org/Standup">our FAQ</a>.
-        </div>
-      {# ENDFIXME #}
       {% if messages %}
-        {% for message in messages %}
-          <div class="notice {{ message.tags }}">{{ message }}</div>
+        {% for msg in messages %}
+          <div class="notice success">
+            {{ msg.created|dateformat('%c') }}: {{ msg.message|safe }}
+          </div>
         {% endfor %}
       {% endif %}
     </div>

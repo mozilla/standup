@@ -1,6 +1,12 @@
 from django.contrib import admin
 
-from standup.status.models import Project, Team, StandupUser, Status
+from standup.status.models import (
+    Project,
+    SiteMessage,
+    StandupUser,
+    Status,
+    Team,
+)
 
 
 @admin.register(Project)
@@ -29,3 +35,9 @@ class StandupUserAdmin(admin.ModelAdmin):
 class StatusAdmin(admin.ModelAdmin):
     list_display = ['id', 'user', 'project', 'content']
     search_fields = ['content']
+
+
+@admin.register(SiteMessage)
+class SiteMessageAdmin(admin.ModelAdmin):
+    fields = ['message', 'enabled', 'created']
+    readonly_fields = ['created']
