@@ -27,5 +27,5 @@ ${DC} exec db createdb -h localhost -U postgres -w postgres
 
 cat ${FILENAME} | ${DOCKER} exec -i ${cid} pg_restore -d "postgres://postgres@localhost/postgres"
 
-${DC} run web python manage.py migrate --fake-initial
-${DC} run web python manage.py createsuperuser
+${DC} run app python manage.py migrate --fake-initial
+${DC} run app python manage.py createsuperuser

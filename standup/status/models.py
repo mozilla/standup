@@ -4,7 +4,7 @@ from collections import OrderedDict
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.db import models
-from django.utils.timezone import now
+from django.utils import timezone
 
 from bleach.callbacks import nofollow
 from bleach.linkifier import Linker
@@ -163,7 +163,7 @@ class Project(models.Model):
 class Status(models.Model):
     """A standup update for a user on a given project."""
 
-    created = models.DateTimeField(default=now)
+    created = models.DateTimeField(default=timezone.now)
     user = models.ForeignKey(StandupUser, on_delete=models.CASCADE, related_name='statuses')
     project = models.ForeignKey(
         'Project', related_name='statuses', on_delete=models.SET_DEFAULT, default=None,
@@ -273,3 +273,18 @@ class Status(models.Model):
         # data['week_end'] = self.week_end.strftime("%Y-%m-%d")
 
         return data
+
+
+class SiteMessage(models.Model):
+    """Messages shown on all pages on the site"""
+    message = models.TextField(
+        help_text='Site message'
+    )
+    enabled = models.BooleanField(
+        default=True,
+        help_text='Whether or not this message is enabled'
+    )
+    created = models.DateTimeField(
+        default=timezone.now,
+        help_text='When this message was created'
+    )
