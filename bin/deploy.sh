@@ -24,6 +24,14 @@ docker login -u "$HEROKU_EMAIL" -p "$HEROKU_API_KEY" "$DOCKER_REGISTRY"
 docker tag mozmeao/standup:latest "$DOCKER_TAG"
 docker push "$DOCKER_TAG"
 
+# do Heroku release
+DOCKER_IMAGE_ID=$(docker inspect "$DOCKER_TAG" --format={{.Id}})
+curl -n -X PATCH https://api.heroku.com/apps/${HEROKU_APP}/formation \
+  -d "{\"updates\": [{\"type\": \"web\", \"docker_image\": \"${DOCKER_IMAGE_ID}\"}]}" \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/vnd.heroku+json; version=3.docker-releases" \
+  -H "Authorization: Bearer ${HEROKU_API_KEY}"
+
 if [[ "$1" == "prod" && -n "$NEWRELIC_API_KEY" ]]; then
   curl -H "x-api-key:$NEWRELIC_API_KEY" \
        -d "deployment[app_name]=$NEWRELIC_APP_NAME" \
