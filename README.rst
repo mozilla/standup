@@ -28,6 +28,24 @@ elite group of us rewrote it in Django.
 This is Standup v2--a Django rewrite of the original.
 
 
+Who builds Standups
+===================
+
+Standups development is done by contributors (including you!). No one is
+paid to work on it. It's not part of anyone's quarterly goals.
+
+If there are changes you need, your options are these:
+
+1. Implement/fix it yourself.
+2. Find someone else to do it.
+
+You can see a `summary of project activity
+<https://github.com/mozilla/standup/pulse>`_.
+
+The Standups service is maintained by Paul and Will. Swag donations are
+encouraged and welcome!
+
+
 Hacking
 =======
 
