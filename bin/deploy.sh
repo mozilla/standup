@@ -40,8 +40,9 @@ if [[ "$1" == "prod" && -n "$NEWRELIC_API_KEY" ]]; then
        https://api.newrelic.com/deployments.xml
 
   if [[ -n "$DOCKER_HUB_USER" ]]; then
+    docker logout || true
     # push to docker hub for better cache for local dev and deployment
-    docker login -u "$DOCKER_HUB_USER" -p "$DOCKER_HUB_PASS" registry.hub.docker.com
+    docker login -u "$DOCKER_HUB_USER" -p "$DOCKER_HUB_PASS"
     docker push mozmeao/standup:latest
     docker tag mozmeao/standup:latest "mozmeao/standup:$TRAVIS_COMMIT"
     docker push "mozmeao/standup:$TRAVIS_COMMIT"
