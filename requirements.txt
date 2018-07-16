@@ -44,9 +44,9 @@ dj-database-url==0.5.0 \
     --hash=sha256:4aeaeb1f573c74835b0686a2b46b85990571159ffc21aa57ecd4d1e1cb334163
 
 # base
-Django==1.11.12 \
-    --hash=sha256:056fe5b9e1f8f7fed9bb392919d64f6b33b3a71cfb0f170a90ee277a6ed32bc2 \
-    --hash=sha256:4d398c7b02761e234bbde490aea13ea94cb539ceeb72805b72303f348682f2eb # pyup:ignore
+Django==1.11.14 \
+    --hash=sha256:b7f77c0d168de4c4ad30a02ae31b9dca04fb3c10472f04918d5c02b4117bba68 \
+    --hash=sha256:eb9271f0874f53106a2719c0c35ce67631f6cc27cf81a60c6f8c9817b35a3f6e
 bleach==2.1.3 \
     --hash=sha256:eb7386f632349d10d9ce9d4a838b134d4731571851149f9cc2c05a9a837a9a44 \
     --hash=sha256:b8fa79e91f96c2c2cd9fd1f9eda906efb1b88b483048978ba62fef680e962b34
@@ -252,9 +252,11 @@ pycryptodome==3.6.3 \
 sqlparse==0.2.4 \
     --hash=sha256:d9cf190f51cbb26da0412247dfe4fb5f4098edb73db84e02f9fc21fdca31fed4 \
     --hash=sha256:ce028444cfab83be538752a2ffdb56bc417b7784ff35bb9a3062413717807dec
+# NOTE(willkg): django-heroku needs to stay at this version until it supports
+# configuring ssl when doing development
 django-heroku==0.2.0 \
     --hash=sha256:4aab3590e16e5f5989427e491e183397e148c1ce02d95078b60e8a60e1327bb8 \
-    --hash=sha256:e60a80363981fa8b3230e9b97d921a49964c08bdc081f8c4245cb639263471b8 # pyup:ignore
+    --hash=sha256:e60a80363981fa8b3230e9b97d921a49964c08bdc081f8c4245cb639263471b8
 rsa==3.4.2 \
     --hash=sha256:25df4e10c263fb88b5ace923dd84bf9aa7f5019687b5e55382ffcdb8bede9db5 \
     --hash=sha256:43f682fea81c452c98d09fc316aae12de6d30c4b5c84226642cf8f8fd1c93abd
