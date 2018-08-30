@@ -23,6 +23,7 @@ urlpatterns = [
     # feeds
     url('^statuses.xml$', views.MainFeed(), name='status.index_feed'),
     url('^user/%s.xml$' % SLUG_RE, views.UserFeed(), name='status.user_feed'),
+    url('^user/%s.json$' % SLUG_RE, views.UserFeedJSON.as_view(), name='status.user_feed'),
     url('^team/%s.xml$' % SLUG_RE, views.TeamFeed(), name='status.team_feed'),
     url('^project/%s.xml$' % SLUG_RE, views.ProjectFeed(), name='status.project_feed'),
 

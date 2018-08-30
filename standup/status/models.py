@@ -252,16 +252,17 @@ class Status(models.Model):
         formatted = LINKER.linkify(formatted)
         return Markup(formatted)
 
-    def dictify(self):
+    def dictify(self, include_user=True):
         """Returns an OrderedDict of model attributes"""
 
         data = OrderedDict()
         data['id'] = self.id
         data['created'] = self.created.isoformat()
-        if self.user:
-            data['user'] = self.user.dictify()
-        else:
-            data['user'] = None
+        if include_user:
+            if self.user:
+                data['user'] = self.user.dictify()
+            else:
+                data['user'] = None
         if self.project:
             data['project'] = self.project.dictify()
         else:

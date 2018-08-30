@@ -13,6 +13,7 @@ from django.utils.feedgenerator import Atom1Feed
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.views.generic import DetailView, TemplateView, UpdateView
+from django.views.generic.detail import BaseDetailView
 
 from raven.contrib.django.models import client
 
@@ -250,6 +251,17 @@ class TeamFeed(StatusesFeed):
 
     def items(self, obj):
         return obj.statuses().select_related('project', 'user')[:self.feed_limit]
+
+
+class UserFeedJSON(BaseDetailView):
+    content_type = 'application/json'
+    model = StandupUser
+
+    def render_to_response(self, context):
+        user = context['object']
+        statuses = user.statuses.select_related('project').all()
+        statuses = json.dumps([s.dictify(False) for s in statuses])
+        return HttpResponse(statuses, content_type=self.content_type)
 
 
 # RANDOM STUFF
