@@ -3,10 +3,6 @@ services:
   - postgres
 env:
   global:
-    - DOCKER_REGISTRY=registry.heroku.com
-    - HEROKU_PROD_APP=standups
-    - HEROKU_STAGE_APP=standupstage
-    - HEROKU_PROC_TYPE=web
     - DATABASE_URL=postgres://postgres:@localhost/standup
 before_install:
   - docker -v
@@ -16,16 +12,5 @@ before_script:
   - psql -c 'create database standup;' -U postgres
 script:
   - make test-image
-deploy:
-  - provider: script
-    script: bin/deploy.sh stage
-    on:
-      branch: master
-      repo: mozilla/standup
-  - provider: script
-    script: bin/deploy.sh prod
-    on:
-      tags: true
-      repo: mozilla/standup
 notifications:
   irc: "irc.mozilla.org#standup"
